@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import Link from "next/link";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -38,36 +39,44 @@ export default async function DashboardPage() {
 
         <div className="grid gap-5 md:grid-cols-3">
           {rooms?.map((room) => (
-            <div
-              key={room.id}
-              className="rounded-2xl bg-white p-6 shadow-sm"
+            <Link
+                key={room.id}
+                href={`/rooms/${room.room_code}`}
+                className="block rounded-2xl bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
             >
-              <h2 className="text-2xl font-semibold">
-                ห้อง {room.room_code}
-              </h2>
+                <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-semibold">
+                    ห้อง {room.room_code}
+                </h2>
 
-              <div className="mt-5 space-y-2 text-gray-600">
+                <span className="text-gray-400">→</span>
+                </div>
+
+                <div className="mt-5 space-y-2 text-gray-600">
                 <p>
-                  ค่าเช่า{" "}
-                  <strong>
-                    {Number(room.monthly_rent).toLocaleString()}
-                  </strong>{" "}
-                  บาท
+                    ค่าเช่า{" "}
+                    <strong>
+                    {Number(room.monthly_rent).toLocaleString()} บาท
+                    </strong>
                 </p>
 
                 <p>
-                  ผู้พัก{" "}
-                  <strong>{room.occupant_count}</strong>{" "}
-                  คน
+                    ผู้พัก <strong>{room.occupant_count} คน</strong>
                 </p>
 
                 <p>
-                  สถานะ{" "}
-                  <strong>{room.status}</strong>
+                    สถานะ{" "}
+                    <strong>
+                    {room.status === "occupied" ? "มีผู้เช่า" : "ว่าง"}
+                    </strong>
                 </p>
-              </div>
-            </div>
-          ))}
+                </div>
+
+                <div className="mt-5 border-t pt-4 text-sm font-medium">
+                ดูรายละเอียดห้อง →
+                </div>
+            </Link>
+            ))}
         </div>
       </div>
     </main>
