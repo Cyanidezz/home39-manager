@@ -31,7 +31,7 @@ const navigation = [
     active: (path: string) => path.startsWith("/expenses"),
   },
   {
-    label: "บัญชีรับโอน",
+    label: "บัญชีโอนเงิน",
     href: "/settings/payment",
     icon: "⚙",
     active: (path: string) => path.startsWith("/settings"),
