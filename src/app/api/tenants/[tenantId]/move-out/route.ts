@@ -157,3 +157,60 @@ export async function DELETE(
 
   return NextResponse.json(data);
 }
+
+
+export async function POST(
+  request: Request,
+  { params }: { params: Promise<{ tenantId: string }> }
+) {
+  const requestOrigin = new URL(request.url).origin;
+  const origin = request.headers.get("origin");
+  if (origin && origin !== requestOrigin) {
+    return NextResponse.json({ error: "คำขอไม่ถูกต้อง" }, { status: 403 });
+  }
+
+  const { tenantId } = await params;
+  if (!uuidPattern.test(tenantId)) {
+    return NextResponse.json({ error: "รหัสผู้เช่าไม่ถูกต้อง" }, { status: 400 });
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "กรุณาเข้าสู่ระบบ" }, { status: 401 });
+  }
+
+  let body: Record<string, unknown>;
+  try {
+    body = (await request.json()) as Record<string, unknown>;
+  } catch {
+    return NextResponse.json({ error: "ข้อมูลไม่ถูกต้อง" }, { status: 400 });
+  }
+
+  const moveOutDate = parseDate(body.moveOutDate);
+  if (!moveOutDate) {
+    return NextResponse.json(
+      { error: "กรุณากรอกวันที่ย้ายออกจริงให้ถูกต้อง" },
+      { status: 400 }
+    );
+  }
+
+  const admin = createAdminClient();
+  const { data, error } = await admin.rpc("complete_tenant_move_out", {
+    p_tenant_id: tenantId,
+    p_move_out_date: moveOutDate.toISOString().slice(0, 10),
+  });
+
+  if (error) {
+    console.error("Complete tenant move-out failed:", error);
+    return NextResponse.json(
+      { error: "บันทึกผู้เช่าย้ายออกไม่สำเร็จ" },
+      { status: 500 }
+    );
+  }
+
+  return NextResponse.json(data);
+}
