@@ -116,3 +116,44 @@ export async function PATCH(
     adjustedBills: existingBills?.length || 0,
   });
 }
+
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ tenantId: string }> }
+) {
+  const requestOrigin = new URL(request.url).origin;
+  const origin = request.headers.get("origin");
+  if (origin && origin !== requestOrigin) {
+    return NextResponse.json({ error: "คำขอไม่ถูกต้อง" }, { status: 403 });
+  }
+
+  const { tenantId } = await params;
+  if (!uuidPattern.test(tenantId)) {
+    return NextResponse.json({ error: "รหัสผู้เช่าไม่ถูกต้อง" }, { status: 400 });
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "กรุณาเข้าสู่ระบบ" }, { status: 401 });
+  }
+
+  const admin = createAdminClient();
+  const { data, error } = await admin.rpc("cancel_tenant_move_out", {
+    p_tenant_id: tenantId,
+  });
+
+  if (error) {
+    console.error("Cancel move-out failed:", error);
+    return NextResponse.json(
+      { error: "ยกเลิกการย้ายออกไม่สำเร็จ" },
+      { status: 500 }
+    );
+  }
+
+  return NextResponse.json(data);
+}
