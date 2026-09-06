@@ -234,11 +234,19 @@ export default async function BillDetailPage({ params }: Props) {
             </p>
           </div>
 
-          <span
-            className={`rounded-full px-4 py-2 text-sm font-semibold ${status.className}`}
-          >
-            {status.text}
-          </span>
+          <div className="flex shrink-0 flex-col items-center gap-1.5">
+            <span
+              className={`rounded-full px-4 py-2 text-sm font-semibold ${status.className}`}
+            >
+              {status.text}
+            </span>
+            <StatusEditor
+              billId={bill.id}
+              roomCode={bill.rooms.room_code}
+              currentStatus={bill.status}
+              updateBillStatus={updateBillStatus}
+            />
+          </div>
         </div>
 
         <div className="mt-8 overflow-hidden rounded-2xl bg-white shadow-sm">
@@ -361,13 +369,6 @@ export default async function BillDetailPage({ params }: Props) {
           >
             👁 ดูบิลสำหรับผู้เช่า
           </Link>
-
-          <StatusEditor
-            billId={bill.id}
-            roomCode={bill.rooms.room_code}
-            currentStatus={bill.status}
-            updateBillStatus={updateBillStatus}
-          />
 
           {bill.status !== "paid" && (
             <form action={markBillAsPaid}>

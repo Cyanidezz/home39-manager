@@ -40,9 +40,9 @@ export default function StatusEditor({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="rounded-xl border border-gray-300 bg-white px-5 py-3 font-medium text-gray-700 transition hover:bg-gray-50"
+        className="text-xs font-medium text-gray-500 underline decoration-gray-300 underline-offset-4 transition hover:text-gray-900"
       >
-        ✏️ แก้ไขสถานะบิล
+        แก้ไขสถานะบิล
       </button>
 
       {open && (
