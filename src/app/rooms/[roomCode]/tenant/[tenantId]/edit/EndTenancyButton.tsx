@@ -160,7 +160,7 @@ export default function EndTenancyButton({
         <button
           type="button"
           onClick={() => setOpen(true)}
-          disabled={cancelling}
+          disabled={cancelling || completing}
           className="rounded-lg bg-orange-600 px-5 py-3 font-semibold text-white hover:bg-orange-700 disabled:opacity-50"
         >
           {initialMoveOutDate ? "แก้ไขข้อมูลย้ายออก" : "สิ้นสุดสัญญาเช่า"}
@@ -192,7 +192,7 @@ export default function EndTenancyButton({
         )}
       </div>
 
-      {error && !open && (
+      {error && !open && !completeOpen && (
         <p className="mt-3 rounded-lg bg-red-50 p-3 text-sm text-red-700">
           {error}
         </p>
