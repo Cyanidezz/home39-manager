@@ -1,9 +1,17 @@
 import { createHmac, timingSafeEqual } from "crypto";
 
-type LineMessage = {
+type LineTextMessage = {
   type: "text";
   text: string;
 };
+
+type LineFlexMessage = {
+  type: "flex";
+  altText: string;
+  contents: Record<string, unknown>;
+};
+
+type LineMessage = LineTextMessage | LineFlexMessage;
 
 function accessToken() {
   const token = process.env.LINE_CHANNEL_ACCESS_TOKEN;
@@ -51,6 +59,17 @@ export async function pushLineText(lineUserId: string, text: string) {
   await sendLine("/v2/bot/message/push", {
     to: lineUserId,
     messages: [{ type: "text", text } satisfies LineMessage],
+  });
+}
+
+export async function pushLineFlex(
+  lineUserId: string,
+  altText: string,
+  contents: Record<string, unknown>
+) {
+  await sendLine("/v2/bot/message/push", {
+    to: lineUserId,
+    messages: [{ type: "flex", altText, contents } satisfies LineMessage],
   });
 }
 
