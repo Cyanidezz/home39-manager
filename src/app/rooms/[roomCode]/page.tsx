@@ -1,13 +1,29 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import LineConnectionCard from "@/components/LineConnectionCard";
 
 type Props = {
   params: Promise<{
     roomCode: string;
   }>;
 };
+
+const thaiMonths = [
+  "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.",
+  "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค.",
+];
+
+function formatThaiDate(date: string | null) {
+  if (!date) return "-";
+  const [year, month, day] = date.split("-").map(Number);
+  return `${day} ${thaiMonths[month - 1]} ${year + 543}`;
+}
+
+function formatThaiMonth(date: string | null) {
+  if (!date) return "-";
+  const [year, month] = date.split("-").map(Number);
+  return `${thaiMonths[month - 1]} ${year + 543}`;
+}
 
 function getBillStatusLabel(status: string) {
   switch (status) {
@@ -101,8 +117,8 @@ export default async function RoomPage({ params }: Props) {
       move_out_date,
       is_active,
       note,
-      line_user_id,
-      line_linked_at
+      termination_notice_date,
+      planned_move_out_date
     `)
     .eq("room_id", room.id)
     .eq("is_active", true);
@@ -122,6 +138,7 @@ export default async function RoomPage({ params }: Props) {
     .order("billing_month", { ascending: false })
     .limit(5);
 
+  const activeTenant = tenants?.[0];
   const latestBill = bills?.[0];
 
   const latestBillStatus = latestBill
@@ -185,8 +202,16 @@ export default async function RoomPage({ params }: Props) {
               🧾 ออกบิลใหม่
             </Link>
 
-            <span className="rounded-full bg-green-100 px-4 py-2 text-sm font-medium text-green-700">
-              {room.status === "occupied" ? "มีผู้เช่า" : "ว่าง"}
+            <span className={`rounded-full px-4 py-2 text-sm font-medium ${
+              activeTenant?.planned_move_out_date
+                ? "bg-orange-100 text-orange-700"
+                : room.status === "occupied"
+                  ? "bg-green-100 text-green-700"
+                  : "bg-gray-100 text-gray-700"
+            }`}>
+              {activeTenant?.planned_move_out_date
+                ? `ผู้เช่าแจ้งย้ายออก ${formatThaiDate(activeTenant.planned_move_out_date)}`
+                : room.status === "occupied" ? "มีผู้เช่า" : "ว่าง"}
             </span>
           </div>
         </div>
@@ -252,10 +277,19 @@ export default async function RoomPage({ params }: Props) {
                       ✏️ แก้ไขข้อมูลผู้เช่า
                     </Link>
 
-                    <LineConnectionCard
-                      tenantId={tenant.id}
-                      linked={Boolean(tenant.line_user_id)}
-                    />
+                    {tenant.planned_move_out_date && (
+                      <div className="mt-4 rounded-xl border border-orange-200 bg-orange-50 p-4 text-sm text-orange-900">
+                        <p className="font-semibold">
+                          ผู้เช่าแจ้งย้ายออก {formatThaiDate(tenant.planned_move_out_date)}
+                        </p>
+                        <p className="mt-1">
+                          แจ้งเมื่อ {formatThaiDate(tenant.termination_notice_date)}
+                        </p>
+                        <p className="mt-1">
+                          ค่าเช่าเดือน {formatThaiMonth(tenant.termination_notice_date)} ใช้ค่าเช่าล่วงหน้า
+                        </p>
+                      </div>
+                    )}
                   </div>
                 ))
               ) : (

@@ -41,7 +41,9 @@ export default async function NewBillPage({ params }: Props) {
     .from("tenants")
     .select(`
       id,
-      full_name
+      full_name,
+      rent_waived_year,
+      rent_waived_month
     `)
     .eq("room_id", room.id)
     .eq("is_active", true)
@@ -98,6 +100,8 @@ export default async function NewBillPage({ params }: Props) {
               }
               tenantId={tenant.id}
               tenantName={tenant.full_name}
+              rentWaivedYear={tenant.rent_waived_year}
+              rentWaivedMonth={tenant.rent_waived_month}
             />
           )}
         </div>

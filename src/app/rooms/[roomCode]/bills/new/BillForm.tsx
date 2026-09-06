@@ -12,6 +12,8 @@ type Props = {
   previousMeter: number | null;
   tenantId: string;
   tenantName: string;
+  rentWaivedYear: number | null;
+  rentWaivedMonth: number | null;
 };
 
 type OtherItem = {
@@ -30,6 +32,8 @@ export default function BillForm({
   previousMeter,
   tenantId,
   tenantName,
+  rentWaivedYear,
+  rentWaivedMonth,
 }: Props) {
   const router = useRouter();
   const supabase = createClient();
@@ -69,7 +73,10 @@ export default function BillForm({
     0
   );
 
-  const totalAmount = monthlyRent + waterAmount + electricityAmount + other;
+  const isRentWaived =
+    billingYear === rentWaivedYear && billingMonth === rentWaivedMonth;
+  const chargedRent = isRentWaived ? 0 : monthlyRent;
+  const totalAmount = chargedRent + waterAmount + electricityAmount + other;
 
   function addOtherItem() {
     setOtherItems((items) => [...items, { name: "", amount: "" }]);
@@ -153,7 +160,7 @@ export default function BillForm({
         p_tenant_id: tenantId,
         p_billing_year: billingYear,
         p_billing_month: billingMonth,
-        p_rent_amount: monthlyRent,
+        p_rent_amount: chargedRent,
         p_occupant_count: occupantCount,
         p_water_rate_per_person: WATER_RATE,
         p_water_amount: waterAmount,
@@ -235,10 +242,26 @@ export default function BillForm({
       </div>
 
       <div className="rounded-xl bg-gray-50 p-5">
-        <div className="flex justify-between">
+        <div className="flex justify-between gap-4">
           <span>ค่าเช่า</span>
-          <strong>{monthlyRent.toLocaleString()} บาท</strong>
+          <strong>
+            {isRentWaived ? (
+              <>
+                <span className="mr-2 font-normal text-gray-400 line-through">
+                  {monthlyRent.toLocaleString()}
+                </span>
+                0 บาท
+              </>
+            ) : (
+              `${monthlyRent.toLocaleString()} บาท`
+            )}
+          </strong>
         </div>
+        {isRentWaived && (
+          <p className="mt-2 text-sm text-orange-700">
+            ใช้ค่าเช่าล่วงหน้าที่ชำระไว้เมื่อเริ่มสัญญา
+          </p>
+        )}
         <div className="mt-3 flex justify-between">
           <span>ค่าน้ำ {occupantCount} × {WATER_RATE}</span>
           <strong>{waterAmount.toLocaleString()} บาท</strong>

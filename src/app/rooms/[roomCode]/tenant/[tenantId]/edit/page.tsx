@@ -1,6 +1,8 @@
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import LineConnectionCard from "@/components/LineConnectionCard";
 import EditTenantForm from "./EditTenantForm";
+import EndTenancyButton from "./EndTenancyButton";
 
 type Props = {
   params: Promise<{
@@ -40,7 +42,10 @@ export default async function EditTenantPage({ params }: Props) {
       phone,
       move_in_date,
       note,
-      room_id
+      room_id,
+      line_user_id,
+      termination_notice_date,
+      planned_move_out_date
     `)
     .eq("id", tenantId)
     .eq("room_id", room.id)
@@ -68,6 +73,27 @@ export default async function EditTenantPage({ params }: Props) {
             roomCode={room.room_code}
             occupantCount={room.occupant_count}
           />
+
+          <div className="mt-8 border-t pt-8">
+            <h2 className="text-xl font-semibold">ผูกบัญชี LINE</h2>
+            <LineConnectionCard
+              tenantId={tenant.id}
+              linked={Boolean(tenant.line_user_id)}
+            />
+          </div>
+
+          <div className="mt-8 border-t pt-8">
+            <h2 className="text-xl font-semibold">การสิ้นสุดสัญญาเช่า</h2>
+            <p className="mt-2 text-sm text-gray-500">
+              บันทึกวันที่แจ้งและวันที่จะย้ายออก โดยต้องแจ้งล่วงหน้าอย่างน้อย 1 เดือน
+            </p>
+            <EndTenancyButton
+              tenantId={tenant.id}
+              tenantName={tenant.full_name}
+              initialNoticeDate={tenant.termination_notice_date}
+              initialMoveOutDate={tenant.planned_move_out_date}
+            />
+          </div>
         </div>
       </div>
     </main>

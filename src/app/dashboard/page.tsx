@@ -2,6 +2,16 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 
+const thaiMonths = [
+  "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.",
+  "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค.",
+];
+
+function formatThaiDate(date: string) {
+  const [year, month, day] = date.split("-").map(Number);
+  return `${day} ${thaiMonths[month - 1]} ${year + 543}`;
+}
+
 export default async function DashboardPage() {
   const supabase = await createClient();
 
@@ -15,7 +25,7 @@ export default async function DashboardPage() {
 
   const { data: rooms, error } = await supabase
     .from("rooms")
-    .select("id, room_code, monthly_rent, occupant_count, status")
+    .select("id, room_code, monthly_rent, occupant_count, status, tenants(planned_move_out_date, is_active)")
     .order("room_code");
 
   return (
@@ -47,7 +57,9 @@ export default async function DashboardPage() {
         )}
 
         <div className="grid gap-5 md:grid-cols-3">
-          {rooms?.map((room) => (
+          {rooms?.map((room) => {
+            const activeTenant = room.tenants?.find((tenant) => tenant.is_active);
+            return (
             <Link
                 key={room.id}
                 href={`/rooms/${room.room_code}`}
@@ -76,7 +88,9 @@ export default async function DashboardPage() {
                 <p>
                     สถานะ{" "}
                     <strong>
-                    {room.status === "occupied" ? "มีผู้เช่า" : "ว่าง"}
+                    {activeTenant?.planned_move_out_date
+                      ? `ผู้เช่าแจ้งย้ายออก ${formatThaiDate(activeTenant.planned_move_out_date)}`
+                      : room.status === "occupied" ? "มีผู้เช่า" : "ว่าง"}
                     </strong>
                 </p>
                 </div>
@@ -85,7 +99,8 @@ export default async function DashboardPage() {
                 ดูรายละเอียดห้อง →
                 </div>
             </Link>
-            ))}
+            );
+          })}
         </div>
       </div>
     </main>
