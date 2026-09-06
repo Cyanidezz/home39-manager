@@ -47,6 +47,7 @@ SUPABASE_SERVICE_ROLE_KEY=
 NEXT_PUBLIC_APP_URL=https://your-production-domain
 LINE_CHANNEL_SECRET=
 LINE_CHANNEL_ACCESS_TOKEN=
+CRON_SECRET=
 ```
 
 After pulling the latest branch, apply database changes:
@@ -65,3 +66,5 @@ https://your-production-domain/api/line/webhook
 Enable webhooks in LINE Developers. Keep the Channel Secret, Channel Access Token, and Supabase service role key only in the hosting provider's server environment; never expose them in browser code or commit them to Git.
 
 To link a tenant, open the room page, create a one-time LINE code, and ask the tenant to send the complete `HOME39 ...` message to the official account within 15 minutes. New bills are sent automatically when LINE is linked, and can also be sent again from the bill detail page.
+
+Vercel runs `/api/cron/bill-reminders` every day at 08:00 Thailand time. Set `CRON_SECRET` to a long random value so only the scheduler can call this endpoint. The job sends one reminder three days before the due date and one overdue notification after the due date.
