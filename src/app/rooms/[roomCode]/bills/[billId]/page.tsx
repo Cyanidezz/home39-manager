@@ -55,6 +55,30 @@ function getStatus(status: string) {
   }
 }
 
+async function setBillStatus(
+  billId: string,
+  newStatus: string,
+  reason: string
+) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) redirect("/login");
+
+  const { error } = await supabase.rpc("update_bill_status", {
+    p_bill_id: billId,
+    p_new_status: newStatus,
+    p_reason: reason,
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
 async function markBillAsPaid(formData: FormData) {
   "use server";
 
@@ -65,29 +89,7 @@ async function markBillAsPaid(formData: FormData) {
     throw new Error("ข้อมูลบิลไม่ครบ");
   }
 
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) redirect("/login");
-
-  const now = new Date().toISOString();
-
-  const { error } = await supabase
-    .from("bills")
-    .update({
-      status: "paid",
-      paid_at: now,
-      updated_at: now,
-    })
-    .eq("id", billId);
-
-  if (error) {
-    throw new Error(`บันทึกการชำระเงินไม่สำเร็จ: ${error.message}`);
-  }
-
+  await setBillStatus(billId, "paid", "บันทึกชำระเงินโดยผู้ดูแล");
   redirect(`/rooms/${roomCode}/bills/${billId}`);
 }
 
@@ -117,69 +119,7 @@ async function updateBillStatus(formData: FormData) {
     throw new Error("สถานะไม่ถูกต้อง");
   }
 
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) redirect("/login");
-
-  const { data: currentBill, error: currentBillError } = await supabase
-    .from("bills")
-    .select("status")
-    .eq("id", billId)
-    .single();
-
-  if (currentBillError || !currentBill) {
-    throw new Error("ไม่พบบิล");
-  }
-
-  const oldStatus = currentBill.status;
-
-  if (newStatus === oldStatus) {
-    throw new Error("กรุณาเลือกสถานะใหม่ที่ต่างจากสถานะปัจจุบัน");
-  }
-
-  const now = new Date().toISOString();
-
-  const updateData: {
-    status: string;
-    updated_at: string;
-    paid_at?: string | null;
-  } = {
-    status: newStatus,
-    updated_at: now,
-  };
-
-  if (newStatus === "paid") {
-    updateData.paid_at = now;
-  } else if (oldStatus === "paid") {
-    updateData.paid_at = null;
-  }
-
-  const { error: updateError } = await supabase
-    .from("bills")
-    .update(updateData)
-    .eq("id", billId);
-
-  if (updateError) {
-    throw new Error(updateError.message);
-  }
-
-  const { error: logError } = await supabase
-    .from("bill_status_logs")
-    .insert({
-      bill_id: billId,
-      old_status: oldStatus,
-      new_status: newStatus,
-      reason,
-    });
-
-  if (logError) {
-    throw new Error(logError.message);
-  }
-
+  await setBillStatus(billId, newStatus, reason);
   redirect(`/rooms/${roomCode}/bills/${billId}`);
 }
 
@@ -193,7 +133,6 @@ export default async function BillDetailPage({ params }: Props) {
 
   if (!user) redirect("/login");
 
-  // รวม room + tenant + bill_items ไว้ใน query เดียว
   const { data: bill, error } = await supabase
     .from("bills")
     .select(`
@@ -237,9 +176,7 @@ export default async function BillDetailPage({ params }: Props) {
         <div className="mt-5 flex items-start justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold">🧾 รายละเอียดบิล</h1>
-            <p className="mt-2 text-gray-500">
-              ห้อง {bill.rooms.room_code}
-            </p>
+            <p className="mt-2 text-gray-500">ห้อง {bill.rooms.room_code}</p>
             <p className="text-gray-500">
               ผู้เช่า:{" "}
               <span className="font-medium text-gray-900">
@@ -268,9 +205,7 @@ export default async function BillDetailPage({ params }: Props) {
           <div className="border-b px-6 py-5">
             <div className="flex justify-between">
               <span>ค่าเช่า</span>
-              <span className="font-semibold">
-                {formatMoney(bill.rent_amount)} บาท
-              </span>
+              <span className="font-semibold">{formatMoney(bill.rent_amount)} บาท</span>
             </div>
           </div>
 
@@ -279,51 +214,33 @@ export default async function BillDetailPage({ params }: Props) {
               <div>
                 <p>ค่าน้ำ</p>
                 <p className="mt-1 text-sm text-gray-500">
-                  {bill.occupant_count} คน ×{" "}
-                  {formatNumber(bill.water_rate_per_person)} บาท
+                  {bill.occupant_count} คน × {formatNumber(bill.water_rate_per_person)} บาท
                 </p>
               </div>
-              <span className="font-semibold">
-                {formatMoney(bill.water_amount)} บาท
-              </span>
+              <span className="font-semibold">{formatMoney(bill.water_amount)} บาท</span>
             </div>
           </div>
 
           <div className="border-b px-6 py-5">
             <h2 className="font-semibold">ค่าไฟฟ้า</h2>
-
             <div className="mt-4 space-y-3 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-500">มิเตอร์ครั้งก่อน</span>
-                <span>
-                  {bill.previous_meter != null
-                    ? formatNumber(bill.previous_meter)
-                    : "-"}
-                </span>
+                <span>{bill.previous_meter != null ? formatNumber(bill.previous_meter) : "-"}</span>
               </div>
-
               <div className="flex justify-between">
                 <span className="text-gray-500">มิเตอร์ครั้งนี้</span>
-                <span>
-                  {bill.current_meter != null
-                    ? formatNumber(bill.current_meter)
-                    : "-"}
-                </span>
+                <span>{bill.current_meter != null ? formatNumber(bill.current_meter) : "-"}</span>
               </div>
-
               <div className="flex justify-between">
                 <span className="text-gray-500">หน่วยไฟที่ใช้</span>
                 <span>{formatNumber(bill.electricity_units)} หน่วย</span>
               </div>
-
               <div className="flex justify-between pt-2">
                 <span>
-                  ค่าไฟ {formatNumber(bill.electricity_units)} ×{" "}
-                  {formatNumber(bill.electricity_rate)}
+                  ค่าไฟ {formatNumber(bill.electricity_units)} × {formatNumber(bill.electricity_rate)}
                 </span>
-                <span className="font-semibold">
-                  {formatMoney(bill.electricity_amount)} บาท
-                </span>
+                <span className="font-semibold">{formatMoney(bill.electricity_amount)} บาท</span>
               </div>
             </div>
           </div>
@@ -331,14 +248,11 @@ export default async function BillDetailPage({ params }: Props) {
           {billItems.length > 0 && (
             <div className="border-b px-6 py-5">
               <h2 className="mb-4 font-semibold">ค่าใช้จ่ายอื่น</h2>
-
               <div className="space-y-3">
                 {billItems.map((item) => (
                   <div key={item.id} className="flex justify-between">
                     <span>{item.item_name}</span>
-                    <span className="font-semibold">
-                      {formatMoney(item.amount)} บาท
-                    </span>
+                    <span className="font-semibold">{formatMoney(item.amount)} บาท</span>
                   </div>
                 ))}
               </div>
@@ -348,9 +262,7 @@ export default async function BillDetailPage({ params }: Props) {
           <div className="bg-gray-50 px-6 py-6">
             <div className="flex items-center justify-between">
               <span className="text-lg font-bold">ยอดรวม</span>
-              <span className="text-2xl font-bold">
-                {formatMoney(bill.total_amount)} บาท
-              </span>
+              <span className="text-2xl font-bold">{formatMoney(bill.total_amount)} บาท</span>
             </div>
           </div>
         </div>
@@ -376,11 +288,7 @@ export default async function BillDetailPage({ params }: Props) {
           {bill.status !== "paid" && (
             <form action={markBillAsPaid}>
               <input type="hidden" name="billId" value={bill.id} />
-              <input
-                type="hidden"
-                name="roomCode"
-                value={bill.rooms.room_code}
-              />
+              <input type="hidden" name="roomCode" value={bill.rooms.room_code} />
               <button
                 type="submit"
                 className="rounded-xl bg-green-600 px-5 py-3 font-semibold text-white hover:bg-green-700"
