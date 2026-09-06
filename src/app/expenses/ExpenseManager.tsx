@@ -168,7 +168,7 @@ export default function ExpenseManager({
 
   return (
     <div className="grid gap-6 lg:grid-cols-[380px_1fr]">
-      <section className="h-fit rounded-2xl bg-white p-6 shadow-sm">
+      <section className="h-fit rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <h2 className="text-xl font-semibold">
           {editingId ? "แก้ไขรายจ่าย" : "เพิ่มรายจ่ายจริง"}
         </h2>
@@ -183,7 +183,7 @@ export default function ExpenseManager({
               type="date"
               value={expenseDate}
               onChange={(event) => setExpenseDate(event.target.value)}
-              className="w-full rounded-xl border px-4 py-3"
+              className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               required
             />
           </div>
@@ -196,7 +196,7 @@ export default function ExpenseManager({
               type="month"
               value={period}
               onChange={(event) => setPeriod(event.target.value)}
-              className="w-full rounded-xl border px-4 py-3"
+              className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               required
             />
           </div>
@@ -206,7 +206,7 @@ export default function ExpenseManager({
             <select
               value={category}
               onChange={(event) => setCategory(event.target.value)}
-              className="w-full rounded-xl border bg-white px-4 py-3"
+              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             >
               {categories.map((item) => (
                 <option key={item.value} value={item.value}>
@@ -224,7 +224,7 @@ export default function ExpenseManager({
               step="0.01"
               value={amount}
               onChange={(event) => setAmount(event.target.value)}
-              className="w-full rounded-xl border px-4 py-3 text-right"
+              className="w-full rounded-xl border border-slate-200 px-4 py-3 text-right outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               placeholder="0.00"
               required
             />
@@ -235,7 +235,7 @@ export default function ExpenseManager({
             <textarea
               value={note}
               onChange={(event) => setNote(event.target.value)}
-              className="min-h-24 w-full rounded-xl border px-4 py-3"
+              className="min-h-24 w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               placeholder="เช่น ค่าแรงทำความสะอาดประจำเดือน"
             />
           </div>
@@ -260,7 +260,7 @@ export default function ExpenseManager({
             <button
               type="submit"
               disabled={saving}
-              className="flex-1 rounded-xl bg-black px-4 py-3 font-semibold text-white hover:bg-gray-800 disabled:opacity-50"
+              className="flex-1 rounded-xl bg-blue-600 px-4 py-3 font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
             >
               {saving ? "กำลังบันทึก..." : editingId ? "บันทึกการแก้ไข" : "เพิ่มรายจ่าย"}
             </button>
@@ -268,7 +268,7 @@ export default function ExpenseManager({
         </form>
       </section>
 
-      <section className="rounded-2xl bg-white p-6 shadow-sm">
+      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <h2 className="text-xl font-semibold">รายการรายจ่ายเดือนนี้</h2>
