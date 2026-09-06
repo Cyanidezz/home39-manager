@@ -8,6 +8,7 @@ type Props = {
   billId: string;
   roomCode: string;
   isPaid: boolean;
+  contentType: string;
   markBillAsPaid: (formData: FormData) => void | Promise<void>;
 };
 
@@ -17,6 +18,7 @@ export default function SlipViewer({
   billId,
   roomCode,
   isPaid,
+  contentType,
   markBillAsPaid,
 }: Props) {
   const [open, setOpen] = useState(false);
@@ -75,11 +77,20 @@ export default function SlipViewer({
             </header>
 
             <div className="min-h-0 flex-1 bg-gray-100 p-2 sm:p-4">
-              <iframe
-                src={slipUrl}
-                title={`สลิป ${fileName}`}
-                className="h-full w-full rounded-lg bg-white"
-              />
+              {contentType.startsWith("image/") ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={slipUrl}
+                  alt={`สลิป ${fileName}`}
+                  className="h-full w-full object-contain"
+                />
+              ) : (
+                <iframe
+                  src={slipUrl}
+                  title={`สลิป ${fileName}`}
+                  className="h-full w-full rounded-lg bg-white"
+                />
+              )}
             </div>
 
             <footer className="flex flex-wrap items-center justify-between gap-3 border-t px-5 py-4">

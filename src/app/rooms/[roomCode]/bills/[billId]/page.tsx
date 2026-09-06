@@ -348,6 +348,7 @@ export default async function BillDetailPage({ params }: Props) {
                   billId={bill.id}
                   roomCode={bill.rooms.room_code}
                   isPaid={bill.status === "paid"}
+                  contentType={bill.slip_content_type || ""}
                   markBillAsPaid={markBillAsPaid}
                 />
               ) : (
