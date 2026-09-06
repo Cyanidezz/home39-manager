@@ -324,18 +324,9 @@ export default async function RoomPage({ params }: Props) {
                   </div>
                 ))
               ) : (
-                <div>
-                  <p className="text-gray-500">
-                    ยังไม่มีข้อมูลผู้เช่า
-                  </p>
-
-                  <Link
-                    href={`/rooms/${room.room_code}/tenant/new`}
-                    className="mt-4 inline-block rounded-lg bg-black px-4 py-2 text-white"
-                  >
-                    + สร้างผู้เช่าใหม่
-                  </Link>
-                </div>
+                <p className="text-gray-500">
+                  ยังไม่มีข้อมูลผู้เช่า
+                </p>
               )}
             </div>
           </section>
