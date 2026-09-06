@@ -174,6 +174,33 @@ export default async function PublicBillPage({ params }: Props) {
               <span className="text-2xl font-bold">{formatMoney(bill.total_amount)} บาท</span>
             </div>
           </div>
+
+          {bill.status !== "paid" && (
+            <div className="border-t bg-purple-50 px-6 py-6">
+              <h2 className="font-bold text-purple-900">ช่องทางชำระเงิน</h2>
+
+              <div className="mt-4 rounded-xl border border-purple-200 bg-white p-5">
+                <p className="text-sm font-medium text-purple-700">
+                  ธนาคารไทยพาณิชย์ (SCB)
+                </p>
+
+                <p className="mt-3 text-sm text-gray-500">ชื่อบัญชี</p>
+                <p className="font-semibold">นางสาวพิรญาณ์ จันทร์งาม</p>
+
+                <p className="mt-3 text-sm text-gray-500">เลขที่บัญชี</p>
+                <p className="select-all text-2xl font-bold tracking-wide text-purple-900">
+                  206-269288-7
+                </p>
+
+                <div className="mt-4 rounded-lg bg-purple-50 p-3 text-sm text-purple-800">
+                  กรุณาโอนจำนวน{" "}
+                  <strong>{formatMoney(bill.total_amount)} บาท</strong>
+                  {" "}และระบุห้อง{" "}
+                  <strong>{bill.room_code || "-"}</strong>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         <p className="mt-5 text-center text-xs text-gray-400">กรุณาตรวจสอบรายละเอียดก่อนชำระเงิน</p>
