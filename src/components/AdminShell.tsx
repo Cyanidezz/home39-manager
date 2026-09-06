@@ -31,10 +31,16 @@ const navigation = [
     active: (path: string) => path.startsWith("/expenses"),
   },
   {
+    label: "จัดการ Homepage",
+    href: "/settings/homepage",
+    icon: "▤",
+    active: (path: string) => path.startsWith("/settings/homepage"),
+  },
+  {
     label: "บัญชีโอนเงิน",
     href: "/settings/payment",
     icon: "⚙",
-    active: (path: string) => path.startsWith("/settings"),
+    active: (path: string) => path.startsWith("/settings/payment"),
   },
 ];
 

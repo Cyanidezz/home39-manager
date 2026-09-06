@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import type { HomepageRoom, HomepageSettings } from "@/lib/homepage";
 
 type Room = {
   room_code: string;
@@ -14,37 +15,42 @@ type Room = {
 type Props = {
   rooms: Room[];
   isLoggedIn: boolean;
+  settings: HomepageSettings;
+  homepageRooms: HomepageRoom[];
 };
 
-const roomDescriptions: Record<string, string> = {
-  A: "ห้องพักส่วนตัว บรรยากาศสงบ เหมาะสำหรับพักอาศัยระยะยาว",
-  B: "ห้องพักสะดวกสบาย ในทำเลเดินทางง่ายใจกลางหาดใหญ่",
-  C: "พื้นที่พักอาศัยเป็นสัดส่วน พร้อมติดต่อสอบถามรายละเอียดเพิ่มเติม",
-};
+type DisplayRoom = Room & HomepageRoom;
 
 function money(value: number | string) {
   return Number(value || 0).toLocaleString("th-TH");
 }
 
-export default function HomePage({ rooms, isLoggedIn }: Props) {
+export default function HomePage({ rooms, isLoggedIn, settings, homepageRooms }: Props) {
   const router = useRouter();
   const supabase = createClient();
   const [loginOpen, setLoginOpen] = useState(false);
-  const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
+  const [selectedRoom, setSelectedRoom] = useState<DisplayRoom | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const displayRooms = ["A", "B", "C"].map(
-    (code) =>
-      rooms.find((room) => room.room_code === code) || {
+  const displayRooms: DisplayRoom[] = ["A", "B", "C"].map((code) => {
+    const room = rooms.find((item) => item.room_code === code) || {
         room_code: code,
         monthly_rent: 0,
         occupant_count: 0,
         status: "vacant",
-      }
-  );
+      };
+    const content = homepageRooms.find((item) => item.room_code === code) || {
+      room_code: code,
+      title: `ห้อง ${code}`,
+      description: "สอบถามรายละเอียดเพิ่มเติม",
+      cover_image_url: null,
+      image_urls: [],
+    };
+    return { ...room, ...content };
+  });
 
   async function login(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -103,20 +109,29 @@ export default function HomePage({ rooms, isLoggedIn }: Props) {
         </div>
       </header>
 
-      <section className="relative overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-blue-500 text-white">
+      <section
+        className="relative overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-blue-500 bg-cover bg-center text-white"
+        style={
+          settings.banner_image_url
+            ? {
+                backgroundImage: `linear-gradient(115deg, rgba(30,64,175,.94), rgba(37,99,235,.72)), url(${settings.banner_image_url})`,
+              }
+            : undefined
+        }
+      >
         <div className="absolute -left-24 top-20 h-72 w-72 rounded-full bg-white/10" />
         <div className="absolute -right-20 -top-20 h-96 w-96 rounded-full bg-blue-300/20" />
         <div className="relative mx-auto grid min-h-[470px] max-w-7xl items-center gap-10 px-4 py-16 sm:px-8 lg:grid-cols-[1.1fr_0.9fr]">
           <div>
             <p className="mb-4 inline-flex rounded-full border border-white/25 bg-white/10 px-4 py-2 text-sm font-medium">
-              ห้องพักในเมืองหาดใหญ่
+              {settings.banner_badge}
             </p>
             <h1 className="max-w-2xl text-4xl font-bold leading-tight sm:text-6xl">
-              อยู่สบาย เดินทางสะดวก
-              <span className="block text-blue-100">ที่ Home 39</span>
+              {settings.banner_title}
+              <span className="block text-blue-100">{settings.banner_highlight}</span>
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-8 text-blue-50">
-              ตรวจสอบสถานะห้องพัก ดูรายละเอียด และติดต่อสอบถามห้องว่างได้ในหน้าเดียว
+              {settings.banner_description}
             </p>
             <a
               href="#rooms"
@@ -161,17 +176,21 @@ export default function HomePage({ rooms, isLoggedIn }: Props) {
                 className="group overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-sm hover:-translate-y-1 hover:border-blue-300 hover:shadow-xl"
               >
                 <div className="relative flex h-52 items-center justify-center overflow-hidden bg-gradient-to-br from-blue-100 via-slate-100 to-blue-50">
-                  <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-blue-200/60" />
-                  <div className="absolute bottom-5 left-6 h-24 w-36 rounded-xl border-4 border-white bg-blue-200 shadow-lg">
-                    <div className="absolute bottom-0 left-0 h-12 w-full bg-white/80" />
-                  </div>
-                  <span className="relative rounded-full bg-white/90 px-4 py-2 text-sm font-semibold text-blue-700 shadow">
-                    รูปห้อง {room.room_code}
-                  </span>
+                  {room.cover_image_url ? (
+                    <img
+                      src={room.cover_image_url}
+                      alt={room.title}
+                      className="absolute inset-0 h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                    />
+                  ) : (
+                    <span className="relative rounded-full bg-white/90 px-4 py-2 text-sm font-semibold text-blue-700 shadow">
+                      รูปห้อง {room.room_code}
+                    </span>
+                  )}
                 </div>
                 <div className="p-5">
                   <div className="flex items-center justify-between gap-3">
-                    <h3 className="text-xl font-bold">ห้อง {room.room_code}</h3>
+                    <h3 className="text-xl font-bold">{room.title}</h3>
                     <span
                       className={`rounded-full px-3 py-1 text-xs font-semibold ${
                         vacant
@@ -183,7 +202,7 @@ export default function HomePage({ rooms, isLoggedIn }: Props) {
                     </span>
                   </div>
                   <p className="mt-3 line-clamp-2 text-sm leading-6 text-slate-500">
-                    {roomDescriptions[room.room_code]}
+                    {room.description}
                   </p>
                   {Number(room.monthly_rent) > 0 && (
                     <p className="mt-4 font-semibold text-blue-700">
@@ -208,7 +227,7 @@ export default function HomePage({ rooms, isLoggedIn }: Props) {
               <span className="text-6xl">📍</span>
               <p className="mt-3 font-bold text-blue-800">Home 39 Hatyai</p>
               <a
-                href="https://share.google/9SpwEy5eYMnBt4cnd"
+                href={settings.map_url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mt-5 inline-flex rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700"
@@ -222,18 +241,18 @@ export default function HomePage({ rooms, isLoggedIn }: Props) {
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-600">
               Location
             </p>
-            <h2 className="mt-2 text-3xl font-bold">เดินทางสะดวกในหาดใหญ่</h2>
+            <h2 className="mt-2 text-3xl font-bold">{settings.location_title}</h2>
             <p className="mt-4 leading-7 text-slate-500">
-              เปิดแผนที่เพื่อดูเส้นทางมายัง Home 39 และตรวจสอบระยะทางจากตำแหน่งของคุณ
+              {settings.location_description}
             </p>
             <div className="mt-7 rounded-xl border border-slate-200 bg-slate-50 p-5">
               <p className="font-semibold">สถานที่ใกล้เคียง</p>
               <div className="mt-4 flex items-start gap-3">
                 <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-100">🎓</span>
                 <div>
-                  <p className="font-medium">โรงเรียนหาดใหญ่วิทยาลัย (ญ.ว.)</p>
+                  <p className="font-medium">{settings.nearby_place}</p>
                   <p className="mt-1 text-sm text-slate-500">
-                    สถานศึกษาสำคัญในพื้นที่หาดใหญ่
+                    {settings.nearby_description}
                   </p>
                 </div>
               </div>
@@ -246,14 +265,14 @@ export default function HomePage({ rooms, isLoggedIn }: Props) {
         <div className="overflow-hidden rounded-3xl bg-gradient-to-r from-blue-700 to-blue-600 p-8 text-white shadow-xl sm:p-12">
           <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
             <div>
-              <h2 className="text-3xl font-bold">สนใจจองห้องพัก?</h2>
+              <h2 className="text-3xl font-bold">{settings.contact_title}</h2>
               <p className="mt-3 text-blue-100">
-                ติดต่อสอบถามสถานะห้อง ราคา และรายละเอียดเพิ่มเติมได้ทุกช่องทาง
+                {settings.contact_description}
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
               <a
-                href="https://www.facebook.com/home39hdy"
+                href={settings.facebook_url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="rounded-xl bg-white px-5 py-3 font-semibold text-blue-700 hover:bg-blue-50"
@@ -261,18 +280,18 @@ export default function HomePage({ rooms, isLoggedIn }: Props) {
                 Facebook
               </a>
               <a
-                href="https://line.me/R/ti/p/%40069jzotj"
+                href={settings.line_url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-white hover:bg-emerald-600"
               >
-                LINE @069jzotj
+                LINE {settings.line_id}
               </a>
             </div>
           </div>
           <div className="mt-8 flex flex-wrap gap-x-8 gap-y-3 border-t border-white/20 pt-6 text-blue-50">
-            <a href="tel:0870954441">โทร 087-0954441</a>
-            <a href="tel:0894644898">โทร 089-4644898</a>
+            <a href={`tel:${settings.phone_primary.replace(/\D/g, "")}`}>โทร {settings.phone_primary}</a>
+            <a href={`tel:${settings.phone_secondary.replace(/\D/g, "")}`}>โทร {settings.phone_secondary}</a>
           </div>
         </div>
       </section>
@@ -345,9 +364,9 @@ export default function HomePage({ rooms, isLoggedIn }: Props) {
           <div className="max-h-[92vh] w-full max-w-4xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
             <div className="sticky top-0 z-10 flex items-start justify-between border-b border-slate-200 bg-white px-6 py-5">
               <div>
-                <h2 className="text-2xl font-bold">ห้อง {selectedRoom.room_code}</h2>
+                <h2 className="text-2xl font-bold">{selectedRoom.title}</h2>
                 <p className="mt-1 text-sm text-slate-500">
-                  {roomDescriptions[selectedRoom.room_code]}
+                  {selectedRoom.description}
                 </p>
               </div>
               <button
@@ -362,24 +381,31 @@ export default function HomePage({ rooms, isLoggedIn }: Props) {
 
             <div className="p-6">
               <div className="grid gap-3 sm:grid-cols-2">
-                {["มุมห้อง", "พื้นที่พักผ่อน", "บริเวณภายใน", "รายละเอียดห้อง"].map(
-                  (label, index) => (
+                {(selectedRoom.image_urls.length
+                  ? selectedRoom.image_urls
+                  : ["", "", "", ""]
+                ).map((imageUrl, index) => (
                     <div
-                      key={label}
+                      key={imageUrl || index}
                       className="flex aspect-[4/3] items-center justify-center rounded-xl border border-blue-100 bg-gradient-to-br from-blue-50 to-slate-100"
                     >
-                      <div className="text-center">
-                        <span className="text-4xl">🛏️</span>
-                        <p className="mt-3 text-sm font-semibold text-blue-700">
-                          รูปห้อง {selectedRoom.room_code} · {label}
-                        </p>
-                        <p className="mt-1 text-xs text-slate-400">
-                          ภาพที่ {index + 1}
-                        </p>
-                      </div>
+                      {imageUrl ? (
+                        <img
+                          src={imageUrl}
+                          alt={`${selectedRoom.title} รูปที่ ${index + 1}`}
+                          className="h-full w-full rounded-xl object-cover"
+                        />
+                      ) : (
+                        <div className="text-center">
+                          <span className="text-4xl">🛏️</span>
+                          <p className="mt-3 text-sm font-semibold text-blue-700">
+                            รูปห้อง {selectedRoom.room_code}
+                          </p>
+                          <p className="mt-1 text-xs text-slate-400">ภาพที่ {index + 1}</p>
+                        </div>
+                      )}
                     </div>
-                  )
-                )}
+                  ))}
               </div>
 
               <div className="mt-6 grid gap-4 rounded-xl bg-slate-50 p-5 sm:grid-cols-3">
@@ -399,8 +425,8 @@ export default function HomePage({ rooms, isLoggedIn }: Props) {
                 </div>
                 <div>
                   <p className="text-xs text-slate-500">สอบถามเพิ่มเติม</p>
-                  <a href="tel:0870954441" className="mt-1 block font-semibold text-blue-700">
-                    087-0954441
+                  <a href={`tel:${settings.phone_primary.replace(/\D/g, "")}`} className="mt-1 block font-semibold text-blue-700">
+                    {settings.phone_primary}
                   </a>
                 </div>
               </div>
