@@ -15,10 +15,21 @@ export default function SendBillLineButton({ billId }: { billId: string }) {
         method: "POST",
         signal: AbortSignal.timeout(15000),
       });
-      const result = (await response.json()) as { error?: string };
+      const rawResponse = await response.text();
+      let result: { error?: string } = {};
+
+      if (rawResponse) {
+        try {
+          result = JSON.parse(rawResponse) as { error?: string };
+        } catch {
+          result = {};
+        }
+      }
 
       if (!response.ok) {
-        throw new Error(result.error || "ส่ง LINE ไม่สำเร็จ");
+        throw new Error(
+          result.error || `ส่ง LINE ไม่สำเร็จ (HTTP ${response.status})`
+        );
       }
 
       setState("success");
