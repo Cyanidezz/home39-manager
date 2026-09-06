@@ -34,3 +34,34 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+
+## Production setup
+
+Required environment variables:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+NEXT_PUBLIC_APP_URL=https://your-production-domain
+LINE_CHANNEL_SECRET=
+LINE_CHANNEL_ACCESS_TOKEN=
+```
+
+After pulling the latest branch, apply database changes:
+
+```bash
+npx supabase db push --dry-run
+npx supabase db push
+```
+
+Configure the LINE Messaging API webhook URL as:
+
+```text
+https://your-production-domain/api/line/webhook
+```
+
+Enable webhooks in LINE Developers. Keep the Channel Secret, Channel Access Token, and Supabase service role key only in the hosting provider's server environment; never expose them in browser code or commit them to Git.
+
+To link a tenant, open the room page, create a one-time LINE code, and ask the tenant to send the complete `HOME39 ...` message to the official account within 15 minutes. New bills are sent automatically when LINE is linked, and can also be sent again from the bill detail page.
