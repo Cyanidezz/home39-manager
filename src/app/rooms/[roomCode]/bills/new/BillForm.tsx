@@ -33,34 +33,24 @@ export default function BillForm({
 }: Props) {
   const router = useRouter();
   const supabase = createClient();
-
   const now = new Date();
 
   const [billingYear, setBillingYear] = useState(now.getFullYear());
   const [billingMonth, setBillingMonth] = useState(now.getMonth() + 1);
-
   const [currentMeter, setCurrentMeter] = useState("");
   const [otherItems, setOtherItems] = useState<OtherItem[]>([
     { name: "", amount: "" },
   ]);
   const [dueDate, setDueDate] = useState("");
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const waterAmount = occupantCount * WATER_RATE;
 
   const electricityUnits = useMemo(() => {
-    if (previousMeter === null || currentMeter === "") {
-      return 0;
-    }
-
+    if (previousMeter === null || currentMeter === "") return 0;
     const current = Number(currentMeter);
-
-    if (!Number.isFinite(current)) {
-      return 0;
-    }
-
+    if (!Number.isFinite(current)) return 0;
     return Math.max(0, current - previousMeter);
   }, [currentMeter, previousMeter]);
 
@@ -79,14 +69,10 @@ export default function BillForm({
     0
   );
 
-  const totalAmount =
-    monthlyRent + waterAmount + electricityAmount + other;
+  const totalAmount = monthlyRent + waterAmount + electricityAmount + other;
 
   function addOtherItem() {
-    setOtherItems((items) => [
-      ...items,
-      { name: "", amount: "" },
-    ]);
+    setOtherItems((items) => [...items, { name: "", amount: "" }]);
   }
 
   function updateOtherItem(
@@ -95,18 +81,13 @@ export default function BillForm({
     value: string
   ) {
     setOtherItems((items) =>
-      items.map((item, i) =>
-        i === index ? { ...item, [field]: value } : item
-      )
+      items.map((item, i) => (i === index ? { ...item, [field]: value } : item))
     );
   }
 
   function removeOtherItem(index: number) {
     setOtherItems((items) => {
-      if (items.length === 1) {
-        return [{ name: "", amount: "" }];
-      }
-
+      if (items.length === 1) return [{ name: "", amount: "" }];
       return items.filter((_, i) => i !== index);
     });
   }
@@ -121,9 +102,7 @@ export default function BillForm({
     }
 
     if (previousMeter === null) {
-      setError(
-        "ยังไม่มีมิเตอร์ครั้งก่อน กรุณากำหนดมิเตอร์เริ่มต้นก่อนออกบิล"
-      );
+      setError("ยังไม่มีมิเตอร์ครั้งก่อน กรุณากำหนดมิเตอร์เริ่มต้นก่อนออกบิล");
       return;
     }
 
@@ -133,7 +112,6 @@ export default function BillForm({
     }
 
     const current = Number(currentMeter);
-
     if (!Number.isFinite(current)) {
       setError("ค่ามิเตอร์ไฟไม่ถูกต้อง");
       return;
@@ -149,14 +127,8 @@ export default function BillForm({
       const hasAmount = item.amount !== "";
       const amount = Number(item.amount);
 
-      if (!hasName && !hasAmount) {
-        return false;
-      }
-
-      if (!hasName || !hasAmount) {
-        return true;
-      }
-
+      if (!hasName && !hasAmount) return false;
+      if (!hasName || !hasAmount) return true;
       return !Number.isFinite(amount) || amount <= 0;
     });
 
@@ -169,104 +141,61 @@ export default function BillForm({
 
     setLoading(true);
 
-    const { data: existingBill, error: checkError } = await supabase
-      .from("bills")
-      .select("id")
-      .eq("room_id", roomId)
-      .eq("billing_year", billingYear)
-      .eq("billing_month", billingMonth)
-      .maybeSingle();
+    const items = validOtherItems.map((item) => ({
+      item_name: item.name.trim(),
+      amount: Number(item.amount),
+    }));
 
-    if (checkError) {
-      setError(checkError.message);
-      setLoading(false);
-      return;
-    }
+    const { data: newBillId, error: rpcError } = await supabase.rpc(
+      "create_bill_with_items",
+      {
+        p_room_id: roomId,
+        p_tenant_id: tenantId,
+        p_billing_year: billingYear,
+        p_billing_month: billingMonth,
+        p_rent_amount: monthlyRent,
+        p_occupant_count: occupantCount,
+        p_water_rate_per_person: WATER_RATE,
+        p_water_amount: waterAmount,
+        p_previous_meter: previousMeter,
+        p_current_meter: current,
+        p_electricity_units: electricityUnits,
+        p_electricity_rate: ELECTRICITY_RATE,
+        p_electricity_amount: electricityAmount,
+        p_other_amount: other,
+        p_total_amount: totalAmount,
+        p_due_date: dueDate || null,
+        p_items: items,
+      }
+    );
 
-    if (existingBill) {
+    if (rpcError || !newBillId) {
+      const message = rpcError?.message || "ไม่สามารถสร้างบิลได้";
       setError(
-        `ห้อง ${roomCode} มีบิล ${billingMonth}/${billingYear} อยู่แล้ว`
+        message.includes("already exists")
+          ? `ห้อง ${roomCode} มีบิล ${billingMonth}/${billingYear} อยู่แล้ว`
+          : message
       );
       setLoading(false);
       return;
     }
 
-    const { data: newBill, error: insertError } = await supabase
-      .from("bills")
-      .insert({
-        room_id: roomId,
-        tenant_id: tenantId,
-        billing_year: billingYear,
-        billing_month: billingMonth,
-        rent_amount: monthlyRent,
-        occupant_count: occupantCount,
-        water_rate_per_person: WATER_RATE,
-        water_amount: waterAmount,
-        previous_meter: previousMeter,
-        current_meter: current,
-        electricity_units: electricityUnits,
-        electricity_rate: ELECTRICITY_RATE,
-        electricity_amount: electricityAmount,
-        other_amount: other,
-        other_note: null,
-        total_amount: totalAmount,
-        due_date: dueDate || null,
-        status: "unpaid",
-      })
-      .select("id")
-      .single();
-
-    if (insertError || !newBill) {
-      setError(insertError?.message || "ไม่สามารถสร้างบิลได้");
-      setLoading(false);
-      return;
-    }
-
-    if (validOtherItems.length > 0) {
-      const billItems = validOtherItems.map((item) => ({
-        bill_id: newBill.id,
-        item_name: item.name.trim(),
-        amount: Number(item.amount),
-      }));
-
-      const { error: itemsError } = await supabase
-        .from("bill_items")
-        .insert(billItems);
-
-      if (itemsError) {
-        await supabase
-          .from("bills")
-          .delete()
-          .eq("id", newBill.id);
-
-        setError(
-          `บันทึกรายการค่าใช้จ่ายไม่สำเร็จ: ${itemsError.message}`
-        );
-        setLoading(false);
-        return;
-      }
-    }
-
-    router.push(`/rooms/${roomCode}`);
+    router.push(`/rooms/${roomCode}/bills/${newBillId}`);
     router.refresh();
   }
 
   return (
     <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-      <div className="rounded-xl bg-gray-50 p-4">
-        <p className="text-sm text-gray-500">ผู้เช่า</p>
-        <p className="mt-1 font-semibold">{tenantName}</p>
-      </div>
+      <p className="text-sm text-gray-500">
+        ผู้เช่า: <strong className="text-gray-800">{tenantName}</strong>
+      </p>
 
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="mb-2 block font-medium">เดือน</label>
-
           <select
             value={billingMonth}
-            onChange={(e) =>
-              setBillingMonth(Number(e.target.value))
-            }
+            onChange={(e) => setBillingMonth(Number(e.target.value))}
             className="w-full rounded-lg border px-4 py-3"
           >
             {[
@@ -283,22 +212,17 @@ export default function BillForm({
               "พฤศจิกายน",
               "ธันวาคม",
             ].map((month, index) => (
-              <option key={month} value={index + 1}>
-                {month}
-              </option>
+              <option key={month} value={index + 1}>{month}</option>
             ))}
           </select>
         </div>
 
         <div>
           <label className="mb-2 block font-medium">ปี ค.ศ.</label>
-
           <input
             type="number"
             value={billingYear}
-            onChange={(e) =>
-              setBillingYear(Number(e.target.value))
-            }
+            onChange={(e) => setBillingYear(Number(e.target.value))}
             className="w-full rounded-lg border px-4 py-3"
           />
         </div>
@@ -309,21 +233,14 @@ export default function BillForm({
           <span>ค่าเช่า</span>
           <strong>{monthlyRent.toLocaleString()} บาท</strong>
         </div>
-
         <div className="mt-3 flex justify-between">
-          <span>
-            ค่าน้ำ {occupantCount} × {WATER_RATE}
-          </span>
-
+          <span>ค่าน้ำ {occupantCount} × {WATER_RATE}</span>
           <strong>{waterAmount.toLocaleString()} บาท</strong>
         </div>
       </div>
 
       <div>
-        <label className="mb-2 block font-medium">
-          มิเตอร์ครั้งก่อน
-        </label>
-
+        <label className="mb-2 block font-medium">มิเตอร์ครั้งก่อน</label>
         <input
           value={previousMeter ?? ""}
           disabled
@@ -332,10 +249,7 @@ export default function BillForm({
       </div>
 
       <div>
-        <label className="mb-2 block font-medium">
-          มิเตอร์ครั้งนี้ *
-        </label>
-
+        <label className="mb-2 block font-medium">มิเตอร์ครั้งนี้ *</label>
         <input
           type="number"
           min={previousMeter ?? undefined}
@@ -352,18 +266,13 @@ export default function BillForm({
           <span>หน่วยไฟที่ใช้</span>
           <strong>{electricityUnits.toFixed(2)} หน่วย</strong>
         </div>
-
         <div className="mt-2 flex justify-between">
-          <span>
-            ค่าไฟ {electricityUnits.toFixed(2)} × {ELECTRICITY_RATE}
-          </span>
-
+          <span>ค่าไฟ {electricityUnits.toFixed(2)} × {ELECTRICITY_RATE}</span>
           <strong>
             {electricityAmount.toLocaleString(undefined, {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
-            })}{" "}
-            บาท
+            })} บาท
           </strong>
         </div>
       </div>
@@ -371,7 +280,6 @@ export default function BillForm({
       <div>
         <div className="mb-3 flex items-center justify-between">
           <label className="font-medium">ค่าใช้จ่ายอื่น</label>
-
           <button
             type="button"
             onClick={addOtherItem}
@@ -383,31 +291,22 @@ export default function BillForm({
 
         <div className="space-y-3">
           {otherItems.map((item, index) => (
-            <div
-              key={index}
-              className="grid grid-cols-[1fr_160px_auto] gap-3"
-            >
+            <div key={index} className="grid grid-cols-[1fr_160px_auto] gap-3">
               <input
                 value={item.name}
-                onChange={(e) =>
-                  updateOtherItem(index, "name", e.target.value)
-                }
+                onChange={(e) => updateOtherItem(index, "name", e.target.value)}
                 className="rounded-lg border px-4 py-3"
                 placeholder="ชื่อรายการ เช่น ค่ากุญแจ"
               />
-
               <input
                 type="number"
                 min="0"
                 step="0.01"
                 value={item.amount}
-                onChange={(e) =>
-                  updateOtherItem(index, "amount", e.target.value)
-                }
+                onChange={(e) => updateOtherItem(index, "amount", e.target.value)}
                 className="rounded-lg border px-4 py-3 text-right"
                 placeholder="จำนวนเงิน"
               />
-
               <button
                 type="button"
                 onClick={() => removeOtherItem(index)}
@@ -427,18 +326,14 @@ export default function BillForm({
               {other.toLocaleString(undefined, {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
-              })}{" "}
-              บาท
+              })} บาท
             </strong>
           </span>
         </div>
       </div>
 
       <div>
-        <label className="mb-2 block font-medium">
-          กำหนดชำระ
-        </label>
-
+        <label className="mb-2 block font-medium">กำหนดชำระ</label>
         <input
           type="date"
           value={dueDate}
@@ -450,21 +345,17 @@ export default function BillForm({
       <div className="rounded-xl bg-green-50 p-6">
         <div className="flex items-end justify-between">
           <span className="font-medium">ยอดรวม</span>
-
           <strong className="text-3xl">
             {totalAmount.toLocaleString(undefined, {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
-            })}{" "}
-            บาท
+            })} บาท
           </strong>
         </div>
       </div>
 
       {error && (
-        <div className="rounded-lg bg-red-50 p-4 text-red-600">
-          {error}
-        </div>
+        <div className="rounded-lg bg-red-50 p-4 text-red-600">{error}</div>
       )}
 
       <div className="flex gap-3">
@@ -475,7 +366,6 @@ export default function BillForm({
         >
           {loading ? "กำลังบันทึก..." : "🧾 บันทึกและออกบิล"}
         </button>
-
         <button
           type="button"
           onClick={() => router.back()}
