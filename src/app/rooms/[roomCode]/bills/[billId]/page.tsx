@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import StatusEditor from "./StatusEditor";
+import SendBillLineButton from "@/components/SendBillLineButton";
 
 type Props = {
   params: Promise<{
@@ -303,7 +304,8 @@ export default async function BillDetailPage({ params }: Props) {
           </section>
         )}
 
-        <div className="mt-6 flex flex-wrap items-center justify-end gap-3">
+        <div className="mt-6 flex flex-wrap items-start justify-end gap-3">
+          <SendBillLineButton billId={bill.id} />
           <Link
             href={`/pay/${bill.public_token}`}
             target="_blank"

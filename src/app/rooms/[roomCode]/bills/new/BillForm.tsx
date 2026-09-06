@@ -180,6 +180,12 @@ export default function BillForm({
       return;
     }
 
+    try {
+      await fetch(`/api/line/bills/${newBillId}/send`, { method: "POST" });
+    } catch {
+      // เปิดดูบิลและส่งซ้ำจากหน้ารายละเอียดได้ หาก LINE ยังไม่พร้อม
+    }
+
     router.push(`/rooms/${roomCode}/bills/${newBillId}`);
     router.refresh();
   }

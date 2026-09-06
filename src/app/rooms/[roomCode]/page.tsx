@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import LineConnectionCard from "@/components/LineConnectionCard";
 
 type Props = {
   params: Promise<{
@@ -99,7 +100,9 @@ export default async function RoomPage({ params }: Props) {
       move_in_date,
       move_out_date,
       is_active,
-      note
+      note,
+      line_user_id,
+      line_linked_at
     `)
     .eq("room_id", room.id)
     .eq("is_active", true);
@@ -248,6 +251,11 @@ export default async function RoomPage({ params }: Props) {
                     >
                       ✏️ แก้ไขข้อมูลผู้เช่า
                     </Link>
+
+                    <LineConnectionCard
+                      tenantId={tenant.id}
+                      linked={Boolean(tenant.line_user_id)}
+                    />
                   </div>
                 ))
               ) : (
