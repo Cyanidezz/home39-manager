@@ -40,6 +40,7 @@ export default function EndTenancyButton({
   const [noticeDate, setNoticeDate] = useState(initialNoticeDate || "");
   const [moveOutDate, setMoveOutDate] = useState(initialMoveOutDate || "");
   const [loading, setLoading] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
   const [error, setError] = useState("");
   const minimumMoveOutDate = useMemo(() => addOneMonth(noticeDate), [noticeDate]);
 
@@ -61,7 +62,9 @@ export default function EndTenancyButton({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ noticeDate, moveOutDate }),
       });
-      const result = (await response.json()) as { error?: string };
+      const result = (await response.json().catch(() => ({}))) as {
+        error?: string;
+      };
       if (!response.ok) {
         setError(result.error || "บันทึกข้อมูลไม่สำเร็จ");
         return;
@@ -75,15 +78,67 @@ export default function EndTenancyButton({
     }
   }
 
+  async function cancelMoveOut() {
+    const confirmed = window.confirm(
+      "ยืนยันยกเลิกการย้ายออก? สถานะห้องจะกลับเป็นมีผู้เช่า"
+    );
+    if (!confirmed) return;
+
+    setError("");
+    setCancelling(true);
+
+    try {
+      const response = await fetch(`/api/tenants/${tenantId}/move-out`, {
+        method: "DELETE",
+      });
+      const result = (await response.json().catch(() => ({}))) as {
+        error?: string;
+      };
+
+      if (!response.ok) {
+        setError(result.error || "ยกเลิกการย้ายออกไม่สำเร็จ");
+        return;
+      }
+
+      setNoticeDate("");
+      setMoveOutDate("");
+      router.refresh();
+    } catch {
+      setError("เชื่อมต่อระบบไม่สำเร็จ กรุณาลองใหม่");
+    } finally {
+      setCancelling(false);
+    }
+  }
+
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="mt-4 rounded-lg bg-orange-600 px-5 py-3 font-semibold text-white hover:bg-orange-700"
-      >
-        {initialMoveOutDate ? "แก้ไขข้อมูลย้ายออก" : "สิ้นสุดสัญญาเช่า"}
-      </button>
+      <div className="mt-4 flex flex-wrap gap-3">
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          disabled={cancelling}
+          className="rounded-lg bg-orange-600 px-5 py-3 font-semibold text-white hover:bg-orange-700 disabled:opacity-50"
+        >
+          {initialMoveOutDate ? "แก้ไขข้อมูลย้ายออก" : "สิ้นสุดสัญญาเช่า"}
+        </button>
+
+        {initialMoveOutDate && (
+          <button
+            type="button"
+            onClick={cancelMoveOut}
+            disabled={loading || cancelling}
+            className="rounded-lg border border-red-300 px-5 py-3 font-semibold text-red-700 hover:bg-red-50 disabled:opacity-50"
+          >
+            {cancelling ? "กำลังยกเลิก..." : "ยกเลิกการย้ายออก"}
+          </button>
+        )}
+      </div>
+
+      {error && !open && (
+        <p className="mt-3 rounded-lg bg-red-50 p-3 text-sm text-red-700">
+          {error}
+        </p>
+      )}
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" role="dialog" aria-modal="true">
@@ -120,8 +175,8 @@ export default function EndTenancyButton({
             </div>
 
             <div className="mt-6 flex justify-end gap-3">
-              <button type="button" onClick={() => setOpen(false)} disabled={loading} className="rounded-lg border px-5 py-3 disabled:opacity-50">ยกเลิก</button>
-              <button type="button" onClick={save} disabled={loading} className="rounded-lg bg-orange-600 px-5 py-3 font-semibold text-white disabled:opacity-50">
+              <button type="button" onClick={() => setOpen(false)} disabled={loading || cancelling} className="rounded-lg border px-5 py-3 disabled:opacity-50">ยกเลิก</button>
+              <button type="button" onClick={save} disabled={loading || cancelling} className="rounded-lg bg-orange-600 px-5 py-3 font-semibold text-white disabled:opacity-50">
                 {loading ? "กำลังบันทึก..." : "บันทึกการแจ้งย้ายออก"}
               </button>
             </div>
