@@ -16,6 +16,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Home 39 - Hatyai",
   description: "ห้องพัก Home 39 หาดใหญ่ พร้อมข้อมูลห้องว่างและช่องทางติดต่อ",
+  icons: {
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
+  },
 };
 
 export default function RootLayout({
