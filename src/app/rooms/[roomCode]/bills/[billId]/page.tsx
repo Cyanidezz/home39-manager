@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import StatusEditor from "./StatusEditor";
+import SlipViewer from "./SlipViewer";
 import SendBillLineButton from "@/components/SendBillLineButton";
 import { publicAppUrl, pushLineText } from "@/lib/line";
 
@@ -341,9 +342,14 @@ export default async function BillDetailPage({ params }: Props) {
                 </p>
               </div>
               {slipUrl ? (
-                <a href={slipUrl} target="_blank" rel="noopener noreferrer" className="rounded-xl bg-blue-700 px-5 py-3 font-semibold text-white hover:bg-blue-800">
-                  เปิดดูสลิป
-                </a>
+                <SlipViewer
+                  slipUrl={slipUrl}
+                  fileName={bill.slip_original_name || "ไฟล์สลิป"}
+                  billId={bill.id}
+                  roomCode={bill.rooms.room_code}
+                  isPaid={bill.status === "paid"}
+                  markBillAsPaid={markBillAsPaid}
+                />
               ) : (
                 <span className="text-sm text-red-700">ไม่สามารถเปิดไฟล์สลิปได้</span>
               )}
@@ -370,18 +376,6 @@ export default async function BillDetailPage({ params }: Props) {
             👁 ดูบิลสำหรับผู้เช่า
           </Link>
 
-          {bill.status !== "paid" && (
-            <form action={markBillAsPaid}>
-              <input type="hidden" name="billId" value={bill.id} />
-              <input type="hidden" name="roomCode" value={bill.rooms.room_code} />
-              <button
-                type="submit"
-                className="rounded-xl bg-green-600 px-5 py-3 font-semibold text-white hover:bg-green-700"
-              >
-                ✓ บันทึกชำระเงิน
-              </button>
-            </form>
-          )}
         </div>
 
         {bill.status === "paid" && bill.paid_at && (
