@@ -55,7 +55,16 @@ export async function pushLineText(lineUserId: string, text: string) {
 }
 
 export function publicAppUrl() {
-  const url = process.env.NEXT_PUBLIC_APP_URL;
-  if (!url) throw new Error("NEXT_PUBLIC_APP_URL is not configured");
+  const configuredUrl = process.env.NEXT_PUBLIC_APP_URL;
+  const vercelProductionUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+  const vercelDeploymentUrl = process.env.VERCEL_URL;
+  const url = configuredUrl
+    || (vercelProductionUrl ? `https://${vercelProductionUrl}` : "")
+    || (vercelDeploymentUrl ? `https://${vercelDeploymentUrl}` : "");
+
+  if (!url) {
+    throw new Error("Application URL is not configured");
+  }
+
   return url.replace(/\/$/, "");
 }
