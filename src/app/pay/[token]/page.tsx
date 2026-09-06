@@ -74,8 +74,8 @@ function getStatus(status: string) {
     case "slip_submitted": return { text: "ส่งสลิปแล้ว", className: "bg-blue-100 text-blue-700" };
     case "verifying": return { text: "กำลังตรวจสอบ", className: "bg-yellow-100 text-yellow-700" };
     case "rejected": return { text: "สลิปไม่ผ่าน", className: "bg-red-100 text-red-700" };
-    case "draft": return { text: "ฉบับร่าง", className: "bg-gray-100 text-gray-700" };
-    default: return { text: status, className: "bg-gray-100 text-gray-700" };
+    case "draft": return { text: "ฉบับร่าง", className: "bg-slate-100 text-slate-700" };
+    default: return { text: status, className: "bg-slate-100 text-slate-700" };
   }
 }
 
@@ -98,27 +98,27 @@ export default async function PublicBillPage({ params }: Props) {
   const status = getStatus(bill.status);
 
   return (
-    <main className="min-h-screen bg-gray-50 px-4 py-10">
+    <main className="min-h-screen bg-slate-50 px-4 py-10">
       <div className="mx-auto max-w-xl">
         <div className="mb-6 text-center">
           <h1 className="text-3xl font-bold">🏠 Home39</h1>
-          <p className="mt-1 text-gray-500">ใบแจ้งค่าใช้จ่าย</p>
+          <p className="mt-1 text-slate-500">ใบแจ้งค่าใช้จ่าย</p>
         </div>
 
-        <div className="overflow-hidden rounded-2xl bg-white shadow-sm">
+        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
           <div className="px-6 py-6">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-xl font-bold">ห้อง {bill.room_code || "-"}</p>
-                <p className="mt-1 text-sm text-gray-500">ผู้เช่า: {bill.tenant_name || "-"}</p>
+                <p className="mt-1 text-sm text-slate-500">ผู้เช่า: {bill.tenant_name || "-"}</p>
               </div>
               <span className={`rounded-full px-4 py-2 text-sm font-semibold ${status.className}`}>
                 {status.text}
               </span>
             </div>
-            <div className="mt-5 rounded-xl bg-gray-50 p-4">
+            <div className="mt-5 rounded-xl bg-slate-50 p-4">
               <p className="font-semibold">{thaiMonths[bill.billing_month - 1]} {bill.billing_year + 543}</p>
-              <p className="mt-1 text-sm text-gray-500">กำหนดชำระ: {formatThaiDate(bill.due_date)}</p>
+              <p className="mt-1 text-sm text-slate-500">กำหนดชำระ: {formatThaiDate(bill.due_date)}</p>
             </div>
           </div>
 
@@ -133,7 +133,7 @@ export default async function PublicBillPage({ params }: Props) {
             <div className="flex justify-between gap-4">
               <div>
                 <p>ค่าน้ำ</p>
-                <p className="mt-1 text-sm text-gray-500">
+                <p className="mt-1 text-sm text-slate-500">
                   {bill.occupant_count} คน × {formatNumber(bill.water_rate_per_person)} บาท
                 </p>
               </div>
@@ -145,15 +145,15 @@ export default async function PublicBillPage({ params }: Props) {
             <h2 className="font-semibold">ค่าไฟฟ้า</h2>
             <div className="mt-4 space-y-3 text-sm">
               <div className="flex justify-between">
-                <span className="text-gray-500">มิเตอร์ครั้งก่อน</span>
+                <span className="text-slate-500">มิเตอร์ครั้งก่อน</span>
                 <span>{bill.previous_meter != null ? formatNumber(bill.previous_meter) : "-"}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">มิเตอร์ครั้งนี้</span>
+                <span className="text-slate-500">มิเตอร์ครั้งนี้</span>
                 <span>{bill.current_meter != null ? formatNumber(bill.current_meter) : "-"}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">หน่วยไฟที่ใช้</span>
+                <span className="text-slate-500">หน่วยไฟที่ใช้</span>
                 <span>{formatNumber(bill.electricity_units)} หน่วย</span>
               </div>
               <div className="flex justify-between pt-2">
@@ -177,7 +177,7 @@ export default async function PublicBillPage({ params }: Props) {
             </div>
           )}
 
-          <div className="border-t bg-gray-50 px-6 py-6">
+          <div className="border-t bg-slate-50 px-6 py-6">
             <div className="flex items-center justify-between gap-4">
               <span className="text-lg font-bold">ยอดชำระ</span>
               <span className="text-2xl font-bold">{formatMoney(bill.total_amount)} บาท</span>
@@ -185,26 +185,26 @@ export default async function PublicBillPage({ params }: Props) {
           </div>
 
           {bill.status !== "paid" && bill.payment_settings && (
-            <div className="border-t bg-purple-50 px-6 py-6">
-              <h2 className="font-bold text-purple-900">ช่องทางชำระเงิน</h2>
+            <div className="border-t bg-blue-50 px-6 py-6">
+              <h2 className="font-bold text-blue-900">ช่องทางชำระเงิน</h2>
 
-              <div className="mt-4 rounded-xl border border-purple-200 bg-white p-5">
-                <p className="text-sm font-medium text-purple-700">
+              <div className="mt-4 rounded-xl border border-blue-200 bg-white p-5">
+                <p className="text-sm font-medium text-blue-700">
                   {bill.payment_settings.bank_name}
                   {bill.payment_settings.bank_code
                     ? ` (${bill.payment_settings.bank_code.toUpperCase()})`
                     : ""}
                 </p>
 
-                <p className="mt-3 text-sm text-gray-500">ชื่อบัญชี</p>
+                <p className="mt-3 text-sm text-slate-500">ชื่อบัญชี</p>
                 <p className="font-semibold">{bill.payment_settings.account_name}</p>
 
-                <p className="mt-3 text-sm text-gray-500">เลขที่บัญชี</p>
-                <p className="select-all text-2xl font-bold tracking-wide text-purple-900">
+                <p className="mt-3 text-sm text-slate-500">เลขที่บัญชี</p>
+                <p className="select-all text-2xl font-bold tracking-wide text-blue-900">
                   {bill.payment_settings.account_number}
                 </p>
 
-                <div className="mt-4 rounded-lg bg-purple-50 p-3 text-sm text-purple-800">
+                <div className="mt-4 rounded-lg bg-blue-50 p-3 text-sm text-blue-800">
                   กรุณาโอนจำนวน{" "}
                   <strong>{formatMoney(bill.total_amount)} บาท</strong>
                   {" "}และระบุห้อง{" "}
@@ -226,7 +226,7 @@ export default async function PublicBillPage({ params }: Props) {
           )}
         </div>
 
-        <p className="mt-5 text-center text-xs text-gray-400">กรุณาตรวจสอบรายละเอียดก่อนชำระเงิน</p>
+        <p className="mt-5 text-center text-xs text-slate-400">กรุณาตรวจสอบรายละเอียดก่อนชำระเงิน</p>
       </div>
     </main>
   );

@@ -66,9 +66,9 @@ export default async function NewBillPage({ params }: Props) {
     .maybeSingle();
 
   return (
-    <main className="min-h-screen bg-gray-50 p-8">
+    <main className="min-h-screen bg-slate-50 p-8">
       <div className="mx-auto max-w-2xl">
-        <div className="rounded-2xl bg-white p-8 shadow-sm">
+        <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
           <h1 className="text-3xl font-bold">
             🧾 ออกบิลใหม่ - ห้อง {room.room_code}
           </h1>
@@ -77,9 +77,9 @@ export default async function NewBillPage({ params }: Props) {
             ห้อง {room.room_code}
           </p> */}
 
-          {/* <p className="mt-1 text-sm text-gray-500">
+          {/* <p className="mt-1 text-sm text-slate-500">
             ผู้เช่า:{" "}
-            <strong className="text-gray-800">
+            <strong className="text-slate-800">
               {tenant?.full_name || "ไม่พบผู้เช่าปัจจุบัน"}
             </strong>
           </p> */}

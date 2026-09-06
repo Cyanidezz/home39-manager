@@ -172,7 +172,7 @@ export default function ExpenseManager({
         <h2 className="text-xl font-semibold">
           {editingId ? "แก้ไขรายจ่าย" : "เพิ่มรายจ่ายจริง"}
         </h2>
-        <p className="mt-1 text-sm text-gray-500">
+        <p className="mt-1 text-sm text-slate-500">
           ใช้เดือนบัญชีในการคำนวณกำไร/ขาดทุน
         </p>
 
@@ -272,18 +272,18 @@ export default function ExpenseManager({
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <h2 className="text-xl font-semibold">รายการรายจ่ายเดือนนี้</h2>
-            <p className="mt-1 text-sm text-gray-500">
+            <p className="mt-1 text-sm text-slate-500">
               ทั้งหมด {initialExpenses.length} รายการ
             </p>
           </div>
           <p className="text-right">
-            <span className="block text-sm text-gray-500">รวมรายจ่าย</span>
+            <span className="block text-sm text-slate-500">รวมรายจ่าย</span>
             <strong className="text-2xl text-red-700">{money(total)} บาท</strong>
           </p>
         </div>
 
         {initialExpenses.length === 0 ? (
-          <div className="mt-8 rounded-xl bg-gray-50 p-8 text-center text-gray-500">
+          <div className="mt-8 rounded-xl bg-slate-50 p-8 text-center text-slate-500">
             ยังไม่มีรายจ่ายในเดือนนี้
           </div>
         ) : (
@@ -295,7 +295,7 @@ export default function ExpenseManager({
               >
                 <div>
                   <p className="font-semibold">{categoryLabel(expense.category)}</p>
-                  <p className="mt-1 text-sm text-gray-500">
+                  <p className="mt-1 text-sm text-slate-500">
                     {thaiDate(expense.expense_date)}
                     {expense.note ? ` · ${expense.note}` : ""}
                   </p>
@@ -305,7 +305,7 @@ export default function ExpenseManager({
                   <button
                     type="button"
                     onClick={() => editExpense(expense)}
-                    className="rounded-lg border px-3 py-2 text-sm hover:bg-gray-50"
+                    className="rounded-lg border px-3 py-2 text-sm hover:bg-slate-50"
                   >
                     แก้ไข
                   </button>

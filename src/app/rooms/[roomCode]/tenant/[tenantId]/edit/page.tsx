@@ -56,14 +56,14 @@ export default async function EditTenantPage({ params }: Props) {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 p-8">
+    <main className="min-h-screen bg-slate-50 p-8">
       <div className="mx-auto max-w-2xl">
-        <div className="rounded-2xl bg-white p-8 shadow-sm">
+        <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
           <h1 className="text-3xl font-bold">
             แก้ไขข้อมูลผู้เช่า
           </h1>
 
-          <p className="mt-2 text-gray-500">
+          <p className="mt-2 text-slate-500">
             ห้อง {room.room_code}
           </p>
 
@@ -84,7 +84,7 @@ export default async function EditTenantPage({ params }: Props) {
 
           <div className="mt-8 border-t pt-8">
             <h2 className="text-xl font-semibold">การสิ้นสุดสัญญาเช่า</h2>
-            <p className="mt-2 text-sm text-gray-500">
+            <p className="mt-2 text-sm text-slate-500">
               บันทึกวันที่แจ้งและวันที่จะย้ายออก โดยต้องแจ้งล่วงหน้าอย่างน้อย 1 เดือน
             </p>
             <EndTenancyButton

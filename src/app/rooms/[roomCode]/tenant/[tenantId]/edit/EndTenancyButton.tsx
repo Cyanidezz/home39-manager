@@ -200,21 +200,21 @@ export default function EndTenancyButton({
 
       {completeOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-blue-600/60 p-4"
           role="dialog"
           aria-modal="true"
         >
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+          <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-xl">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h3 className="text-xl font-bold">ยืนยันผู้เช่าย้ายออกแล้ว</h3>
-                <p className="mt-1 text-sm text-gray-500">{tenantName}</p>
+                <p className="mt-1 text-sm text-slate-500">{tenantName}</p>
               </div>
               <button
                 type="button"
                 onClick={() => setCompleteOpen(false)}
                 disabled={completing}
-                className="text-2xl text-gray-400 hover:text-black disabled:opacity-50"
+                className="text-2xl text-slate-400 hover:text-blue-700 disabled:opacity-50"
                 aria-label="ปิด"
               >
                 ×
@@ -231,7 +231,7 @@ export default function EndTenancyButton({
                 onChange={(event) => setActualMoveOutDate(event.target.value)}
                 className="w-full rounded-lg border px-4 py-3"
               />
-              <p className="mt-3 rounded-xl bg-gray-50 p-4 text-sm text-gray-600">
+              <p className="mt-3 rounded-xl bg-slate-50 p-4 text-sm text-slate-600">
                 หลังยืนยัน ผู้เช่าจะถูกปิดสถานะและห้องจะเปลี่ยนเป็นห้องว่าง
               </p>
               {error && (
@@ -264,14 +264,14 @@ export default function EndTenancyButton({
       )}
 
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" role="dialog" aria-modal="true">
-          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-blue-600/60 p-4" role="dialog" aria-modal="true">
+          <div className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-6 shadow-xl">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h3 className="text-xl font-bold">บันทึกการสิ้นสุดสัญญาเช่า</h3>
-                <p className="mt-1 text-sm text-gray-500">{tenantName}</p>
+                <p className="mt-1 text-sm text-slate-500">{tenantName}</p>
               </div>
-              <button type="button" onClick={() => setOpen(false)} className="text-2xl text-gray-400 hover:text-black" aria-label="ปิด">×</button>
+              <button type="button" onClick={() => setOpen(false)} className="text-2xl text-slate-400 hover:text-blue-700" aria-label="ปิด">×</button>
             </div>
 
             <div className="mt-6 space-y-5">
@@ -286,7 +286,7 @@ export default function EndTenancyButton({
               <div>
                 <label className="mb-2 block font-medium">วันที่ผู้เช่าแจ้งว่าจะย้ายออก *</label>
                 <input type="date" min={minimumMoveOutDate} value={moveOutDate} onChange={(event) => setMoveOutDate(event.target.value)} className="w-full rounded-lg border px-4 py-3" />
-                <p className="mt-2 text-sm text-gray-500">ต้องแจ้งล่วงหน้าอย่างน้อย 1 เดือน</p>
+                <p className="mt-2 text-sm text-slate-500">ต้องแจ้งล่วงหน้าอย่างน้อย 1 เดือน</p>
               </div>
 
               {noticeDate && (

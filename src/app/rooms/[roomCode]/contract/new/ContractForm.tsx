@@ -151,7 +151,7 @@ export default function ContractForm({
         />
 
         {file && (
-          <p className="mt-2 text-sm text-gray-500">
+          <p className="mt-2 text-sm text-slate-500">
             📎 {file.name}
           </p>
         )}
@@ -179,7 +179,7 @@ export default function ContractForm({
         <button
           type="submit"
           disabled={loading}
-          className="rounded-lg bg-black px-6 py-3 text-white disabled:opacity-50"
+          className="rounded-lg bg-blue-600 px-6 py-3 text-white disabled:opacity-50"
         >
           {loading ? "กำลัง Upload..." : "บันทึกสัญญา"}
         </button>

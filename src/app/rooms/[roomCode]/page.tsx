@@ -66,13 +66,13 @@ function getBillStatusLabel(status: string) {
     case "draft":
       return {
         text: "ฉบับร่าง",
-        className: "text-gray-600",
+        className: "text-slate-600",
       };
 
     default:
       return {
         text: status,
-        className: "text-gray-600",
+        className: "text-slate-600",
       };
   }
 }
@@ -177,11 +177,11 @@ export default async function RoomPage({ params }: Props) {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 p-8">
+    <main className="min-h-screen bg-slate-50 p-8">
       <div className="mx-auto max-w-5xl">
         <Link
           href="/dashboard"
-          className="text-sm text-gray-500 hover:text-black"
+          className="text-sm text-slate-500 hover:text-blue-700"
         >
           ← กลับ Dashboard
         </Link>
@@ -192,7 +192,7 @@ export default async function RoomPage({ params }: Props) {
               ห้อง {room.room_code}
             </h1>
 
-            <p className="mt-1 text-gray-500">
+            <p className="mt-1 text-slate-500">
               จัดการข้อมูลห้องพัก
             </p>
           </div>
@@ -201,14 +201,14 @@ export default async function RoomPage({ params }: Props) {
             {activeTenant ? (
               <Link
                 href={`/rooms/${room.room_code}/bills/new`}
-                className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
+                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
               >
                 🧾 ออกบิลใหม่
               </Link>
             ) : (
               <Link
                 href={`/rooms/${room.room_code}/tenant/new`}
-                className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
+                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
               >
                 + สร้างผู้เช่าใหม่
               </Link>
@@ -219,7 +219,7 @@ export default async function RoomPage({ params }: Props) {
                 ? "bg-orange-100 text-orange-700"
                 : room.status === "occupied"
                   ? "bg-green-100 text-green-700"
-                  : "bg-gray-100 text-gray-700"
+                  : "bg-slate-100 text-slate-700"
             }`}>
               {activeTenant?.planned_move_out_date
                 ? `ผู้เช่าแจ้งย้ายออก ${formatThaiDate(activeTenant.planned_move_out_date)}`
@@ -229,7 +229,7 @@ export default async function RoomPage({ params }: Props) {
         </div>
 
         <div className="mt-8 grid gap-6 md:grid-cols-2">
-          <section className="rounded-2xl bg-white p-6 shadow-sm">
+          <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <h2 className="text-xl font-semibold">
               🏠 ข้อมูลห้อง
             </h2>
@@ -261,7 +261,7 @@ export default async function RoomPage({ params }: Props) {
             </div>
           </section>
 
-          <section className="rounded-2xl bg-white p-6 shadow-sm">
+          <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <h2 className="text-xl font-semibold">
               👤 ผู้เช่า
             </h2>
@@ -274,15 +274,15 @@ export default async function RoomPage({ params }: Props) {
                       {tenant.full_name}
                     </p>
 
-                    <p className="mt-2 text-gray-600">
+                    <p className="mt-2 text-slate-600">
                       โทร: {tenant.phone || "-"}
                     </p>
 
-                    <p className="text-gray-600">
+                    <p className="text-slate-600">
                       เริ่มเช่า: {formatThaiDate(tenant.move_in_date)}
                     </p>
 
-                    <div className="mt-4 grid gap-2 rounded-xl bg-gray-50 p-4 text-sm text-gray-700 sm:grid-cols-2">
+                    <div className="mt-4 grid gap-2 rounded-xl bg-slate-50 p-4 text-sm text-slate-700 sm:grid-cols-2">
                       <p>
                         ค่าเช่าล่วงหน้า{" "}
                         <strong>{tenant.advance_rent_amount != null
@@ -303,7 +303,7 @@ export default async function RoomPage({ params }: Props) {
 
                     <Link
                       href={`/rooms/${room.room_code}/tenant/${tenant.id}/edit`}
-                      className="mt-4 inline-block rounded-lg border px-4 py-2 text-sm hover:bg-gray-50"
+                      className="mt-4 inline-block rounded-lg border px-4 py-2 text-sm hover:bg-slate-50"
                     >
                       ✏️ แก้ไขข้อมูลผู้เช่า
                     </Link>
@@ -324,14 +324,14 @@ export default async function RoomPage({ params }: Props) {
                   </div>
                 ))
               ) : (
-                <p className="text-gray-500">
+                <p className="text-slate-500">
                   ยังไม่มีข้อมูลผู้เช่า
                 </p>
               )}
             </div>
           </section>
 
-          <section className="rounded-2xl bg-white p-6 shadow-sm">
+          <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <h2 className="text-xl font-semibold">
               📄 สัญญาเช่า
             </h2>
@@ -342,7 +342,7 @@ export default async function RoomPage({ params }: Props) {
                   {latestContract.original_file_name || "สัญญาเช่า"}
                 </p>
 
-                <div className="mt-3 space-y-1 text-sm text-gray-600">
+                <div className="mt-3 space-y-1 text-sm text-slate-600">
                   <p>
                     เริ่มสัญญา: {latestContract.contract_start || "-"}
                   </p>
@@ -367,7 +367,7 @@ export default async function RoomPage({ params }: Props) {
                       href={contractUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="rounded-lg bg-black px-4 py-2 text-sm text-white"
+                      className="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white"
                     >
                       👁 ดูสัญญา
                     </a>
@@ -375,7 +375,7 @@ export default async function RoomPage({ params }: Props) {
 
                   <Link
                     href={`/rooms/${room.room_code}/contract/new`}
-                    className="rounded-lg border px-4 py-2 text-sm hover:bg-gray-50"
+                    className="rounded-lg border px-4 py-2 text-sm hover:bg-slate-50"
                   >
                     ⬆ Upload สัญญาใหม่
                   </Link>
@@ -383,13 +383,13 @@ export default async function RoomPage({ params }: Props) {
               </div>
             ) : (
               <div className="mt-4">
-                <p className="text-gray-500">
+                <p className="text-slate-500">
                   ยังไม่มีสัญญาเช่า
                 </p>
 
                 <Link
                   href={`/rooms/${room.room_code}/contract/new`}
-                  className="mt-4 inline-block rounded-lg border px-4 py-2 hover:bg-gray-50"
+                  className="mt-4 inline-block rounded-lg border px-4 py-2 hover:bg-slate-50"
                 >
                   ⬆ Upload สัญญา
                 </Link>
@@ -397,7 +397,7 @@ export default async function RoomPage({ params }: Props) {
             )}
           </section>
 
-          <section className="rounded-2xl bg-white p-6 shadow-sm">
+          <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <h2 className="text-xl font-semibold">
               ⚡ ข้อมูลล่าสุด
             </h2>
@@ -442,20 +442,20 @@ export default async function RoomPage({ params }: Props) {
 
                 <Link
                   href={`/rooms/${room.room_code}/bills`}
-                  className="mt-5 inline-block rounded-lg border px-4 py-2 text-sm hover:bg-gray-50"
+                  className="mt-5 inline-block rounded-lg border px-4 py-2 text-sm hover:bg-slate-50"
                 >
                   🧾 ดูประวัติบิลทั้งหมด
                 </Link>
               </div>
             ) : (
               <div className="mt-4">
-                <p className="text-gray-500">
+                <p className="text-slate-500">
                   ยังไม่มีประวัติบิล
                 </p>
 
                 <Link
                   href={`/rooms/${room.room_code}/bills/new`}
-                  className="mt-4 inline-block rounded-lg border px-4 py-2 text-sm hover:bg-gray-50"
+                  className="mt-4 inline-block rounded-lg border px-4 py-2 text-sm hover:bg-slate-50"
                 >
                   🧾 ออกบิลแรก
                 </Link>

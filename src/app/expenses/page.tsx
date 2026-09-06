@@ -34,7 +34,7 @@ export default async function ExpensesPage({ searchParams }: Props) {
     .order("created_at", { ascending: false });
 
   return (
-    <main className="min-h-screen bg-gray-50 px-4 py-8 sm:p-8">
+    <main className="min-h-screen bg-slate-50 px-4 py-8 sm:p-8">
       <div className="mx-auto max-w-6xl">
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
@@ -45,14 +45,14 @@ export default async function ExpensesPage({ searchParams }: Props) {
               ← กลับ Dashboard
             </Link>
             <h1 className="mt-3 text-3xl font-bold">รายจ่ายจริง</h1>
-            <p className="mt-1 text-gray-500">
+            <p className="mt-1 text-slate-500">
               บันทึกค่าใช้จ่ายเพื่อนำไปคำนวณกำไร/ขาดทุน
             </p>
           </div>
 
           <form className="flex items-end gap-3">
             <div>
-              <label htmlFor="month" className="mb-1 block text-sm text-gray-500">
+              <label htmlFor="month" className="mb-1 block text-sm text-slate-500">
                 เดือนบัญชี
               </label>
               <input

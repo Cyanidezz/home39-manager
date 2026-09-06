@@ -72,7 +72,7 @@ export default function PaymentSettingsForm({
           value={bankName}
           onChange={(event) => setBankName(event.target.value)}
           required
-          className="w-full rounded-lg border px-4 py-3 outline-none focus:ring-2 focus:ring-purple-600"
+          className="w-full rounded-lg border px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="ธนาคารไทยพาณิชย์"
         />
       </div>
@@ -82,7 +82,7 @@ export default function PaymentSettingsForm({
         <input
           value={bankCode}
           onChange={(event) => setBankCode(event.target.value)}
-          className="w-full rounded-lg border px-4 py-3 uppercase outline-none focus:ring-2 focus:ring-purple-600"
+          className="w-full rounded-lg border px-4 py-3 uppercase outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="SCB"
         />
       </div>
@@ -93,7 +93,7 @@ export default function PaymentSettingsForm({
           value={accountName}
           onChange={(event) => setAccountName(event.target.value)}
           required
-          className="w-full rounded-lg border px-4 py-3 outline-none focus:ring-2 focus:ring-purple-600"
+          className="w-full rounded-lg border px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="ชื่อเจ้าของบัญชี"
         />
       </div>
@@ -105,7 +105,7 @@ export default function PaymentSettingsForm({
           onChange={(event) => setAccountNumber(event.target.value)}
           required
           inputMode="numeric"
-          className="w-full rounded-lg border px-4 py-3 text-lg font-semibold tracking-wide outline-none focus:ring-2 focus:ring-purple-600"
+          className="w-full rounded-lg border px-4 py-3 text-lg font-semibold tracking-wide outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="000-000000-0"
         />
       </div>
@@ -125,7 +125,7 @@ export default function PaymentSettingsForm({
       <button
         type="submit"
         disabled={saving}
-        className="w-full rounded-lg bg-purple-700 py-3 font-medium text-white transition hover:bg-purple-800 disabled:opacity-50"
+        className="w-full rounded-lg bg-blue-600 py-3 font-medium text-white transition hover:bg-blue-700 disabled:opacity-50"
       >
         {saving ? "กำลังบันทึก..." : "บันทึกข้อมูลบัญชี"}
       </button>

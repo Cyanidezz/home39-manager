@@ -76,7 +76,7 @@ export default function BillEditForm({ billId, roomCode, initial }: Props) {
     }
   }
 
-  const inputClass = "w-full rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-black";
+  const inputClass = "w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-black";
 
   return (
     <form onSubmit={save} className="mt-8 space-y-7">
@@ -93,15 +93,15 @@ export default function BillEditForm({ billId, roomCode, initial }: Props) {
       </div>
 
       <section>
-        <div className="flex items-center justify-between gap-4"><h2 className="text-lg font-bold">ค่าใช้จ่ายอื่น</h2><button type="button" onClick={() => setItems((current) => [...current, { name: "", amount: "" }])} className="rounded-lg border px-4 py-2 text-sm hover:bg-gray-50">+ เพิ่มรายการ</button></div>
+        <div className="flex items-center justify-between gap-4"><h2 className="text-lg font-bold">ค่าใช้จ่ายอื่น</h2><button type="button" onClick={() => setItems((current) => [...current, { name: "", amount: "" }])} className="rounded-lg border px-4 py-2 text-sm hover:bg-slate-50">+ เพิ่มรายการ</button></div>
         <div className="mt-4 space-y-3">{items.map((item, index) => <div key={index} className="grid gap-3 sm:grid-cols-[1fr_160px_auto]"><input aria-label={`ชื่อรายการที่ ${index + 1}`} placeholder="ชื่อรายการ" value={item.name} onChange={(e) => updateItem(index, "name", e.target.value)} className={inputClass} /><input aria-label={`จำนวนเงินรายการที่ ${index + 1}`} type="number" min="0.01" step="0.01" placeholder="จำนวนเงิน" value={item.amount} onChange={(e) => updateItem(index, "amount", e.target.value)} className={inputClass} /><button type="button" onClick={() => setItems((current) => current.filter((_, itemIndex) => itemIndex !== index))} className="rounded-xl px-4 py-3 text-red-600 hover:bg-red-50">ลบรายการ</button></div>)}</div>
       </section>
 
-      <section className="rounded-xl bg-gray-50 p-5"><div className="space-y-2 text-sm"><p className="flex justify-between"><span>ค่าน้ำ</span><strong>{totals.water.toLocaleString("th-TH")} บาท</strong></p><p className="flex justify-between"><span>ไฟฟ้า {totals.units.toLocaleString("th-TH")} หน่วย</span><strong>{totals.electricity.toLocaleString("th-TH")} บาท</strong></p><p className="flex justify-between"><span>ค่าใช้จ่ายอื่น</span><strong>{totals.other.toLocaleString("th-TH")} บาท</strong></p></div><div className="mt-4 flex justify-between border-t pt-4 text-xl font-bold"><span>ยอดรวมใหม่</span><span>{totals.total.toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} บาท</span></div></section>
+      <section className="rounded-xl bg-slate-50 p-5"><div className="space-y-2 text-sm"><p className="flex justify-between"><span>ค่าน้ำ</span><strong>{totals.water.toLocaleString("th-TH")} บาท</strong></p><p className="flex justify-between"><span>ไฟฟ้า {totals.units.toLocaleString("th-TH")} หน่วย</span><strong>{totals.electricity.toLocaleString("th-TH")} บาท</strong></p><p className="flex justify-between"><span>ค่าใช้จ่ายอื่น</span><strong>{totals.other.toLocaleString("th-TH")} บาท</strong></p></div><div className="mt-4 flex justify-between border-t pt-4 text-xl font-bold"><span>ยอดรวมใหม่</span><span>{totals.total.toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} บาท</span></div></section>
       {error && <p className="rounded-xl bg-red-50 p-4 text-red-700">{error}</p>}
-      <div className="flex justify-end gap-3"><button type="button" onClick={() => router.back()} className="rounded-xl border px-5 py-3">ยกเลิก</button><button type="submit" disabled={loading} className="rounded-xl bg-black px-6 py-3 font-semibold text-white disabled:opacity-50">{loading ? "กำลังบันทึก..." : "บันทึกการแก้ไข"}</button></div>
+      <div className="flex justify-end gap-3"><button type="button" onClick={() => router.back()} className="rounded-xl border px-5 py-3">ยกเลิก</button><button type="submit" disabled={loading} className="rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white disabled:opacity-50">{loading ? "กำลังบันทึก..." : "บันทึกการแก้ไข"}</button></div>
 
-      <section className="border-t border-red-200 pt-7"><h2 className="font-bold text-red-800">ลบบิล</h2><p className="mt-1 text-sm text-gray-500">ลบบิล รายการค่าใช้จ่าย ประวัติ และสลิปที่เกี่ยวข้องอย่างถาวร</p><div className="mt-4"><DeleteBillButton billId={billId} roomCode={roomCode} billLabel={`${months[billingMonth - 1]} ${billingYear + 543} · ห้อง ${roomCode}`} /></div></section>
+      <section className="border-t border-red-200 pt-7"><h2 className="font-bold text-red-800">ลบบิล</h2><p className="mt-1 text-sm text-slate-500">ลบบิล รายการค่าใช้จ่าย ประวัติ และสลิปที่เกี่ยวข้องอย่างถาวร</p><div className="mt-4"><DeleteBillButton billId={billId} roomCode={roomCode} billLabel={`${months[billingMonth - 1]} ${billingYear + 543} · ห้อง ${roomCode}`} /></div></section>
     </form>
   );
 }

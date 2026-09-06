@@ -179,7 +179,7 @@ export default function EditTenantForm({
         <button
           type="submit"
           disabled={loading}
-          className="rounded-lg bg-black px-6 py-3 text-white disabled:opacity-50"
+          className="rounded-lg bg-blue-600 px-6 py-3 text-white disabled:opacity-50"
         >
           {loading ? "กำลังบันทึก..." : "บันทึกการแก้ไข"}
         </button>

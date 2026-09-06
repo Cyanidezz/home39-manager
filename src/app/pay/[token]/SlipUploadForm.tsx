@@ -42,11 +42,11 @@ export default function SlipUploadForm({ token }: Props) {
 
   return (
     <form onSubmit={handleSubmit} className="border-t bg-white px-6 py-6">
-      <h2 className="font-bold text-gray-900">ส่งหลักฐานการโอนเงิน</h2>
-      <p className="mt-1 text-sm text-gray-500">รองรับ JPG, PNG, WebP หรือ PDF ขนาดไม่เกิน 8 MB</p>
+      <h2 className="font-bold text-slate-900">ส่งหลักฐานการโอนเงิน</h2>
+      <p className="mt-1 text-sm text-slate-500">รองรับ JPG, PNG, WebP หรือ PDF ขนาดไม่เกิน 8 MB</p>
 
-      <label className="mt-4 block cursor-pointer rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 p-5 text-center transition hover:border-purple-400 hover:bg-purple-50">
-        <span className="block font-medium text-gray-700">
+      <label className="mt-4 block cursor-pointer rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 p-5 text-center transition hover:border-blue-400 hover:bg-blue-50">
+        <span className="block font-medium text-slate-700">
           {file ? file.name : "แตะเพื่อเลือกไฟล์สลิป"}
         </span>
         <input
@@ -64,7 +64,7 @@ export default function SlipUploadForm({ token }: Props) {
       <button
         type="submit"
         disabled={!file || loading}
-        className="mt-4 w-full rounded-xl bg-purple-700 px-5 py-3 font-semibold text-white transition hover:bg-purple-800 disabled:cursor-not-allowed disabled:opacity-50"
+        className="mt-4 w-full rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {loading ? "กำลังส่งสลิป..." : "ส่งสลิปให้ผู้ดูแลตรวจสอบ"}
       </button>

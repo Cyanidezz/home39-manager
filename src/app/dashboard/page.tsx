@@ -254,7 +254,7 @@ export default async function DashboardPage({ searchParams }: Props) {
               <strong className="text-2xl tracking-tight">
                 {money(Math.abs(netProfit))}
               </strong>
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/20 font-bold">
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white/20 font-bold">
                 ฿
               </span>
             </div>

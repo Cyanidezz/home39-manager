@@ -35,11 +35,11 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-      <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow">
+    <main className="min-h-screen flex items-center justify-center bg-slate-100 px-4">
+      <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 shadow">
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold">Home39 Manager</h1>
-          <p className="mt-2 text-gray-500">
+          <p className="mt-2 text-slate-500">
             ระบบจัดการห้องพัก
           </p>
         </div>
@@ -55,7 +55,7 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full rounded-lg border px-4 py-3 outline-none focus:ring-2 focus:ring-black"
+              className="w-full rounded-lg border px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="admin@example.com"
             />
           </div>
@@ -70,7 +70,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full rounded-lg border px-4 py-3 outline-none focus:ring-2 focus:ring-black"
+              className="w-full rounded-lg border px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="••••••••"
             />
           </div>
@@ -84,7 +84,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-lg bg-black py-3 font-medium text-white disabled:opacity-50"
+            className="w-full rounded-lg bg-blue-600 py-3 font-medium text-white disabled:opacity-50"
           >
             {loading ? "กำลังเข้าสู่ระบบ..." : "เข้าสู่ระบบ"}
           </button>

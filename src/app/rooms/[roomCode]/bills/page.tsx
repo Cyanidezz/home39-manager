@@ -41,9 +41,9 @@ function getStatus(status: string) {
     case "rejected":
       return { text: "สลิปไม่ผ่าน", className: "bg-red-100 text-red-700" };
     case "draft":
-      return { text: "ฉบับร่าง", className: "bg-gray-100 text-gray-700" };
+      return { text: "ฉบับร่าง", className: "bg-slate-100 text-slate-700" };
     default:
-      return { text: status, className: "bg-gray-100 text-gray-700" };
+      return { text: status, className: "bg-slate-100 text-slate-700" };
   }
 }
 
@@ -97,11 +97,11 @@ export default async function BillsHistoryPage({ params }: Props) {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 px-4 py-10">
+    <main className="min-h-screen bg-slate-50 px-4 py-10">
       <div className="mx-auto max-w-4xl">
         <Link
           href={`/rooms/${room.room_code}`}
-          className="text-sm text-gray-500 hover:text-black"
+          className="text-sm text-slate-500 hover:text-blue-700"
         >
           ← กลับห้อง {room.room_code}
         </Link>
@@ -109,20 +109,20 @@ export default async function BillsHistoryPage({ params }: Props) {
         <div className="mt-5 flex items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold">🧾 ประวัติบิล</h1>
-            <p className="mt-2 text-gray-500">ห้อง {room.room_code}</p>
+            <p className="mt-2 text-slate-500">ห้อง {room.room_code}</p>
           </div>
 
           <Link
             href={`/rooms/${room.room_code}/bills/new`}
-            className="rounded-xl bg-black px-5 py-3 font-semibold text-white hover:bg-gray-800"
+            className="rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700"
           >
             + ออกบิลใหม่
           </Link>
         </div>
 
-        <div className="mt-8 overflow-hidden rounded-2xl bg-white shadow-sm">
+        <div className="mt-8 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
           {!bills || bills.length === 0 ? (
-            <div className="px-6 py-10 text-center text-gray-500">
+            <div className="px-6 py-10 text-center text-slate-500">
               ยังไม่มีประวัติบิล
             </div>
           ) : (
@@ -133,7 +133,7 @@ export default async function BillsHistoryPage({ params }: Props) {
                 <Link
                   key={bill.id}
                   href={`/rooms/${room.room_code}/bills/${bill.id}`}
-                  className="flex items-center justify-between gap-4 border-b px-6 py-5 last:border-b-0 hover:bg-gray-50"
+                  className="flex items-center justify-between gap-4 border-b px-6 py-5 last:border-b-0 hover:bg-slate-50"
                 >
                   <div>
                     <p className="font-bold">
@@ -141,7 +141,7 @@ export default async function BillsHistoryPage({ params }: Props) {
                       {bill.billing_year + 543}
                     </p>
 
-                    <p className="mt-1 text-sm text-gray-500">
+                    <p className="mt-1 text-sm text-slate-500">
                       กำหนดชำระ: {formatThaiDate(bill.due_date)}
                     </p>
                   </div>
@@ -157,7 +157,7 @@ export default async function BillsHistoryPage({ params }: Props) {
                       {status.text}
                     </span>
 
-                    <span className="text-gray-400">›</span>
+                    <span className="text-slate-400">›</span>
                   </div>
                 </Link>
               );

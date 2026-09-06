@@ -52,31 +52,31 @@ export default function SlipViewer({
             type="button"
             aria-label="ปิดหน้าต่างดูสลิป"
             onClick={() => setOpen(false)}
-            className="absolute inset-0 bg-black/70"
+            className="absolute inset-0 bg-blue-600/70"
           />
 
           <section
             role="dialog"
             aria-modal="true"
             aria-labelledby="slip-dialog-title"
-            className="relative z-10 flex h-[92vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl"
+            className="relative z-10 flex h-[92vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl"
           >
             <header className="flex items-center justify-between gap-4 border-b px-5 py-4">
               <div className="min-w-0">
                 <h2 id="slip-dialog-title" className="text-lg font-bold">ตรวจสอบสลิป</h2>
-                <p className="truncate text-sm text-gray-500">{fileName}</p>
+                <p className="truncate text-sm text-slate-500">{fileName}</p>
               </div>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
                 aria-label="ปิด"
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xl text-gray-500 hover:bg-gray-100 hover:text-black"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xl text-slate-500 hover:bg-slate-100 hover:text-blue-700"
               >
                 ✕
               </button>
             </header>
 
-            <div className="min-h-0 flex-1 bg-gray-100 p-2 sm:p-4">
+            <div className="min-h-0 flex-1 bg-slate-100 p-2 sm:p-4">
               {contentType.startsWith("image/") ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img

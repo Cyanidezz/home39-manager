@@ -216,7 +216,7 @@ export default function TenantForm({
             onChange={(e) => setOccupantCount(Number(e.target.value))}
             className="w-full rounded-lg border px-4 py-3"
           />
-          <p className="mt-2 text-sm text-gray-500">
+          <p className="mt-2 text-sm text-slate-500">
             ค่าน้ำ {occupantCount || 0} × {WATER_RATE} ={" "}
             <strong>{((occupantCount || 0) * WATER_RATE).toLocaleString()} บาท/เดือน</strong>
           </p>
@@ -255,7 +255,7 @@ export default function TenantForm({
               }}
               className="w-full rounded-lg border px-4 py-3"
             />
-            <p className="mt-2 text-sm text-gray-500">คำนวณเริ่มต้นเท่ากับค่าเช่า 1 เดือน</p>
+            <p className="mt-2 text-sm text-slate-500">คำนวณเริ่มต้นเท่ากับค่าเช่า 1 เดือน</p>
           </div>
 
           <div>
@@ -272,7 +272,7 @@ export default function TenantForm({
               }}
               className="w-full rounded-lg border px-4 py-3"
             />
-            <p className="mt-2 text-sm text-gray-500">คำนวณเริ่มต้นเท่ากับค่าเช่า 2 เดือน</p>
+            <p className="mt-2 text-sm text-slate-500">คำนวณเริ่มต้นเท่ากับค่าเช่า 2 เดือน</p>
           </div>
         </div>
 
@@ -306,7 +306,7 @@ export default function TenantForm({
             className="w-full rounded-lg border px-4 py-3"
             placeholder="ใส่ภายหลังได้"
           />
-          <p className="mt-2 text-sm text-gray-500">
+          <p className="mt-2 text-sm text-slate-500">
             หากกรอก ระบบจะใช้เป็นเลขมิเตอร์ครั้งก่อนของบิลแรก
           </p>
         </div>
@@ -319,11 +319,11 @@ export default function TenantForm({
             onChange={(e) => setContractFile(e.target.files?.[0] ?? null)}
             className="w-full rounded-lg border px-4 py-3"
           />
-          <p className="mt-2 text-sm text-gray-500">
+          <p className="mt-2 text-sm text-slate-500">
             ไม่บังคับ • PDF ขนาดไม่เกิน 10 MB • เพิ่มภายหลังได้
           </p>
           {contractFile && (
-            <p className="mt-2 text-sm font-medium text-gray-700">📎 {contractFile.name}</p>
+            <p className="mt-2 text-sm font-medium text-slate-700">📎 {contractFile.name}</p>
           )}
         </div>
 
@@ -346,7 +346,7 @@ export default function TenantForm({
         <button
           type="submit"
           disabled={loading}
-          className="rounded-lg bg-black px-6 py-3 font-semibold text-white disabled:opacity-50"
+          className="rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white disabled:opacity-50"
         >
           {loading ? "กำลังบันทึก..." : "บันทึกและสร้างผู้เช่า"}
         </button>

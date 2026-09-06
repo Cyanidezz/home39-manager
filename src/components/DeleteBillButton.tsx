@@ -48,18 +48,18 @@ export default function DeleteBillButton({ billId, roomCode, billLabel }: Props)
             type="button"
             aria-label="ปิดหน้าต่างยืนยัน"
             onClick={() => !loading && setOpen(false)}
-            className="absolute inset-0 bg-black/50"
+            className="absolute inset-0 bg-blue-600/50"
           />
-          <div role="alertdialog" aria-modal="true" aria-labelledby="delete-bill-title" className="relative z-10 w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
-            <h2 id="delete-bill-title" className="text-xl font-bold text-gray-950">ยืนยันการลบบิล</h2>
-            <p className="mt-3 text-gray-600">
+          <div role="alertdialog" aria-modal="true" aria-labelledby="delete-bill-title" className="relative z-10 w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl">
+            <h2 id="delete-bill-title" className="text-xl font-bold text-slate-950">ยืนยันการลบบิล</h2>
+            <p className="mt-3 text-slate-600">
               ต้องการลบบิล <strong>{billLabel}</strong> ใช่หรือไม่?
               รายการค่าใช้จ่าย ประวัติสถานะ และสลิปของบิลนี้จะถูกลบด้วย
             </p>
             <p className="mt-2 text-sm font-medium text-red-700">การลบนี้ไม่สามารถย้อนกลับได้</p>
             {error && <p className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</p>}
             <div className="mt-6 flex justify-end gap-3">
-              <button type="button" disabled={loading} onClick={() => setOpen(false)} className="rounded-xl border border-gray-300 px-5 py-2.5 font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50">
+              <button type="button" disabled={loading} onClick={() => setOpen(false)} className="rounded-xl border border-slate-300 px-5 py-2.5 font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50">
                 ยกเลิก
               </button>
               <button type="button" disabled={loading} onClick={deleteBill} className="rounded-xl bg-red-600 px-5 py-2.5 font-semibold text-white hover:bg-red-700 disabled:opacity-50">
