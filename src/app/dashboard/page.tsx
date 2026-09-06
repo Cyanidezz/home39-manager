@@ -133,33 +133,36 @@ export default async function DashboardPage({ searchParams }: Props) {
   const billsByRoom = new Map(bills.map((bill) => [bill.room_id, bill]));
 
   return (
-    <main className="min-h-screen bg-gray-50 px-4 py-8 sm:p-8">
-      <div className="mx-auto max-w-7xl">
-        <div className="mb-8 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <h1 className="text-3xl font-bold">Home39 Manager</h1>
-            <p className="mt-1 text-gray-500">
-              ภาพรวมธุรกิจหอพัก · {formatPeriod(selectedPeriod)}
-            </p>
+    <main className="min-h-screen bg-slate-50 text-slate-900">
+      <header className="border-b border-slate-200 bg-white">
+        <div className="mx-auto flex max-w-7xl flex-col gap-5 px-4 py-5 sm:px-8 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex items-center gap-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-600 text-2xl text-white shadow-lg shadow-blue-200">
+              🏢
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold tracking-tight">Home39 Manager</h1>
+              <p className="mt-1 text-sm text-slate-500">
+                ภาพรวมธุรกิจหอพัก · {formatPeriod(selectedPeriod)}
+              </p>
+            </div>
           </div>
 
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+          <div className="flex flex-wrap items-end gap-2">
             <form className="flex items-end gap-2">
               <div>
-                <label htmlFor="month" className="mb-1 block text-xs text-gray-500">
-                  เดือนที่แสดง
-                </label>
+                <label htmlFor="month" className="sr-only">เดือนที่แสดง</label>
                 <input
                   id="month"
                   name="month"
                   type="month"
                   defaultValue={selectedPeriod}
-                  className="rounded-xl border bg-white px-4 py-3"
+                  className="h-11 rounded-lg border border-slate-200 bg-white px-3 text-sm font-medium outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                 />
               </div>
               <button
                 type="submit"
-                className="rounded-xl border bg-white px-4 py-3 font-medium hover:bg-gray-50"
+                className="h-11 rounded-lg border border-blue-200 px-4 text-sm font-semibold text-blue-700 transition hover:bg-blue-50"
               >
                 ดูข้อมูล
               </button>
@@ -167,203 +170,232 @@ export default async function DashboardPage({ searchParams }: Props) {
 
             <Link
               href={`/expenses?month=${selectedPeriod}`}
-              className="inline-flex items-center justify-center rounded-xl bg-black px-4 py-3 font-semibold text-white hover:bg-gray-800"
+              className="inline-flex h-11 items-center justify-center rounded-lg bg-blue-600 px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
             >
-              + บันทึกรายจ่าย
+              ＋ บันทึกรายจ่าย
             </Link>
 
             <Link
               href="/settings/payment"
-              className="inline-flex items-center justify-center rounded-xl border bg-white px-4 py-3 font-medium hover:bg-gray-50"
+              className="inline-flex h-11 items-center justify-center rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
             >
-              ⚙️ บัญชีรับโอน
+              ⚙ บัญชีรับโอน
             </Link>
           </div>
         </div>
+      </header>
 
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-8">
         {pageError && (
-          <div className="mb-6 rounded-xl bg-red-50 p-4 text-red-700">
+          <div className="mb-5 rounded-xl border border-red-200 bg-red-50 p-4 text-red-700">
             โหลดข้อมูลบางส่วนไม่สำเร็จ: {pageError.message}
           </div>
         )}
 
-        <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
-          <div className="rounded-2xl bg-white p-5 shadow-sm">
-            <p className="text-sm text-gray-500">ยอดเรียกเก็บ</p>
-            <p className="mt-2 text-2xl font-bold">{money(totalIssued)}</p>
-            <p className="mt-1 text-xs text-gray-400">{issuedBills.length} บิล</p>
-          </div>
-          <div className="rounded-2xl bg-green-50 p-5 shadow-sm">
-            <p className="text-sm text-green-700">รับเงินจริง</p>
-            <p className="mt-2 text-2xl font-bold text-green-800">
-              {money(totalReceived)}
-            </p>
-            <p className="mt-1 text-xs text-green-600">{paidBills.length} บิลชำระแล้ว</p>
-          </div>
-          <div className="rounded-2xl bg-orange-50 p-5 shadow-sm">
-            <p className="text-sm text-orange-700">ยอดค้างชำระ</p>
-            <p className="mt-2 text-2xl font-bold text-orange-800">
-              {money(totalOutstanding)}
-            </p>
-            <p className="mt-1 text-xs text-orange-600">
-              {outstandingBills.length} บิลค้าง
-            </p>
-          </div>
-          <div className="rounded-2xl bg-red-50 p-5 shadow-sm">
-            <p className="text-sm text-red-700">รายจ่ายจริง</p>
-            <p className="mt-2 text-2xl font-bold text-red-800">
-              {money(totalExpenses)}
-            </p>
-            <p className="mt-1 text-xs text-red-600">{expenses.length} รายการ</p>
-          </div>
-          <div
-            className={`rounded-2xl p-5 shadow-sm ${
-              netProfit >= 0 ? "bg-blue-50" : "bg-red-100"
-            }`}
-          >
-            <p className={`text-sm ${netProfit >= 0 ? "text-blue-700" : "text-red-700"}`}>
+        <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+          {[
+            {
+              label: "ยอดเรียกเก็บ",
+              value: totalIssued,
+              detail: `${issuedBills.length} บิล`,
+              icon: "▤",
+              valueClass: "text-slate-900",
+              iconClass: "bg-blue-50 text-blue-600",
+            },
+            {
+              label: "รับเงินจริง",
+              value: totalReceived,
+              detail: `${paidBills.length} บิลชำระแล้ว`,
+              icon: "▣",
+              valueClass: "text-emerald-600",
+              iconClass: "bg-emerald-50 text-emerald-600",
+            },
+            {
+              label: "ยอดค้างชำระ",
+              value: totalOutstanding,
+              detail: `${outstandingBills.length} บิลค้าง`,
+              icon: "!",
+              valueClass: "text-amber-600",
+              iconClass: "bg-amber-50 text-amber-600",
+            },
+            {
+              label: "รายจ่ายจริง",
+              value: totalExpenses,
+              detail: `${expenses.length} รายการ`,
+              icon: "฿",
+              valueClass: "text-red-600",
+              iconClass: "bg-red-50 text-red-600",
+            },
+          ].map((card) => (
+            <div
+              key={card.label}
+              className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
+            >
+              <p className="text-xs font-semibold text-slate-600">{card.label}</p>
+              <div className="mt-3 flex items-center justify-between gap-3">
+                <strong className={`text-2xl tracking-tight ${card.valueClass}`}>
+                  {money(card.value)}
+                </strong>
+                <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl font-bold ${card.iconClass}`}>
+                  {card.icon}
+                </span>
+              </div>
+              <p className="mt-2 text-xs text-slate-400">{card.detail}</p>
+            </div>
+          ))}
+
+          <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 p-4 text-white shadow-lg shadow-blue-200">
+            <div className="absolute -bottom-8 -right-6 h-24 w-24 rounded-full bg-blue-400/30" />
+            <div className="absolute bottom-0 right-0 h-12 w-28 -skew-x-12 bg-blue-500/40" />
+            <p className="relative text-xs font-semibold text-blue-100">
               {netProfit >= 0 ? "กำไรสุทธิ" : "ขาดทุนสุทธิ"}
             </p>
-            <p
-              className={`mt-2 text-2xl font-bold ${
-                netProfit >= 0 ? "text-blue-800" : "text-red-800"
-              }`}
-            >
-              {money(Math.abs(netProfit))}
-            </p>
-            <p className="mt-1 text-xs text-gray-500">
+            <div className="relative mt-3 flex items-center justify-between gap-3">
+              <strong className="text-2xl tracking-tight">
+                {money(Math.abs(netProfit))}
+              </strong>
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/20 font-bold">
+                ฿
+              </span>
+            </div>
+            <p className="relative mt-2 text-xs text-blue-100">
               เงินรับจริง − รายจ่ายจริง
             </p>
           </div>
         </section>
 
-        <section className="mt-6 grid gap-6 lg:grid-cols-2">
-          <div className="rounded-2xl bg-white p-6 shadow-sm">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-xl font-semibold">💧 วิเคราะห์ค่าน้ำ</h2>
-                <p className="mt-1 text-sm text-gray-500">
-                  เปรียบเทียบที่เก็บจากผู้เช่ากับบิลประปาจริง
-                </p>
-              </div>
-              <span
-                className={`rounded-full px-3 py-1 text-sm font-semibold ${
-                  waterReceived - waterPaid >= 0
-                    ? "bg-green-100 text-green-700"
-                    : "bg-red-100 text-red-700"
-                }`}
+        <section className="mt-5 grid gap-5 lg:grid-cols-2">
+          {[
+            {
+              title: "วิเคราะห์ค่าน้ำ",
+              subtitle: "เปรียบเทียบยอดเรียกเก็บกับต้นทุนจริง",
+              icon: "💧",
+              billed: waterBilled,
+              received: waterReceived,
+              paid: waterPaid,
+            },
+            {
+              title: "วิเคราะห์ค่าไฟ",
+              subtitle: `ผู้เช่าใช้รวม ${electricityUnits.toLocaleString("th-TH")} หน่วย`,
+              icon: "💡",
+              billed: electricityBilled,
+              received: electricityReceived,
+              paid: electricityPaid,
+            },
+          ].map((utility) => {
+            const margin = utility.received - utility.paid;
+            return (
+              <div
+                key={utility.title}
+                className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
               >
-                {waterReceived - waterPaid >= 0 ? "กำไร" : "ขาดทุน"}{" "}
-                {money(Math.abs(waterReceived - waterPaid))}
-              </span>
-            </div>
-            <div className="mt-6 grid grid-cols-3 gap-3 text-center">
-              <div className="rounded-xl bg-gray-50 p-4">
-                <p className="text-xs text-gray-500">เรียกเก็บ</p>
-                <strong className="mt-1 block">{money(waterBilled)}</strong>
-              </div>
-              <div className="rounded-xl bg-green-50 p-4">
-                <p className="text-xs text-green-700">รับแล้ว</p>
-                <strong className="mt-1 block text-green-800">
-                  {money(waterReceived)}
-                </strong>
-              </div>
-              <div className="rounded-xl bg-red-50 p-4">
-                <p className="text-xs text-red-700">จ่ายจริง</p>
-                <strong className="mt-1 block text-red-800">{money(waterPaid)}</strong>
-              </div>
-            </div>
-          </div>
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                  <div className="flex items-center gap-4">
+                    <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-2xl">
+                      {utility.icon}
+                    </span>
+                    <div>
+                      <h2 className="font-bold">{utility.title}</h2>
+                      <p className="mt-1 text-xs text-slate-500">{utility.subtitle}</p>
+                    </div>
+                  </div>
+                  <span
+                    className={`rounded-full border px-3 py-1 text-xs font-semibold ${
+                      margin >= 0
+                        ? "border-blue-100 bg-blue-50 text-blue-700"
+                        : "border-red-100 bg-red-50 text-red-700"
+                    }`}
+                  >
+                    {margin >= 0 ? "กำไร" : "ขาดทุน"} {money(Math.abs(margin))}
+                  </span>
+                </div>
 
-          <div className="rounded-2xl bg-white p-6 shadow-sm">
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <h2 className="text-xl font-semibold">⚡ วิเคราะห์ค่าไฟ</h2>
-                <p className="mt-1 text-sm text-gray-500">
-                  ผู้เช่าใช้รวม {electricityUnits.toLocaleString("th-TH")} หน่วย
-                </p>
+                <div className="mt-5 grid grid-cols-3 gap-3">
+                  <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-center">
+                    <p className="text-xs text-slate-500">เรียกเก็บ</p>
+                    <strong className="mt-2 block text-lg">{money(utility.billed)}</strong>
+                  </div>
+                  <div className="rounded-lg border border-blue-100 bg-blue-50/60 p-4 text-center">
+                    <p className="text-xs text-blue-600">รับแล้ว</p>
+                    <strong className="mt-2 block text-lg text-blue-700">
+                      {money(utility.received)}
+                    </strong>
+                  </div>
+                  <div className="rounded-lg border border-slate-200 bg-white p-4 text-center">
+                    <p className="text-xs text-slate-500">จ่ายจริง</p>
+                    <strong className="mt-2 block text-lg">{money(utility.paid)}</strong>
+                  </div>
+                </div>
               </div>
-              <span
-                className={`rounded-full px-3 py-1 text-sm font-semibold ${
-                  electricityReceived - electricityPaid >= 0
-                    ? "bg-green-100 text-green-700"
-                    : "bg-red-100 text-red-700"
-                }`}
-              >
-                {electricityReceived - electricityPaid >= 0 ? "กำไร" : "ขาดทุน"}{" "}
-                {money(Math.abs(electricityReceived - electricityPaid))}
-              </span>
-            </div>
-            <div className="mt-6 grid grid-cols-3 gap-3 text-center">
-              <div className="rounded-xl bg-gray-50 p-4">
-                <p className="text-xs text-gray-500">เรียกเก็บ</p>
-                <strong className="mt-1 block">{money(electricityBilled)}</strong>
-              </div>
-              <div className="rounded-xl bg-green-50 p-4">
-                <p className="text-xs text-green-700">รับแล้ว</p>
-                <strong className="mt-1 block text-green-800">
-                  {money(electricityReceived)}
-                </strong>
-              </div>
-              <div className="rounded-xl bg-red-50 p-4">
-                <p className="text-xs text-red-700">จ่ายจริง</p>
-                <strong className="mt-1 block text-red-800">
-                  {money(electricityPaid)}
-                </strong>
-              </div>
-            </div>
-          </div>
+            );
+          })}
         </section>
 
-        <section className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr]">
-          <div className="rounded-2xl bg-white p-6 shadow-sm">
-            <h2 className="text-xl font-semibold">สรุปรายรับที่ได้รับแล้ว</h2>
-            <div className="mt-5 space-y-3">
+        <section className="mt-5 grid gap-5 lg:grid-cols-2">
+          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+            <h2 className="font-bold">สรุปรายรับที่ได้รับแล้ว</h2>
+            <div className="mt-4 overflow-hidden rounded-lg border border-slate-200">
               {[
-                ["ค่าเช่า", rentReceived],
-                ["ค่าน้ำ", waterReceived],
-                ["ค่าไฟ", electricityReceived],
-                ["รายรับอื่น", otherReceived],
-              ].map(([label, value]) => (
-                <div key={String(label)} className="flex justify-between border-b pb-3 last:border-0">
-                  <span className="text-gray-600">{label}</span>
-                  <strong>{money(Number(value))} บาท</strong>
+                ["⌂", "ค่าเช่า", rentReceived],
+                ["💧", "ค่าน้ำ", waterReceived],
+                ["💡", "ค่าไฟ", electricityReceived],
+                ["•••", "รายรับอื่น", otherReceived],
+              ].map(([icon, label, value], index) => (
+                <div
+                  key={String(label)}
+                  className={`flex items-center justify-between gap-4 px-4 py-3 ${
+                    index > 0 ? "border-t border-slate-100" : ""
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="w-6 text-center text-blue-600">{icon}</span>
+                    <span className="text-sm text-slate-600">{label}</span>
+                  </div>
+                  <strong className="text-sm">
+                    {money(Number(value))} <span className="font-normal text-slate-400">บาท</span>
+                  </strong>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="rounded-2xl bg-white p-6 shadow-sm">
-            <h2 className="text-xl font-semibold">รายการที่ต้องจัดการ</h2>
-            <div className="mt-5 grid grid-cols-2 gap-3">
+          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+            <h2 className="font-bold">รายการที่ต้องจัดการ</h2>
+            <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
               {[
-                ["บิลค้างชำระ", outstandingBills.length, "text-orange-700"],
-                ["สลิปรอตรวจ", pendingSlips.length, "text-blue-700"],
-                ["ห้องว่าง", vacantRooms.length, "text-gray-700"],
-                ["แจ้งย้ายออก", movingOutTenants.length, "text-orange-700"],
-                ["ยังไม่ผูก LINE", unlinkedTenants.length, "text-red-700"],
-                ["ห้องมีผู้เช่า", occupiedRooms.length, "text-green-700"],
-              ].map(([label, value, color]) => (
-                <div key={String(label)} className="rounded-xl bg-gray-50 p-4">
-                  <strong className={`text-2xl ${color}`}>{value}</strong>
-                  <p className="mt-1 text-sm text-gray-600">{label}</p>
+                ["▤", "บิลค้างชำระ", outstandingBills.length, "bg-red-50 text-red-600"],
+                ["⌕", "สลิปรอตรวจ", pendingSlips.length, "bg-amber-50 text-amber-600"],
+                ["⌂", "ห้องว่าง", vacantRooms.length, "bg-blue-50 text-blue-600"],
+                ["↪", "แจ้งย้ายออก", movingOutTenants.length, "bg-slate-100 text-slate-600"],
+                ["LINE", "ยังไม่ผูก LINE", unlinkedTenants.length, "bg-emerald-50 text-emerald-600"],
+                ["♟", "ห้องมีผู้เช่า", occupiedRooms.length, "bg-blue-50 text-blue-700"],
+              ].map(([icon, label, value, color]) => (
+                <div key={String(label)} className="rounded-lg border border-slate-200 p-3">
+                  <div className="flex items-center gap-2">
+                    <span className={`flex h-8 min-w-8 items-center justify-center rounded-lg px-1 text-xs font-bold ${color}`}>
+                      {icon}
+                    </span>
+                    <strong className="text-lg">{value}</strong>
+                  </div>
+                  <p className="mt-2 text-xs text-slate-500">{label}</p>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        <section className="mt-8">
+        <section className="mt-6">
           <div className="mb-4 flex items-end justify-between">
-            <div>
-              <h2 className="text-2xl font-bold">ห้องพัก</h2>
-              <p className="mt-1 text-sm text-gray-500">
+            <div className="flex items-baseline gap-3">
+              <h2 className="text-xl font-bold">ห้องพัก</h2>
+              <p className="text-xs text-slate-500">
                 สถานะและบิลของ {formatPeriod(selectedPeriod)}
               </p>
             </div>
+            <span className="text-sm font-semibold text-blue-600">ดูห้องทั้งหมด →</span>
           </div>
 
-          <div className="grid gap-5 md:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-3">
             {rooms.map((room) => {
               const activeTenant = (room.tenants || []).find(
                 (tenant) => tenant.is_active
@@ -375,22 +407,22 @@ export default async function DashboardPage({ searchParams }: Props) {
                 <Link
                   key={room.id}
                   href={`/rooms/${room.room_code}`}
-                  className="block rounded-2xl bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
+                  className="group rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-blue-300 hover:shadow-md"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <h3 className="text-2xl font-semibold">ห้อง {room.room_code}</h3>
-                      <p className="mt-1 text-sm text-gray-500">
+                      <h3 className="text-lg font-bold">ห้อง {room.room_code}</h3>
+                      <p className="mt-1 text-xs text-slate-500">
                         {activeTenant?.full_name || "ยังไม่มีผู้เช่า"}
                       </p>
                     </div>
                     <span
                       className={`rounded-full px-3 py-1 text-xs font-semibold ${
                         movingOut
-                          ? "bg-orange-100 text-orange-700"
+                          ? "bg-amber-50 text-amber-700"
                           : room.status === "occupied"
-                            ? "bg-green-100 text-green-700"
-                            : "bg-gray-100 text-gray-700"
+                            ? "bg-blue-50 text-blue-700"
+                            : "bg-slate-100 text-slate-600"
                       }`}
                     >
                       {movingOut
@@ -401,26 +433,28 @@ export default async function DashboardPage({ searchParams }: Props) {
                     </span>
                   </div>
 
-                  <div className="mt-5 space-y-2 text-sm text-gray-600">
-                    <div className="flex justify-between">
-                      <span>ผู้พัก</span>
+                  <div className="mt-4 divide-y divide-slate-100 border-y border-slate-100 text-xs">
+                    <div className="flex justify-between py-2">
+                      <span className="text-slate-500">ผู้พัก</span>
                       <strong>{room.occupant_count} คน</strong>
                     </div>
-                    <div className="flex justify-between">
-                      <span>บิลเดือนนี้</span>
+                    <div className="flex justify-between py-2">
+                      <span className="text-slate-500">บิลเดือนนี้</span>
                       <strong>
-                        {currentBill ? `${money(Number(currentBill.total_amount))} บาท` : "ยังไม่ออกบิล"}
+                        {currentBill
+                          ? `${money(Number(currentBill.total_amount))} บาท`
+                          : "ยังไม่ออกบิล"}
                       </strong>
                     </div>
-                    <div className="flex justify-between">
-                      <span>สถานะบิล</span>
+                    <div className="flex justify-between py-2">
+                      <span className="text-slate-500">สถานะบิล</span>
                       <strong
                         className={
                           currentBill?.status === "paid"
-                            ? "text-green-700"
+                            ? "text-emerald-600"
                             : currentBill
-                              ? "text-orange-700"
-                              : "text-gray-500"
+                              ? "text-amber-600"
+                              : "text-slate-400"
                         }
                       >
                         {currentBill?.status === "paid"
@@ -432,8 +466,8 @@ export default async function DashboardPage({ searchParams }: Props) {
                     </div>
                   </div>
 
-                  <div className="mt-5 border-t pt-4 text-sm font-medium">
-                    ดูรายละเอียดห้อง →
+                  <div className="mt-3 rounded-lg border border-blue-200 py-2 text-center text-xs font-semibold text-blue-600 transition group-hover:bg-blue-50">
+                    ดูรายละเอียดห้อง　→
                   </div>
                 </Link>
               );
