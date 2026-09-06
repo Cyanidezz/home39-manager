@@ -90,7 +90,7 @@ export default async function DashboardPage() {
                     <strong>
                     {activeTenant?.planned_move_out_date
                       ? `ผู้เช่าแจ้งย้ายออก ${formatThaiDate(activeTenant.planned_move_out_date)}`
-                      : room.status === "occupied" ? "มีผู้เช่า" : "ว่าง"}
+                      : room.status === "occupied" ? "มีผู้เช่า" : "ไม่มีผู้เช่า"}
                     </strong>
                 </p>
                 </div>

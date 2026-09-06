@@ -23,7 +23,7 @@ export default async function NewTenantPage({ params }: Props) {
 
   const { data: room } = await supabase
     .from("rooms")
-    .select("id, room_code")
+    .select("id, room_code, monthly_rent")
     .eq("room_code", roomCode.toUpperCase())
     .single();
 
@@ -46,6 +46,7 @@ export default async function NewTenantPage({ params }: Props) {
           <TenantForm
             roomId={room.id}
             roomCode={room.room_code}
+            initialMonthlyRent={Number(room.monthly_rent)}
           />
         </div>
       </div>

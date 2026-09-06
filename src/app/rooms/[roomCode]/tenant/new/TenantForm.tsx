@@ -7,9 +7,14 @@ import { createClient } from "@/lib/supabase/client";
 type Props = {
   roomId: string;
   roomCode: string;
+  initialMonthlyRent: number;
 };
 
-export default function TenantForm({ roomId, roomCode }: Props) {
+export default function TenantForm({
+  roomId,
+  roomCode,
+  initialMonthlyRent,
+}: Props) {
   const router = useRouter();
   const supabase = createClient();
 
@@ -17,6 +22,9 @@ export default function TenantForm({ roomId, roomCode }: Props) {
   const [phone, setPhone] = useState("");
   const [moveInDate, setMoveInDate] = useState("");
   const [occupantCount, setOccupantCount] = useState(1);
+  const [monthlyRent, setMonthlyRent] = useState(
+    initialMonthlyRent > 0 ? String(initialMonthlyRent) : ""
+  );
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -24,8 +32,15 @@ export default function TenantForm({ roomId, roomCode }: Props) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    setLoading(true);
     setError("");
+
+    const rent = Number(monthlyRent);
+    if (!Number.isFinite(rent) || rent <= 0) {
+      setError("กรุณากรอกอัตราค่าเช่าต่อเดือนให้ถูกต้อง");
+      return;
+    }
+
+    setLoading(true);
 
     const { error: tenantError } = await supabase
       .from("tenants")
@@ -47,6 +62,7 @@ export default function TenantForm({ roomId, roomCode }: Props) {
       .from("rooms")
       .update({
         occupant_count: occupantCount,
+        monthly_rent: rent,
         status: "occupied",
       })
       .eq("id", roomId);
@@ -92,6 +108,28 @@ export default function TenantForm({ roomId, roomCode }: Props) {
 
       <div>
         <label className="mb-2 block font-medium">
+          อัตราค่าเช่าต่อเดือน *
+        </label>
+
+        <div className="relative">
+          <input
+            required
+            type="number"
+            min="1"
+            step="0.01"
+            value={monthlyRent}
+            onChange={(e) => setMonthlyRent(e.target.value)}
+            className="w-full rounded-lg border px-4 py-3 pr-16"
+            placeholder="เช่น 5000"
+          />
+          <span className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-gray-500">
+            บาท
+          </span>
+        </div>
+      </div>
+
+      <div>
+        <label className="mb-2 block font-medium">
           จำนวนผู้พัก
         </label>
 
@@ -122,6 +160,16 @@ export default function TenantForm({ roomId, roomCode }: Props) {
         <p className="font-medium">สรุปค่าใช้จ่ายพื้นฐาน</p>
 
         <p className="mt-2 text-sm">
+          ค่าเช่า{" "}
+          <strong>
+            {(Number(monthlyRent) || 0).toLocaleString(undefined, {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })} บาท/เดือน
+          </strong>
+        </p>
+
+        <p className="mt-1 text-sm">
           ค่าน้ำ {occupantCount} × 150 ={" "}
           <strong>{occupantCount * 150} บาท/เดือน</strong>
         </p>

@@ -195,12 +195,21 @@ export default async function RoomPage({ params }: Props) {
           </div>
 
           <div className="flex items-center gap-3">
-            <Link
-              href={`/rooms/${room.room_code}/bills/new`}
-              className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
-            >
-              🧾 ออกบิลใหม่
-            </Link>
+            {activeTenant ? (
+              <Link
+                href={`/rooms/${room.room_code}/bills/new`}
+                className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
+              >
+                🧾 ออกบิลใหม่
+              </Link>
+            ) : (
+              <Link
+                href={`/rooms/${room.room_code}/tenant/new`}
+                className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
+              >
+                + สร้างผู้เช่าใหม่
+              </Link>
+            )}
 
             <span className={`rounded-full px-4 py-2 text-sm font-medium ${
               activeTenant?.planned_move_out_date
@@ -211,7 +220,7 @@ export default async function RoomPage({ params }: Props) {
             }`}>
               {activeTenant?.planned_move_out_date
                 ? `ผู้เช่าแจ้งย้ายออก ${formatThaiDate(activeTenant.planned_move_out_date)}`
-                : room.status === "occupied" ? "มีผู้เช่า" : "ว่าง"}
+                : room.status === "occupied" ? "มีผู้เช่า" : "ไม่มีผู้เช่า"}
             </span>
           </div>
         </div>
@@ -302,7 +311,7 @@ export default async function RoomPage({ params }: Props) {
                     href={`/rooms/${room.room_code}/tenant/new`}
                     className="mt-4 inline-block rounded-lg bg-black px-4 py-2 text-white"
                   >
-                    + เพิ่มข้อมูลผู้เช่า
+                    + สร้างผู้เช่าใหม่
                   </Link>
                 </div>
               )}
