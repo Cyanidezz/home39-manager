@@ -29,7 +29,10 @@ export async function POST(
     return NextResponse.json({ error: "ไม่พบบิล" }, { status: 404 });
   }
 
-  if (!bill.tenants?.line_user_id) {
+  const tenant = Array.isArray(bill.tenants) ? bill.tenants[0] : bill.tenants;
+  const room = Array.isArray(bill.rooms) ? bill.rooms[0] : bill.rooms;
+
+  if (!tenant?.line_user_id) {
     return NextResponse.json({ error: "ผู้เช่ายังไม่ได้ผูก LINE" }, { status: 409 });
   }
 
@@ -42,7 +45,7 @@ export async function POST(
     : "ไม่ระบุ";
   const text = [
     "Home39 · ใบแจ้งค่าใช้จ่าย",
-    `ห้อง ${bill.rooms?.room_code || "-"}`,
+    `ห้อง ${room?.room_code || "-"}`,
     `${thaiMonths[bill.billing_month - 1]} ${bill.billing_year + 543}`,
     `ยอดชำระ ${amount} บาท`,
     `กำหนดชำระ ${dueDate}`,
@@ -51,7 +54,7 @@ export async function POST(
   ].join("\n");
 
   try {
-    await pushLineText(bill.tenants.line_user_id, text);
+    await pushLineText(tenant.line_user_id, text);
     return NextResponse.json({ ok: true });
   } catch (error) {
     console.error("LINE bill push failed:", error);
