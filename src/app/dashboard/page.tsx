@@ -135,53 +135,34 @@ export default async function DashboardPage({ searchParams }: Props) {
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
       <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-7xl flex-col gap-5 px-4 py-5 sm:px-8 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-600 text-2xl text-white shadow-lg shadow-blue-200">
-              🏢
-            </div>
+        <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">
+              ภาพรวมประจำเดือน
+            </h1>
+            <p className="mt-1 text-sm text-slate-500">
+              รายรับ รายจ่าย และสถานะห้องพัก · {formatPeriod(selectedPeriod)}
+            </p>
+          </div>
+
+          <form className="flex items-end gap-2">
             <div>
-              <h1 className="text-2xl font-bold tracking-tight">Home39 Manager</h1>
-              <p className="mt-1 text-sm text-slate-500">
-                ภาพรวมธุรกิจหอพัก · {formatPeriod(selectedPeriod)}
-              </p>
+              <label htmlFor="month" className="sr-only">เดือนที่แสดง</label>
+              <input
+                id="month"
+                name="month"
+                type="month"
+                defaultValue={selectedPeriod}
+                className="h-11 rounded-lg border border-slate-200 bg-white px-3 text-sm font-medium outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              />
             </div>
-          </div>
-
-          <div className="flex flex-wrap items-end gap-2">
-            <form className="flex items-end gap-2">
-              <div>
-                <label htmlFor="month" className="sr-only">เดือนที่แสดง</label>
-                <input
-                  id="month"
-                  name="month"
-                  type="month"
-                  defaultValue={selectedPeriod}
-                  className="h-11 rounded-lg border border-slate-200 bg-white px-3 text-sm font-medium outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                />
-              </div>
-              <button
-                type="submit"
-                className="h-11 rounded-lg border border-blue-200 px-4 text-sm font-semibold text-blue-700 transition hover:bg-blue-50"
-              >
-                ดูข้อมูล
-              </button>
-            </form>
-
-            <Link
-              href={`/expenses?month=${selectedPeriod}`}
-              className="inline-flex h-11 items-center justify-center rounded-lg bg-blue-600 px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
+            <button
+              type="submit"
+              className="h-11 rounded-lg border border-blue-200 px-4 text-sm font-semibold text-blue-700 transition hover:bg-blue-50"
             >
-              ＋ บันทึกรายจ่าย
-            </Link>
-
-            <Link
-              href="/settings/payment"
-              className="inline-flex h-11 items-center justify-center rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-            >
-              ⚙ บัญชีรับโอน
-            </Link>
-          </div>
+              ดูข้อมูล
+            </button>
+          </form>
         </div>
       </header>
 
