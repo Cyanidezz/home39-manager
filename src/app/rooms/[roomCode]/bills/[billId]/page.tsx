@@ -3,7 +3,6 @@ import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import StatusEditor from "./StatusEditor";
 import SendBillLineButton from "@/components/SendBillLineButton";
-import DeleteBillButton from "@/components/DeleteBillButton";
 import { publicAppUrl, pushLineText } from "@/lib/line";
 
 type Props = {
@@ -347,6 +346,13 @@ export default async function BillDetailPage({ params }: Props) {
         <div className="mt-6 flex flex-wrap items-start justify-end gap-3">
           <SendBillLineButton billId={bill.id} />
           <Link
+            href={`/rooms/${bill.rooms.room_code}/bills/${bill.id}/edit`}
+            className="rounded-xl border border-gray-300 bg-white px-5 py-3 font-medium text-gray-700 hover:bg-gray-50"
+          >
+            แก้ไขข้อมูลบิล
+          </Link>
+
+          <Link
             href={`/pay/${bill.public_token}`}
             target="_blank"
             rel="noopener noreferrer"
@@ -375,12 +381,6 @@ export default async function BillDetailPage({ params }: Props) {
               </button>
             </form>
           )}
-
-          <DeleteBillButton
-            billId={bill.id}
-            roomCode={bill.rooms.room_code}
-            billLabel={`${thaiMonths[bill.billing_month - 1]} ${bill.billing_year + 543} · ห้อง ${bill.rooms.room_code}`}
-          />
         </div>
 
         {bill.status === "paid" && bill.paid_at && (
