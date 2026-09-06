@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
 
 type Props = {
   params: Promise<{ token: string }>;
@@ -77,7 +77,7 @@ export default async function PublicBillPage({ params }: Props) {
     notFound();
   }
 
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data, error } = await supabase.rpc("get_public_bill", { p_token: token });
 
   if (error || !data) {
