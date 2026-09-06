@@ -29,6 +29,12 @@ function formatThaiMonth(value: string) {
   return `${thaiMonths[month - 1]} ${year + 543}`;
 }
 
+function getToday() {
+  const now = new Date();
+  const localDate = new Date(now.getTime() - now.getTimezoneOffset() * 60_000);
+  return localDate.toISOString().slice(0, 10);
+}
+
 export default function EndTenancyButton({
   tenantId,
   tenantName,
@@ -41,6 +47,9 @@ export default function EndTenancyButton({
   const [moveOutDate, setMoveOutDate] = useState(initialMoveOutDate || "");
   const [loading, setLoading] = useState(false);
   const [cancelling, setCancelling] = useState(false);
+  const [completeOpen, setCompleteOpen] = useState(false);
+  const [actualMoveOutDate, setActualMoveOutDate] = useState(getToday);
+  const [completing, setCompleting] = useState(false);
   const [error, setError] = useState("");
   const minimumMoveOutDate = useMemo(() => addOneMonth(noticeDate), [noticeDate]);
 
@@ -110,6 +119,41 @@ export default function EndTenancyButton({
     }
   }
 
+  async function completeMoveOut() {
+    setError("");
+    if (!actualMoveOutDate) {
+      setError("กรุณากรอกวันที่ย้ายออกจริง");
+      return;
+    }
+
+    setCompleting(true);
+
+    try {
+      const response = await fetch(`/api/tenants/${tenantId}/move-out`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ moveOutDate: actualMoveOutDate }),
+      });
+      const result = (await response.json().catch(() => ({}))) as {
+        error?: string;
+        roomCode?: string;
+      };
+
+      if (!response.ok || !result.roomCode) {
+        setError(result.error || "บันทึกผู้เช่าย้ายออกไม่สำเร็จ");
+        return;
+      }
+
+      setCompleteOpen(false);
+      router.push(`/rooms/${result.roomCode}`);
+      router.refresh();
+    } catch {
+      setError("เชื่อมต่อระบบไม่สำเร็จ กรุณาลองใหม่");
+    } finally {
+      setCompleting(false);
+    }
+  }
+
   return (
     <>
       <div className="mt-4 flex flex-wrap gap-3">
@@ -123,14 +167,28 @@ export default function EndTenancyButton({
         </button>
 
         {initialMoveOutDate && (
-          <button
-            type="button"
-            onClick={cancelMoveOut}
-            disabled={loading || cancelling}
-            className="rounded-lg border border-red-300 px-5 py-3 font-semibold text-red-700 hover:bg-red-50 disabled:opacity-50"
-          >
-            {cancelling ? "กำลังยกเลิก..." : "ยกเลิกการย้ายออก"}
-          </button>
+          <>
+            <button
+              type="button"
+              onClick={cancelMoveOut}
+              disabled={loading || cancelling || completing}
+              className="rounded-lg border border-red-300 px-5 py-3 font-semibold text-red-700 hover:bg-red-50 disabled:opacity-50"
+            >
+              {cancelling ? "กำลังยกเลิก..." : "ยกเลิกการย้ายออก"}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setError("");
+                setCompleteOpen(true);
+              }}
+              disabled={loading || cancelling || completing}
+              className="rounded-lg bg-green-700 px-5 py-3 font-semibold text-white hover:bg-green-800 disabled:opacity-50"
+            >
+              ผู้เช่าย้ายออกแล้ว
+            </button>
+          </>
         )}
       </div>
 
@@ -138,6 +196,71 @@ export default function EndTenancyButton({
         <p className="mt-3 rounded-lg bg-red-50 p-3 text-sm text-red-700">
           {error}
         </p>
+      )}
+
+      {completeOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+          role="dialog"
+          aria-modal="true"
+        >
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h3 className="text-xl font-bold">ยืนยันผู้เช่าย้ายออกแล้ว</h3>
+                <p className="mt-1 text-sm text-gray-500">{tenantName}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setCompleteOpen(false)}
+                disabled={completing}
+                className="text-2xl text-gray-400 hover:text-black disabled:opacity-50"
+                aria-label="ปิด"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="mt-6">
+              <label className="mb-2 block font-medium">
+                วันที่ย้ายออกจริง *
+              </label>
+              <input
+                type="date"
+                value={actualMoveOutDate}
+                onChange={(event) => setActualMoveOutDate(event.target.value)}
+                className="w-full rounded-lg border px-4 py-3"
+              />
+              <p className="mt-3 rounded-xl bg-gray-50 p-4 text-sm text-gray-600">
+                หลังยืนยัน ผู้เช่าจะถูกปิดสถานะและห้องจะเปลี่ยนเป็นห้องว่าง
+              </p>
+              {error && (
+                <p className="mt-3 rounded-lg bg-red-50 p-3 text-sm text-red-700">
+                  {error}
+                </p>
+              )}
+            </div>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setCompleteOpen(false)}
+                disabled={completing}
+                className="rounded-lg border px-5 py-3 disabled:opacity-50"
+              >
+                ยกเลิก
+              </button>
+              <button
+                type="button"
+                onClick={completeMoveOut}
+                disabled={completing}
+                className="rounded-lg bg-green-700 px-5 py-3 font-semibold text-white disabled:opacity-50"
+              >
+                {completing ? "กำลังบันทึก..." : "ยืนยันย้ายออกแล้ว"}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {open && (
