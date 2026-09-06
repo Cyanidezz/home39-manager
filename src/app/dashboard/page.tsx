@@ -21,14 +21,23 @@ export default async function DashboardPage() {
   return (
     <main className="min-h-screen bg-gray-50 p-8">
       <div className="mx-auto max-w-6xl">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold">
-            Home39 Manager
-          </h1>
+        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">
+              Home39 Manager
+            </h1>
 
-          <p className="mt-1 text-gray-500">
-            Dashboard
-          </p>
+            <p className="mt-1 text-gray-500">
+              Dashboard
+            </p>
+          </div>
+
+          <Link
+            href="/settings/payment"
+            className="inline-flex items-center justify-center rounded-xl border bg-white px-4 py-3 font-medium shadow-sm transition hover:bg-gray-50"
+          >
+            ⚙️ ตั้งค่าบัญชีรับโอน
+          </Link>
         </div>
 
         {error && (

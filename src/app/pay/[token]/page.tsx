@@ -10,6 +10,13 @@ type PublicBillItem = {
   amount: number | string;
 };
 
+type PaymentSettings = {
+  bank_name: string;
+  bank_code: string | null;
+  account_name: string;
+  account_number: string;
+};
+
 type PublicBill = {
   room_code: string | null;
   tenant_name: string | null;
@@ -31,6 +38,7 @@ type PublicBill = {
   issued_at: string | null;
   paid_at: string | null;
   bill_items: PublicBillItem[];
+  payment_settings: PaymentSettings | null;
 };
 
 const thaiMonths = [
@@ -175,21 +183,24 @@ export default async function PublicBillPage({ params }: Props) {
             </div>
           </div>
 
-          {bill.status !== "paid" && (
+          {bill.status !== "paid" && bill.payment_settings && (
             <div className="border-t bg-purple-50 px-6 py-6">
               <h2 className="font-bold text-purple-900">ช่องทางชำระเงิน</h2>
 
               <div className="mt-4 rounded-xl border border-purple-200 bg-white p-5">
                 <p className="text-sm font-medium text-purple-700">
-                  ธนาคารไทยพาณิชย์ (SCB)
+                  {bill.payment_settings.bank_name}
+                  {bill.payment_settings.bank_code
+                    ? ` (${bill.payment_settings.bank_code.toUpperCase()})`
+                    : ""}
                 </p>
 
                 <p className="mt-3 text-sm text-gray-500">ชื่อบัญชี</p>
-                <p className="font-semibold">นางสาวพิรญาณ์ จันทร์งาม</p>
+                <p className="font-semibold">{bill.payment_settings.account_name}</p>
 
                 <p className="mt-3 text-sm text-gray-500">เลขที่บัญชี</p>
                 <p className="select-all text-2xl font-bold tracking-wide text-purple-900">
-                  206-269288-7
+                  {bill.payment_settings.account_number}
                 </p>
 
                 <div className="mt-4 rounded-lg bg-purple-50 p-3 text-sm text-purple-800">
