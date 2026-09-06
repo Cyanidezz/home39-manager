@@ -20,7 +20,7 @@ const navigation = [
   },
   {
     label: "ห้องพัก",
-    href: "/dashboard#rooms",
+    href: "/rooms",
     icon: "⌂",
     active: (path: string) => path.startsWith("/rooms"),
   },
@@ -61,7 +61,7 @@ export default function AdminShell({ children }: Props) {
 
   const navContent = (
     <>
-      <div className="border-b border-slate-200 px-5 py-5">
+      <div className="border-b border-white/15 px-5 py-5">
         <Link
           href="/dashboard"
           onClick={() => setMenuOpen(false)}
@@ -71,14 +71,14 @@ export default function AdminShell({ children }: Props) {
             🏢
           </span>
           <div>
-            <p className="font-bold leading-tight text-slate-900">Home39 Manager</p>
-            <p className="mt-1 text-xs text-slate-500">ระบบจัดการหอพัก</p>
+            <p className="font-bold leading-tight text-white">Home39 Manager</p>
+            <p className="mt-1 text-xs text-blue-200">ระบบจัดการหอพัก</p>
           </div>
         </Link>
       </div>
 
       <nav className="flex-1 space-y-1 px-3 py-5">
-        <p className="mb-3 px-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
+        <p className="mb-3 px-3 text-xs font-semibold uppercase tracking-wider text-blue-300">
           เมนูหลัก
         </p>
         {navigation.map((item) => {
@@ -90,13 +90,13 @@ export default function AdminShell({ children }: Props) {
               onClick={() => setMenuOpen(false)}
               className={`flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold ${
                 selected
-                  ? "bg-blue-50 text-blue-700"
-                  : "text-slate-600 hover:bg-slate-50 hover:text-blue-700"
+                  ? "bg-white text-blue-800 shadow-sm"
+                  : "text-blue-100 hover:bg-white/10 hover:text-white"
               }`}
             >
               <span
                 className={`flex h-8 w-8 items-center justify-center rounded-lg ${
-                  selected ? "bg-blue-100" : "bg-slate-100"
+                  selected ? "bg-blue-100" : "bg-white/10"
                 }`}
               >
                 {item.icon}
@@ -107,13 +107,13 @@ export default function AdminShell({ children }: Props) {
         })}
       </nav>
 
-      <div className="border-t border-slate-200 p-3">
+      <div className="border-t border-white/15 p-3">
         <Link
           href="/"
           onClick={() => setMenuOpen(false)}
-          className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-blue-700"
+          className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-blue-100 hover:bg-white/10 hover:text-white"
         >
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/10">
             ↗
           </span>
           ดูหน้าเว็บไซต์
@@ -122,9 +122,9 @@ export default function AdminShell({ children }: Props) {
           type="button"
           onClick={signOut}
           disabled={signingOut}
-          className="mt-1 flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-red-600 hover:bg-red-50 disabled:opacity-50"
+          className="mt-1 flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-red-100 hover:bg-red-500/20 hover:text-white disabled:opacity-50"
         >
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-50">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-400/20">
             ⇥
           </span>
           {signingOut ? "กำลังออกจากระบบ..." : "ออกจากระบบ"}
@@ -135,7 +135,7 @@ export default function AdminShell({ children }: Props) {
 
   return (
     <div className="min-h-screen bg-slate-50 lg:flex">
-      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-slate-200 bg-white lg:flex">
+      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col bg-gradient-to-b from-blue-800 to-blue-950 shadow-xl lg:flex">
         {navContent}
       </aside>
 
@@ -168,11 +168,11 @@ export default function AdminShell({ children }: Props) {
             className="absolute inset-0 bg-slate-950/50"
             aria-label="ปิดเมนู"
           />
-          <aside className="relative flex h-full w-[min(85vw,300px)] flex-col bg-white shadow-2xl">
+          <aside className="relative flex h-full w-[min(85vw,300px)] flex-col bg-gradient-to-b from-blue-800 to-blue-950 shadow-2xl">
             <button
               type="button"
               onClick={() => setMenuOpen(false)}
-              className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-lg text-xl text-slate-400 hover:bg-slate-100"
+              className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-lg text-xl text-blue-200 hover:bg-white/10 hover:text-white"
               aria-label="ปิดเมนู"
             >
               ×

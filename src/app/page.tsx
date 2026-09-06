@@ -1,9 +1,15 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
 import HomePage from "./HomePage";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   let rooms: {
     room_code: string;
     monthly_rent: number | string;
@@ -24,5 +30,5 @@ export default async function Home() {
     console.error("Load public room status failed:", error);
   }
 
-  return <HomePage rooms={rooms} />;
+  return <HomePage rooms={rooms} isLoggedIn={Boolean(user)} />;
 }

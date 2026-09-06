@@ -13,6 +13,7 @@ type Room = {
 
 type Props = {
   rooms: Room[];
+  isLoggedIn: boolean;
 };
 
 const roomDescriptions: Record<string, string> = {
@@ -25,7 +26,7 @@ function money(value: number | string) {
   return Number(value || 0).toLocaleString("th-TH");
 }
 
-export default function HomePage({ rooms }: Props) {
+export default function HomePage({ rooms, isLoggedIn }: Props) {
   const router = useRouter();
   const supabase = createClient();
   const [loginOpen, setLoginOpen] = useState(false);
@@ -79,16 +80,26 @@ export default function HomePage({ rooms }: Props) {
             </div>
           </a>
 
-          <button
-            type="button"
-            onClick={() => {
-              setError("");
-              setLoginOpen(true);
-            }}
-            className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700"
-          >
-            เข้าสู่ระบบ
-          </button>
+          {isLoggedIn ? (
+            <button
+              type="button"
+              onClick={() => router.push("/dashboard")}
+              className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700"
+            >
+              กลับหน้าจัดการ
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => {
+                setError("");
+                setLoginOpen(true);
+              }}
+              className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700"
+            >
+              เข้าสู่ระบบ
+            </button>
+          )}
         </div>
       </header>
 
