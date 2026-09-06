@@ -31,12 +31,6 @@ const navigation = [
     active: (path: string) => path.startsWith("/expenses"),
   },
   {
-    label: "จัดการ Homepage",
-    href: "/settings/homepage",
-    icon: "▤",
-    active: (path: string) => path.startsWith("/settings/homepage"),
-  },
-  {
     label: "บัญชีโอนเงิน",
     href: "/settings/payment",
     icon: "⚙",
@@ -114,6 +108,24 @@ export default function AdminShell({ children }: Props) {
       </nav>
 
       <div className="border-t border-white/15 p-3">
+        <Link
+          href="/settings/homepage"
+          onClick={() => setMenuOpen(false)}
+          className={`flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium ${
+            pathname.startsWith("/settings/homepage")
+              ? "bg-white text-blue-800 shadow-sm"
+              : "text-blue-100 hover:bg-white/10 hover:text-white"
+          }`}
+        >
+          <span
+            className={`flex h-8 w-8 items-center justify-center rounded-lg ${
+              pathname.startsWith("/settings/homepage") ? "bg-blue-100" : "bg-white/10"
+            }`}
+          >
+            ▤
+          </span>
+          จัดการ Homepage
+        </Link>
         <Link
           href="/"
           onClick={() => setMenuOpen(false)}

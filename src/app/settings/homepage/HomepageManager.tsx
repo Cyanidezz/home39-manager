@@ -160,8 +160,7 @@ export default function HomepageManager({ initialSettings, initialRooms }: Props
       <div className="mx-auto max-w-6xl">
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-sm font-semibold text-blue-600">เว็บไซต์สาธารณะ</p>
-            <h1 className="mt-1 text-3xl font-bold text-slate-900">จัดการ Homepage</h1>
+            <h1 className="text-3xl font-bold text-slate-900">จัดการ Homepage</h1>
             <p className="mt-2 text-slate-500">แก้ไขข้อความ รูปภาพ แผนที่ และช่องทางติดต่อหน้าแรก</p>
           </div>
           <a
