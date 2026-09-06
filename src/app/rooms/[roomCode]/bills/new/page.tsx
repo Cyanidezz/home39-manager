@@ -43,7 +43,8 @@ export default async function NewBillPage({ params }: Props) {
       id,
       full_name,
       rent_waived_year,
-      rent_waived_month
+      rent_waived_month,
+      initial_electricity_meter
     `)
     .eq("room_id", room.id)
     .eq("is_active", true)
@@ -96,7 +97,9 @@ export default async function NewBillPage({ params }: Props) {
               previousMeter={
                 latestBill?.current_meter != null
                   ? Number(latestBill.current_meter)
-                  : null
+                  : tenant.initial_electricity_meter != null
+                    ? Number(tenant.initial_electricity_meter)
+                    : null
               }
               tenantId={tenant.id}
               tenantName={tenant.full_name}

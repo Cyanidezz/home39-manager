@@ -118,7 +118,10 @@ export default async function RoomPage({ params }: Props) {
       is_active,
       note,
       termination_notice_date,
-      planned_move_out_date
+      planned_move_out_date,
+      advance_rent_amount,
+      deposit_amount,
+      initial_electricity_meter
     `)
     .eq("room_id", room.id)
     .eq("is_active", true);
@@ -276,8 +279,27 @@ export default async function RoomPage({ params }: Props) {
                     </p>
 
                     <p className="text-gray-600">
-                      เริ่มเช่า: {tenant.move_in_date || "-"}
+                      เริ่มเช่า: {formatThaiDate(tenant.move_in_date)}
                     </p>
+
+                    <div className="mt-4 grid gap-2 rounded-xl bg-gray-50 p-4 text-sm text-gray-700 sm:grid-cols-2">
+                      <p>
+                        ค่าเช่าล่วงหน้า{" "}
+                        <strong>{tenant.advance_rent_amount != null
+                          ? `${Number(tenant.advance_rent_amount).toLocaleString()} บาท`
+                          : "-"}</strong>
+                      </p>
+                      <p>
+                        ค่ามัดจำ{" "}
+                        <strong>{tenant.deposit_amount != null
+                          ? `${Number(tenant.deposit_amount).toLocaleString()} บาท`
+                          : "-"}</strong>
+                      </p>
+                      <p className="sm:col-span-2">
+                        มิเตอร์ไฟตอนเข้าอยู่{" "}
+                        <strong>{tenant.initial_electricity_meter ?? "ยังไม่ได้ระบุ"}</strong>
+                      </p>
+                    </div>
 
                     <Link
                       href={`/rooms/${room.room_code}/tenant/${tenant.id}/edit`}
