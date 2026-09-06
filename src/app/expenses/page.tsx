@@ -40,7 +40,7 @@ export default async function ExpensesPage({ searchParams }: Props) {
           <div>
             <Link
               href={`/dashboard?month=${selectedPeriod}`}
-              className="text-sm text-gray-500 hover:text-black"
+              className="text-sm font-medium text-blue-600 hover:text-blue-700"
             >
               ← กลับ Dashboard
             </Link>
@@ -60,12 +60,12 @@ export default async function ExpensesPage({ searchParams }: Props) {
                 name="month"
                 type="month"
                 defaultValue={selectedPeriod}
-                className="rounded-xl border bg-white px-4 py-3"
+                className="rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               />
             </div>
             <button
               type="submit"
-              className="rounded-xl border bg-white px-4 py-3 font-medium hover:bg-gray-50"
+              className="rounded-xl border border-blue-200 bg-white px-4 py-3 font-semibold text-blue-700 hover:bg-blue-50"
             >
               ดูเดือนนี้
             </button>
