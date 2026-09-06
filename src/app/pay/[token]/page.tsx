@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { createPublicClient } from "@/lib/supabase/public";
+import SlipUploadForm from "./SlipUploadForm";
 
 type Props = {
   params: Promise<{ token: string }>;
@@ -210,6 +211,17 @@ export default async function PublicBillPage({ params }: Props) {
                   <strong>{bill.room_code || "-"}</strong>
                 </div>
               </div>
+            </div>
+          )}
+
+          {["unpaid", "overdue", "rejected"].includes(bill.status) && (
+            <SlipUploadForm token={token} />
+          )}
+
+          {["slip_submitted", "verifying"].includes(bill.status) && (
+            <div className="border-t bg-blue-50 px-6 py-6 text-center">
+              <p className="font-semibold text-blue-900">ได้รับสลิปแล้ว</p>
+              <p className="mt-1 text-sm text-blue-700">ผู้ดูแลกำลังตรวจสอบหลักฐานการชำระเงิน</p>
             </div>
           )}
         </div>

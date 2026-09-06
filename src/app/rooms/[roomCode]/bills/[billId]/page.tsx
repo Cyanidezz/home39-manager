@@ -158,6 +158,15 @@ export default async function BillDetailPage({ params }: Props) {
   }
 
   const status = getStatus(bill.status);
+  let slipUrl: string | null = null;
+
+  if (bill.slip_path) {
+    const { data: slipData } = await supabase.storage
+      .from("payment-slips")
+      .createSignedUrl(bill.slip_path, 60 * 10);
+    slipUrl = slipData?.signedUrl ?? null;
+  }
+
   const billItems = [...(bill.bill_items || [])].sort(
     (a, b) =>
       new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
@@ -267,7 +276,34 @@ export default async function BillDetailPage({ params }: Props) {
           </div>
         </div>
 
-        <div className="mt-6 flex items-center justify-end gap-3">
+        {bill.slip_path && (
+          <section className="mt-6 rounded-2xl border border-blue-200 bg-blue-50 p-6">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <h2 className="font-bold text-blue-950">หลักฐานการชำระเงิน</h2>
+                <p className="mt-1 text-sm text-blue-700">
+                  {bill.slip_original_name || "ไฟล์สลิป"}
+                  {bill.slip_submitted_at
+                    ? ` · ส่งเมื่อ ${new Date(bill.slip_submitted_at).toLocaleString("th-TH", {
+                        dateStyle: "medium",
+                        timeStyle: "short",
+                        timeZone: "Asia/Bangkok",
+                      })}`
+                    : ""}
+                </p>
+              </div>
+              {slipUrl ? (
+                <a href={slipUrl} target="_blank" rel="noopener noreferrer" className="rounded-xl bg-blue-700 px-5 py-3 font-semibold text-white hover:bg-blue-800">
+                  เปิดดูสลิป
+                </a>
+              ) : (
+                <span className="text-sm text-red-700">ไม่สามารถเปิดไฟล์สลิปได้</span>
+              )}
+            </div>
+          </section>
+        )}
+
+        <div className="mt-6 flex flex-wrap items-center justify-end gap-3">
           <Link
             href={`/pay/${bill.public_token}`}
             target="_blank"
