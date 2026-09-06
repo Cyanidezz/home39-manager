@@ -8,6 +8,58 @@ type Props = {
   }>;
 };
 
+function getBillStatusLabel(status: string) {
+  switch (status) {
+    case "paid":
+      return {
+        text: "ชำระแล้ว",
+        className: "text-green-600",
+      };
+
+    case "unpaid":
+      return {
+        text: "ยังไม่ชำระ",
+        className: "text-red-600",
+      };
+
+    case "overdue":
+      return {
+        text: "เกินกำหนด",
+        className: "text-orange-600",
+      };
+
+    case "slip_submitted":
+      return {
+        text: "ส่งสลิปแล้ว",
+        className: "text-blue-600",
+      };
+
+    case "verifying":
+      return {
+        text: "กำลังตรวจสอบ",
+        className: "text-yellow-600",
+      };
+
+    case "rejected":
+      return {
+        text: "สลิปไม่ผ่าน",
+        className: "text-red-600",
+      };
+
+    case "draft":
+      return {
+        text: "ฉบับร่าง",
+        className: "text-gray-600",
+      };
+
+    default:
+      return {
+        text: status,
+        className: "text-gray-600",
+      };
+  }
+}
+
 export default async function RoomPage({ params }: Props) {
   const { roomCode } = await params;
 
@@ -69,6 +121,10 @@ export default async function RoomPage({ params }: Props) {
 
   const latestBill = bills?.[0];
 
+  const latestBillStatus = latestBill
+    ? getBillStatusLabel(latestBill.status)
+    : null;
+
   const { data: contracts } = await supabase
     .from("contracts")
     .select(`
@@ -100,7 +156,6 @@ export default async function RoomPage({ params }: Props) {
   return (
     <main className="min-h-screen bg-gray-50 p-8">
       <div className="mx-auto max-w-5xl">
-
         <Link
           href="/dashboard"
           className="text-sm text-gray-500 hover:text-black"
@@ -119,15 +174,21 @@ export default async function RoomPage({ params }: Props) {
             </p>
           </div>
 
-          <span className="rounded-full bg-green-100 px-4 py-2 text-sm font-medium text-green-700">
-            {room.status === "occupied"
-              ? "มีผู้เช่า"
-              : "ว่าง"}
-          </span>
+          <div className="flex items-center gap-3">
+            <Link
+              href={`/rooms/${room.room_code}/bills/new`}
+              className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
+            >
+              🧾 ออกบิลใหม่
+            </Link>
+
+            <span className="rounded-full bg-green-100 px-4 py-2 text-sm font-medium text-green-700">
+              {room.status === "occupied" ? "มีผู้เช่า" : "ว่าง"}
+            </span>
+          </div>
         </div>
 
         <div className="mt-8 grid gap-6 md:grid-cols-2">
-
           <section className="rounded-2xl bg-white p-6 shadow-sm">
             <h2 className="text-xl font-semibold">
               🏠 ข้อมูลห้อง
@@ -168,36 +229,39 @@ export default async function RoomPage({ params }: Props) {
             <div className="mt-5">
               {tenants && tenants.length > 0 ? (
                 tenants.map((tenant) => (
-                    <div key={tenant.id}>
-                    <p className="text-lg font-medium">{tenant.full_name}</p>
+                  <div key={tenant.id}>
+                    <p className="text-lg font-medium">
+                      {tenant.full_name}
+                    </p>
 
                     <p className="mt-2 text-gray-600">
-                        โทร: {tenant.phone || "-"}
+                      โทร: {tenant.phone || "-"}
                     </p>
 
                     <p className="text-gray-600">
-                        เริ่มเช่า: {tenant.move_in_date || "-"}
+                      เริ่มเช่า: {tenant.move_in_date || "-"}
                     </p>
 
                     <Link
-                        href={`/rooms/${room.room_code}/tenant/${tenant.id}/edit`}
-                        className="mt-4 inline-block rounded-lg border px-4 py-2 text-sm hover:bg-gray-50"
+                      href={`/rooms/${room.room_code}/tenant/${tenant.id}/edit`}
+                      className="mt-4 inline-block rounded-lg border px-4 py-2 text-sm hover:bg-gray-50"
                     >
-                        ✏️ แก้ไขข้อมูลผู้เช่า
+                      ✏️ แก้ไขข้อมูลผู้เช่า
                     </Link>
-                    </div>
+                  </div>
                 ))
-                ) : (
+              ) : (
                 <div>
                   <p className="text-gray-500">
                     ยังไม่มีข้อมูลผู้เช่า
                   </p>
-                    <Link
+
+                  <Link
                     href={`/rooms/${room.room_code}/tenant/new`}
                     className="mt-4 inline-block rounded-lg bg-black px-4 py-2 text-white"
-                    >
+                  >
                     + เพิ่มข้อมูลผู้เช่า
-                    </Link>
+                  </Link>
                 </div>
               )}
             </div>
@@ -294,22 +358,46 @@ export default async function RoomPage({ params }: Props) {
                 <p>
                   ยอด{" "}
                   <strong>
-                    {Number(latestBill.total_amount).toLocaleString()}
-                    {" "}บาท
+                    {Number(latestBill.total_amount).toLocaleString(
+                      undefined,
+                      {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }
+                    )}{" "}
+                    บาท
                   </strong>
                 </p>
 
                 <p>
-                  สถานะ <strong>{latestBill.status}</strong>
+                  สถานะ{" "}
+                  <strong className={latestBillStatus?.className}>
+                    {latestBillStatus?.text}
+                  </strong>
                 </p>
+
+                <Link
+                  href={`/rooms/${room.room_code}/bills`}
+                  className="mt-5 inline-block rounded-lg border px-4 py-2 text-sm hover:bg-gray-50"
+                >
+                  🧾 ดูประวัติบิลทั้งหมด
+                </Link>
               </div>
             ) : (
-              <p className="mt-4 text-gray-500">
-                ยังไม่มีประวัติบิล
-              </p>
+              <div className="mt-4">
+                <p className="text-gray-500">
+                  ยังไม่มีประวัติบิล
+                </p>
+
+                <Link
+                  href={`/rooms/${room.room_code}/bills/new`}
+                  className="mt-4 inline-block rounded-lg border px-4 py-2 text-sm hover:bg-gray-50"
+                >
+                  🧾 ออกบิลแรก
+                </Link>
+              </div>
             )}
           </section>
-
         </div>
       </div>
     </main>
