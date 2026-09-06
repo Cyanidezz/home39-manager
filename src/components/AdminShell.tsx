@@ -25,7 +25,7 @@ const navigation = [
     active: (path: string) => path.startsWith("/rooms"),
   },
   {
-    label: "รายจ่ายจริง",
+    label: "บันทึกรายจ่าย",
     href: "/expenses",
     icon: "฿",
     active: (path: string) => path.startsWith("/expenses"),
