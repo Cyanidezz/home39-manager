@@ -9,15 +9,30 @@ export default function SendBillLineButton({ billId }: { billId: string }) {
   async function send() {
     setState("loading");
     setMessage("");
-    const response = await fetch(`/api/line/bills/${billId}/send`, { method: "POST" });
-    const result = (await response.json()) as { error?: string };
-    if (!response.ok) {
+
+    try {
+      const response = await fetch(`/api/line/bills/${billId}/send`, {
+        method: "POST",
+        signal: AbortSignal.timeout(15000),
+      });
+      const result = (await response.json()) as { error?: string };
+
+      if (!response.ok) {
+        throw new Error(result.error || "ส่ง LINE ไม่สำเร็จ");
+      }
+
+      setState("success");
+      setMessage("ส่งบิลทาง LINE แล้ว");
+    } catch (error) {
       setState("error");
-      setMessage(result.error || "ส่ง LINE ไม่สำเร็จ");
-      return;
+      setMessage(
+        error instanceof DOMException && error.name === "TimeoutError"
+          ? "LINE ตอบช้าเกินไป กรุณาลองใหม่"
+          : error instanceof Error
+            ? error.message
+            : "ส่ง LINE ไม่สำเร็จ"
+      );
     }
-    setState("success");
-    setMessage("ส่งบิลทาง LINE แล้ว");
   }
 
   return (
