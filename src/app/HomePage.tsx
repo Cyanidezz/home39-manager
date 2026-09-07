@@ -46,6 +46,7 @@ export default function HomePage({ rooms, isLoggedIn, settings, homepageRooms }:
       room_code: code,
       title: `ห้อง ${code}`,
       description: "สอบถามรายละเอียดเพิ่มเติม",
+      monthly_price: room.monthly_rent,
       cover_image_url: null,
       image_urls: [],
     };
@@ -204,9 +205,9 @@ export default function HomePage({ rooms, isLoggedIn, settings, homepageRooms }:
                   <p className="mt-3 line-clamp-2 text-sm leading-6 text-slate-500">
                     {room.description}
                   </p>
-                  {Number(room.monthly_rent) > 0 && (
+                  {Number(room.monthly_price) > 0 && (
                     <p className="mt-4 font-semibold text-blue-700">
-                      {money(room.monthly_rent)} บาท/เดือน
+                      {money(room.monthly_price)} บาท/เดือน
                     </p>
                   )}
                   <p className="mt-4 border-t border-slate-100 pt-4 text-sm font-semibold text-blue-600">
@@ -418,8 +419,8 @@ export default function HomePage({ rooms, isLoggedIn, settings, homepageRooms }:
                 <div>
                   <p className="text-xs text-slate-500">ค่าเช่ารายเดือน</p>
                   <p className="mt-1 font-semibold">
-                    {Number(selectedRoom.monthly_rent) > 0
-                      ? `${money(selectedRoom.monthly_rent)} บาท`
+                    {Number(selectedRoom.monthly_price) > 0
+                      ? `${money(selectedRoom.monthly_price)} บาท`
                       : "กรุณาสอบถาม"}
                   </p>
                 </div>

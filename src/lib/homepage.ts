@@ -23,6 +23,7 @@ export type HomepageRoom = {
   room_code: string;
   title: string;
   description: string;
+  monthly_price: number | string;
   cover_image_url: string | null;
   image_urls: string[];
 };
@@ -62,6 +63,7 @@ export const defaultHomepageRooms: HomepageRoom[] = ["A", "B", "C"].map(
     room_code: roomCode,
     title: `ห้อง ${roomCode}`,
     description: roomDescriptions[roomCode],
+    monthly_price: roomCode === "A" ? 5000 : 4500,
     cover_image_url: null,
     image_urls: [],
   })

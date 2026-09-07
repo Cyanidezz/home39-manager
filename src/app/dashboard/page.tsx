@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import SlipNotificationBell from "@/components/SlipNotificationBell";
 
 type Props = {
   searchParams: Promise<{ month?: string }>;
@@ -162,6 +163,7 @@ export default async function DashboardPage({ searchParams }: Props) {
             >
               ดูข้อมูล
             </button>
+            <SlipNotificationBell />
           </form>
         </div>
       </header>

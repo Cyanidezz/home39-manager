@@ -110,12 +110,12 @@ export default function SlipNotificationBell() {
   return (
     <div
       ref={containerRef}
-      className="fixed right-[4.5rem] top-3 z-[60] lg:left-[13.1rem] lg:right-auto lg:top-5"
+      className="relative z-30 shrink-0"
     >
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
-        className="relative flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-300 lg:border-white/15 lg:bg-white/10 lg:text-blue-100 lg:shadow-none lg:hover:bg-white/20 lg:hover:text-white"
+        className="relative flex h-11 w-11 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300"
         aria-label={
           notifications.length > 0
             ? `มีสลิปใหม่ ${notifications.length} รายการ`
@@ -138,14 +138,14 @@ export default function SlipNotificationBell() {
         </svg>
 
         {notifications.length > 0 && (
-          <span className="absolute -right-1.5 -top-1.5 flex min-h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[11px] font-bold leading-none text-white ring-2 ring-white lg:ring-blue-800">
+          <span className="absolute -right-1.5 -top-1.5 flex min-h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[11px] font-bold leading-none text-white ring-2 ring-white">
             {countLabel}
           </span>
         )}
       </button>
 
       {open && (
-        <section className="absolute -right-14 top-12 w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-slate-200 bg-white text-slate-900 shadow-2xl lg:left-0 lg:right-auto">
+        <section className="absolute right-0 top-14 w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-slate-200 bg-white text-slate-900 shadow-2xl">
           <header className="flex items-center justify-between border-b border-slate-100 px-4 py-3.5">
             <div>
               <h2 className="font-bold">สลิปรอตรวจสอบ</h2>

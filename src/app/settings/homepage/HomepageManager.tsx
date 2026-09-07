@@ -139,10 +139,20 @@ export default function HomepageManager({ initialSettings, initialRooms }: Props
   }
 
   async function saveRoom(room: HomepageRoom) {
+    const monthlyPrice = Number(room.monthly_price);
+    if (!Number.isFinite(monthlyPrice) || monthlyPrice < 0) {
+      setMessage({
+        type: "error",
+        text: `กรุณากรอกราคาห้อง ${room.room_code} ให้ถูกต้อง`,
+      });
+      return;
+    }
+
     setSaving(true);
     setMessage(null);
     const { error } = await supabase.from("homepage_rooms").upsert({
       ...room,
+      monthly_price: monthlyPrice,
       updated_at: new Date().toISOString(),
     });
     setSaving(false);
@@ -161,7 +171,7 @@ export default function HomepageManager({ initialSettings, initialRooms }: Props
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h1 className="text-3xl font-bold text-slate-900">จัดการ Homepage</h1>
-            <p className="mt-2 text-slate-500">แก้ไขข้อความ รูปภาพ แผนที่ และช่องทางติดต่อหน้าแรก</p>
+            <p className="mt-2 text-slate-500">แก้ไขข้อความ ราคา รูปภาพ แผนที่ และช่องทางติดต่อหน้าแรก</p>
           </div>
           <a
             href="/"
@@ -280,7 +290,7 @@ export default function HomepageManager({ initialSettings, initialRooms }: Props
         <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
           <div className="mb-6">
             <h2 className="text-xl font-bold">ข้อมูลและรูปภาพห้องพัก</h2>
-            <p className="mt-1 text-sm text-slate-500">รูปหน้าปกจะแสดงบนการ์ด และรูปเพิ่มเติมจะแสดงเมื่อเปิดดูห้อง</p>
+            <p className="mt-1 text-sm text-slate-500">กำหนดราคาที่แสดง รูปหน้าปกบนการ์ด และรูปเพิ่มเติมของแต่ละห้อง</p>
           </div>
           <div className="space-y-8">
             {rooms.map((room) => (
@@ -295,6 +305,20 @@ export default function HomepageManager({ initialSettings, initialRooms }: Props
                   <div className="space-y-5">
                     <label className="block text-sm font-semibold">ชื่อห้อง
                       <input className={inputClass} value={room.title} onChange={(e) => updateRoom(room.room_code, { title: e.target.value })} required />
+                    </label>
+                    <label className="block text-sm font-semibold">ราคาห้องต่อเดือน (บาท)
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        className={inputClass}
+                        value={room.monthly_price}
+                        onChange={(e) => updateRoom(room.room_code, { monthly_price: e.target.value })}
+                        required
+                      />
+                      <span className="mt-2 block text-xs font-normal text-slate-500">
+                        ราคานี้แสดงเฉพาะหน้าเว็บไซต์ ไม่เปลี่ยนอัตราค่าเช่าในสัญญา
+                      </span>
                     </label>
                     <label className="block text-sm font-semibold">รายละเอียดห้อง
                       <textarea className={`${inputClass} min-h-28`} value={room.description} onChange={(e) => updateRoom(room.room_code, { description: e.target.value })} required />
