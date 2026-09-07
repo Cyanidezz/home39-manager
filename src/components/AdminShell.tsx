@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { ReactNode, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import SlipNotificationBell from "@/components/SlipNotificationBell";
 
 type Props = {
   children: ReactNode;
@@ -153,6 +154,8 @@ export default function AdminShell({ children }: Props) {
 
   return (
     <div className="min-h-screen bg-slate-50 lg:flex">
+      <SlipNotificationBell />
+
       <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col bg-gradient-to-b from-blue-800 to-blue-950 shadow-xl lg:flex">
         {navContent}
       </aside>
