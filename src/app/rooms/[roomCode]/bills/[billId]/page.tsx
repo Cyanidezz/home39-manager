@@ -134,6 +134,24 @@ async function markBillAsPaid(formData: FormData) {
   redirect(`/rooms/${roomCode}/bills/${billId}`);
 }
 
+async function rejectBillSlip(formData: FormData) {
+  "use server";
+
+  const billId = String(formData.get("billId") || "");
+  const roomCode = String(formData.get("roomCode") || "");
+
+  if (!billId || !roomCode) {
+    throw new Error("ข้อมูลบิลไม่ครบ");
+  }
+
+  await setBillStatus(
+    billId,
+    "rejected",
+    "ผู้ดูแลตรวจสอบแล้วว่าสลิปไม่ถูกต้อง"
+  );
+  redirect(`/rooms/${roomCode}/bills/${billId}`);
+}
+
 async function updateBillStatus(formData: FormData) {
   "use server";
 
@@ -348,8 +366,10 @@ export default async function BillDetailPage({ params }: Props) {
                   billId={bill.id}
                   roomCode={bill.rooms.room_code}
                   isPaid={bill.status === "paid"}
+                  canReject={!['paid', 'rejected'].includes(bill.status)}
                   contentType={bill.slip_content_type || ""}
                   markBillAsPaid={markBillAsPaid}
+                  rejectBillSlip={rejectBillSlip}
                 />
               ) : (
                 <span className="text-sm text-red-700">ไม่สามารถเปิดไฟล์สลิปได้</span>

@@ -8,8 +8,10 @@ type Props = {
   billId: string;
   roomCode: string;
   isPaid: boolean;
+  canReject: boolean;
   contentType: string;
   markBillAsPaid: (formData: FormData) => void | Promise<void>;
+  rejectBillSlip: (formData: FormData) => void | Promise<void>;
 };
 
 export default function SlipViewer({
@@ -18,8 +20,10 @@ export default function SlipViewer({
   billId,
   roomCode,
   isPaid,
+  canReject,
   contentType,
   markBillAsPaid,
+  rejectBillSlip,
 }: Props) {
   const [open, setOpen] = useState(false);
 
@@ -108,16 +112,30 @@ export default function SlipViewer({
                   ยืนยันชำระเงินแล้ว
                 </span>
               ) : (
-                <form action={markBillAsPaid}>
-                  <input type="hidden" name="billId" value={billId} />
-                  <input type="hidden" name="roomCode" value={roomCode} />
-                  <button
-                    type="submit"
-                    className="rounded-xl bg-green-600 px-5 py-3 font-semibold text-white hover:bg-green-700"
-                  >
-                    ยืนยันสลิปและบันทึกชำระเงิน
-                  </button>
-                </form>
+                <div className="flex flex-wrap justify-end gap-3">
+                  {canReject && (
+                    <form action={rejectBillSlip}>
+                      <input type="hidden" name="billId" value={billId} />
+                      <input type="hidden" name="roomCode" value={roomCode} />
+                      <button
+                        type="submit"
+                        className="rounded-xl bg-red-600 px-5 py-3 font-semibold text-white hover:bg-red-700"
+                      >
+                        สลิปไม่ถูกต้อง
+                      </button>
+                    </form>
+                  )}
+                  <form action={markBillAsPaid}>
+                    <input type="hidden" name="billId" value={billId} />
+                    <input type="hidden" name="roomCode" value={roomCode} />
+                    <button
+                      type="submit"
+                      className="rounded-xl bg-green-600 px-5 py-3 font-semibold text-white hover:bg-green-700"
+                    >
+                      ยืนยันสลิปและบันทึกชำระเงิน
+                    </button>
+                  </form>
+                </div>
               )}
             </footer>
           </section>
