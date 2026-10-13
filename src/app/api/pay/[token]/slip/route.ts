@@ -14,8 +14,22 @@ const allowedTypes = new Set([
 ]);
 const maxFileSize = 8 * 1024 * 1024;
 
-function extensionFor(file: File) {
-  const byType: Record<string, string> = {
+function normalizedType(file: File) {
+  const byExtension: Record<string, string> = {
+    heic: "image/heic",
+    heif: "image/heif",
+    jpg: "image/jpeg",
+    jpeg: "image/jpeg",
+    png: "image/png",
+    webp: "image/webp",
+    pdf: "application/pdf",
+  };
+  const extension = file.name.split(".").pop()?.toLowerCase() || "";
+  return file.type || byExtension[extension] || "";
+}
+
+function extensionFor(file: File, contentType: string) {
+  const byType: Record<string, string> {
     "image/jpeg": "jpg",
     "image/png": "png",
     "image/webp": "webp",
@@ -23,7 +37,7 @@ function extensionFor(file: File) {
     "image/heif": "heif",
     "application/pdf": "pdf",
   };
-  return byType[file.type];
+  return byType[contentType];
 }
 
 export async function POST(
@@ -43,7 +57,9 @@ export async function POST(
     return NextResponse.json({ error: "กรุณาเลือกไฟล์สลิป" }, { status: 400 });
   }
 
-  if (!allowedTypes.has(slip.type)) {
+  const slipType = normalizedType(slip);
+
+  if (!allowedTypes.has(slipType)) {
     return NextResponse.json(
       { error: "รองรับ JPG, PNG, WebP, HEIC, HEIF หรือ PDF" },
       { status: 415 }
@@ -69,11 +85,11 @@ export async function POST(
     return NextResponse.json({ error: "บิลนี้ชำระแล้ว" }, { status: 409 });
   }
 
-  const objectPath = `${bill.id}/${crypto.randomUUID()}.${extensionFor(slip)}`;
+  const objectPath = `${bill.id}/${crypto.randomUUID()}.${extensionFor(slip, slipType)}`;
   const body = new Uint8Array(await slip.arrayBuffer());
   const { error: uploadError } = await supabase.storage
     .from("payment-slips")
-    .upload(objectPath, body, { contentType: slip.type, upsert: false });
+    .upload(objectPath, body, { contentType: slipType, upsert: false });
 
   if (uploadError) {
     console.error("Payment slip upload failed:", uploadError);
@@ -86,7 +102,7 @@ export async function POST(
     .update({
       slip_path: objectPath,
       slip_original_name: slip.name.slice(0, 255),
-      slip_content_type: slip.type,
+      slip_content_type: slipType,
       slip_size_bytes: slip.size,
       slip_submitted_at: submittedAt,
       status: "slip_submitted",
