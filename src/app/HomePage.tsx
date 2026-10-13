@@ -3,7 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import type { HomepageRoom, HomepageSettings } from "@/lib/homepage";
+import { homepageImageDisplayUrl, type HomepageRoom, type HomepageSettings } from "@/lib/homepage";
 
 type Room = {
   room_code: string;
@@ -115,7 +115,7 @@ export default function HomePage({ rooms, isLoggedIn, settings, homepageRooms }:
         style={
           settings.banner_image_url
             ? {
-                backgroundImage: `linear-gradient(115deg, rgba(30,64,175,.94), rgba(37,99,235,.72)), url(${settings.banner_image_url})`,
+                backgroundImage: `linear-gradient(115deg, rgba(30,64,175,.94), rgba(37,99,235,.72)), url(${homepageImageDisplayUrl(settings.banner_image_url)})`,
               }
             : undefined
         }
@@ -179,7 +179,7 @@ export default function HomePage({ rooms, isLoggedIn, settings, homepageRooms }:
                 <div className="relative flex h-52 items-center justify-center overflow-hidden bg-gradient-to-br from-blue-100 via-slate-100 to-blue-50">
                   {room.cover_image_url ? (
                     <img
-                      src={room.cover_image_url}
+                      src={homepageImageDisplayUrl(room.cover_image_url)}
                       alt={room.title}
                       className="absolute inset-0 h-full w-full object-cover transition duration-300 group-hover:scale-105"
                     />
@@ -392,7 +392,7 @@ export default function HomePage({ rooms, isLoggedIn, settings, homepageRooms }:
                     >
                       {imageUrl ? (
                         <img
-                          src={imageUrl}
+                          src={homepageImageDisplayUrl(imageUrl)}
                           alt={`${selectedRoom.title} รูปที่ ${index + 1}`}
                           className="h-full w-full rounded-xl object-cover"
                         />

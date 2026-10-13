@@ -28,6 +28,25 @@ export type HomepageRoom = {
   image_urls: string[];
 };
 
+export function homepageImageDisplayUrl(imageUrl: string) {
+  try {
+    const url = new URL(imageUrl);
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    if (
+      supabaseUrl &&
+      url.origin === new URL(supabaseUrl).origin &&
+      url.pathname.startsWith("/storage/v1/object/public/homepage/") &&
+      /\.(heic|heif)$/i.test(url.pathname)
+    ) {
+      return `/api/homepage-image?url=${encodeURIComponent(url.toString())}`;
+    }
+  } catch {
+    return imageUrl;
+  }
+
+  return imageUrl;
+}
+
 export const defaultHomepageSettings: HomepageSettings = {
   id: "default",
   banner_badge: "ห้องพักในเมืองหาดใหญ่",

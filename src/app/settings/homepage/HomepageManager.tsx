@@ -3,7 +3,7 @@
 import { ChangeEvent, FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import type { HomepageRoom, HomepageSettings } from "@/lib/homepage";
+import { homepageImageDisplayUrl, type HomepageRoom, type HomepageSettings } from "@/lib/homepage";
 
 type Props = {
   initialSettings: HomepageSettings;
@@ -26,7 +26,7 @@ function ImagePreview({ src, alt }: { src: string | null; alt: string }) {
 
   return (
     <img
-      src={src}
+      src={homepageImageDisplayUrl(src)}
       alt={alt}
       className="aspect-[16/9] w-full rounded-xl border border-slate-200 object-cover"
     />
@@ -58,13 +58,18 @@ export default function HomepageManager({ initialSettings, initialRooms }: Props
   }
 
   async function uploadImage(file: File, folder: string) {
-    if (!file.type.startsWith("image/")) throw new Error("กรุณาเลือกไฟล์รูปภาพ");
+    const extension = file.name.split(".").pop()?.toLowerCase() || "jpg";
+    const isHeic = extension === "heic" || extension === "heif";
+    if (!file.type.startsWith("image/") && !isHeic) throw new Error("กรุณาเลือกไฟล์รูปภาพ");
     if (file.size > 10 * 1024 * 1024) throw new Error("รูปภาพต้องมีขนาดไม่เกิน 10 MB");
 
-    const extension = file.name.split(".").pop()?.toLowerCase() || "jpg";
     const path = `${folder}/${crypto.randomUUID()}.${extension}`;
+    const contentType = isHeic
+      ? extension === "heif" ? "image/heif" : "image/heic"
+      : file.type;
     const { error } = await supabase.storage.from("homepage").upload(path, file, {
       cacheControl: "3600",
+      contentType,
       upsert: false,
     });
 
@@ -221,7 +226,7 @@ export default function HomepageManager({ initialSettings, initialRooms }: Props
                 <ImagePreview src={settings.banner_image_url} alt="ตัวอย่าง Banner" />
                 <label className="mt-4 block cursor-pointer rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-center font-semibold text-blue-700 hover:bg-blue-100">
                   {uploading === "banner" ? "กำลังอัปโหลด..." : "เลือกรูป Banner"}
-                  <input type="file" accept="image/*" className="sr-only" disabled={Boolean(uploading)} onChange={uploadBanner} />
+                  <input type="file" accept="image/*,.heic,.heif" className="sr-only" disabled={Boolean(uploading)} onChange={uploadBanner} />
                 </label>
                 {settings.banner_image_url && (
                   <button type="button" onClick={() => updateSetting("banner_image_url", null)} className="mt-3 w-full text-sm font-semibold text-red-600 hover:underline">
@@ -328,7 +333,7 @@ export default function HomepageManager({ initialSettings, initialRooms }: Props
                     <ImagePreview src={room.cover_image_url} alt={`รูปหน้าปกห้อง ${room.room_code}`} />
                     <label className="mt-3 block cursor-pointer rounded-lg border border-blue-200 bg-blue-50 px-4 py-2.5 text-center text-sm font-semibold text-blue-700 hover:bg-blue-100">
                       {uploading === `${room.room_code}-cover` ? "กำลังอัปโหลด..." : "เลือกรูปหน้าปก"}
-                      <input type="file" accept="image/*" className="sr-only" disabled={Boolean(uploading)} onChange={(event) => uploadRoomImages(room.room_code, event, true)} />
+                      <input type="file" accept="image/*,.heic,.heif" className="sr-only" disabled={Boolean(uploading)} onChange={(event) => uploadRoomImages(room.room_code, event, true)} />
                     </label>
                   </div>
                 </div>
@@ -337,14 +342,14 @@ export default function HomepageManager({ initialSettings, initialRooms }: Props
                     <p className="text-sm font-semibold">รูปเพิ่มเติม ({room.image_urls.length} รูป)</p>
                     <label className="cursor-pointer rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-blue-700 hover:bg-blue-50">
                       {uploading === `${room.room_code}-gallery` ? "กำลังอัปโหลด..." : "+ เพิ่มรูปภาพ"}
-                      <input type="file" accept="image/*" multiple className="sr-only" disabled={Boolean(uploading)} onChange={(event) => uploadRoomImages(room.room_code, event, false)} />
+                      <input type="file" accept="image/*,.heic,.heif" multiple className="sr-only" disabled={Boolean(uploading)} onChange={(event) => uploadRoomImages(room.room_code, event, false)} />
                     </label>
                   </div>
                   {room.image_urls.length ? (
                     <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
                       {room.image_urls.map((url, index) => (
                         <div key={url} className="relative">
-                          <img src={url} alt={`ห้อง ${room.room_code} รูปที่ ${index + 1}`} className="aspect-[4/3] w-full rounded-lg object-cover" />
+                          <img src={homepageImageDisplayUrl(url)} alt={`ห้อง ${room.room_code} รูปที่ ${index + 1}`} className="aspect-[4/3] w-full rounded-lg object-cover" />
                           <button type="button" aria-label={`เอารูปที่ ${index + 1} ออก`} onClick={() => updateRoom(room.room_code, { image_urls: room.image_urls.filter((item) => item !== url) })} className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-slate-950/75 text-white hover:bg-red-600">×</button>
                         </div>
                       ))}

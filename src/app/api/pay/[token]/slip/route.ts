@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { convertHeicToJpeg } from "@/lib/image";
 
 export const runtime = "nodejs";
 
@@ -25,6 +26,12 @@ function normalizedType(file: File) {
     pdf: "application/pdf",
   };
   const extension = file.name.split(".").pop()?.toLowerCase() || "";
+  if (
+    (extension === "heic" || extension === "heif") &&
+    (!file.type || file.type === "application/octet-stream")
+  ) {
+    return byExtension[extension];
+  }
   return file.type || byExtension[extension] || "";
 }
 
@@ -73,7 +80,7 @@ export async function POST(
   const supabase = createAdminClient();
   const { data: bill, error: billError } = await supabase
     .from("bills")
-    .select("id, status, slip_path")
+    .select("id, status, slip_path, slip_preview_path")
     .eq("public_token", token)
     .single();
 
@@ -85,8 +92,25 @@ export async function POST(
     return NextResponse.json({ error: "บิลนี้ชำระแล้ว" }, { status: 409 });
   }
 
-  const objectPath = `${bill.id}/${crypto.randomUUID()}.${extensionFor(slip, slipType)}`;
+  const uploadId = crypto.randomUUID();
+  const objectPath = `${bill.id}/${uploadId}.${extensionFor(slip, slipType)}`;
   const body = new Uint8Array(await slip.arrayBuffer());
+  const isHeic = slipType === "image/heic" || slipType === "image/heif";
+  const previewPath = isHeic ? `${bill.id}/${uploadId}.preview.jpg` : null;
+  let previewBody: Uint8Array | null = null;
+
+  if (isHeic) {
+    try {
+      previewBody = await convertHeicToJpeg(body);
+    } catch (conversionError) {
+      console.error("Payment slip preview conversion failed:", conversionError);
+      return NextResponse.json(
+        { error: "แปลงไฟล์ HEIC เพื่อแสดงตัวอย่างไม่สำเร็จ กรุณาเลือกไฟล์ใหม่" },
+        { status: 415 }
+      );
+    }
+  }
+
   const { error: uploadError } = await supabase.storage
     .from("payment-slips")
     .upload(objectPath, body, { contentType: slipType, upsert: false });
@@ -96,11 +120,24 @@ export async function POST(
     return NextResponse.json({ error: "อัปโหลดสลิปไม่สำเร็จ กรุณาลองอีกครั้ง" }, { status: 500 });
   }
 
+  if (previewPath && previewBody) {
+    const { error: previewUploadError } = await supabase.storage
+      .from("payment-slips")
+      .upload(previewPath, previewBody, { contentType: "image/jpeg", upsert: false });
+
+    if (previewUploadError) {
+      await supabase.storage.from("payment-slips").remove([objectPath]);
+      console.error("Payment slip preview upload failed:", previewUploadError);
+      return NextResponse.json({ error: "สร้างตัวอย่างสลิปไม่สำเร็จ กรุณาลองอีกครั้ง" }, { status: 500 });
+    }
+  }
+
   const submittedAt = new Date().toISOString();
   const { error: updateError } = await supabase
     .from("bills")
     .update({
       slip_path: objectPath,
+      slip_preview_path: previewPath,
       slip_original_name: slip.name.slice(0, 255),
       slip_content_type: slipType,
       slip_size_bytes: slip.size,
@@ -111,7 +148,9 @@ export async function POST(
     .eq("id", bill.id);
 
   if (updateError) {
-    await supabase.storage.from("payment-slips").remove([objectPath]);
+    await supabase.storage.from("payment-slips").remove(
+      previewPath ? [objectPath, previewPath] : [objectPath]
+    );
     console.error("Payment slip record update failed:", updateError);
     return NextResponse.json({ error: "บันทึกสลิปไม่สำเร็จ กรุณาลองอีกครั้ง" }, { status: 500 });
   }
@@ -123,8 +162,11 @@ export async function POST(
     reason: "ผู้เช่าอัปโหลดหลักฐานการชำระเงิน",
   });
 
-  if (bill.slip_path && bill.slip_path !== objectPath) {
-    await supabase.storage.from("payment-slips").remove([bill.slip_path]);
+  const oldPaths = [bill.slip_path, bill.slip_preview_path].filter(
+    (path): path is string => Boolean(path) && path !== objectPath && path !== previewPath
+  );
+  if (oldPaths.length > 0) {
+    await supabase.storage.from("payment-slips").remove(oldPaths);
   }
 
   return NextResponse.json({ ok: true });

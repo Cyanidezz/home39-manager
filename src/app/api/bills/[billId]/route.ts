@@ -146,7 +146,7 @@ export async function DELETE(
 
   const { data: visibleBill } = await supabase
     .from("bills")
-    .select("id, slip_path, rooms(room_code)")
+    .select("id, slip_path, slip_preview_path, rooms(room_code)")
     .eq("id", billId)
     .single();
 
@@ -175,10 +175,13 @@ export async function DELETE(
     return NextResponse.json({ error: "ลบบิลไม่สำเร็จ" }, { status: 500 });
   }
 
-  if (visibleBill.slip_path) {
+  const slipPaths = [visibleBill.slip_path, visibleBill.slip_preview_path].filter(
+    (path): path is string => Boolean(path)
+  );
+  if (slipPaths.length > 0) {
     const { error: storageError } = await admin.storage
       .from("payment-slips")
-      .remove([visibleBill.slip_path]);
+      .remove(slipPaths);
     if (storageError) {
       console.error("Delete payment slip failed:", storageError);
     }

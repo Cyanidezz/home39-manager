@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 type Props = {
   slipUrl: string;
+  previewUrl: string | null;
   fileName: string;
   billId: string;
   roomCode: string;
@@ -16,6 +17,7 @@ type Props = {
 
 export default function SlipViewer({
   slipUrl,
+  previewUrl,
   fileName,
   billId,
   roomCode,
@@ -27,6 +29,10 @@ export default function SlipViewer({
 }: Props) {
   const [open, setOpen] = useState(false);
   const [imagePreviewFailed, setImagePreviewFailed] = useState(false);
+  const isHeic = contentType === "image/heic" || contentType === "image/heif";
+  const imageUrl = isHeic
+    ? previewUrl || `/api/bills/${billId}/slip-preview`
+    : slipUrl;
 
   useEffect(() => {
     if (!open) return;
@@ -85,15 +91,15 @@ export default function SlipViewer({
               {contentType.startsWith("image/") && !imagePreviewFailed ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
-                  src={slipUrl}
+                  src={imageUrl}
                   alt={`สลิป ${fileName}`}
                   onError={() => setImagePreviewFailed(true)}
                   className="h-full w-full object-contain"
                 />
               ) : contentType.startsWith("image/") ? (
                 <div className="flex h-full flex-col items-center justify-center gap-3 rounded-lg bg-white p-6 text-center text-slate-700">
-                  <p className="font-semibold">เบราว์เซอร์นี้ไม่สามารถแสดงตัวอย่างไฟล์ HEIC/HEIF ได้</p>
-                  <p className="text-sm text-slate-500">ดาวน์โหลดหรือเปิดไฟล์ด้วยแอปที่รองรับ HEIC/HEIF เพื่อตรวจสอบสลิป</p>
+                  <p className="font-semibold">ไม่สามารถแสดงตัวอย่างภาพนี้ได้</p>
+                  <p className="text-sm text-slate-500">ดาวน์โหลดไฟล์ต้นฉบับเพื่อตรวจสอบสลิป</p>
                   <a href={slipUrl} download={fileName} className="rounded-lg bg-blue-700 px-4 py-2 font-semibold text-white hover:bg-blue-800">
                     ดาวน์โหลดไฟล์สลิป
                   </a>
@@ -115,6 +121,9 @@ export default function SlipViewer({
                 className="text-sm font-medium text-blue-700 hover:underline"
               >
                 เปิดไฟล์ในแท็บใหม่
+              </a>
+              <a href={slipUrl} download={fileName} className="text-sm font-medium text-blue-700 hover:underline">
+                ดาวน์โหลดไฟล์ต้นฉบับ
               </a>
 
               {isPaid ? (
