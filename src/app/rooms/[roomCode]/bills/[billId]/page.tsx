@@ -2,10 +2,10 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import StatusEditor from "./StatusEditor";
-import SlipViewer from "./SlipViewer";
+import BillBreakdown from "./_components/BillBreakdown";
+import SlipSection from "./_components/SlipSection";
+import { updateBillStatus } from "./actions";
 import SendBillLineButton from "@/components/SendBillLineButton";
-import { publicAppUrl, pushLineText } from "@/lib/line";
-import { formatMoney, formatNumber, formatThaiDateShort, thaiMonths } from "@/lib/format";
 import { getBillStatus } from "@/lib/billStatus";
 
 type Props = {
@@ -14,130 +14,6 @@ type Props = {
     billId: string;
   }>;
 };
-
-async function notifyTenantAboutStatus(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-  billId: string,
-  newStatus: string
-) {
-  if (!["paid", "rejected", "verifying"].includes(newStatus)) return;
-
-  const { data: bill } = await supabase
-    .from("bills")
-    .select("total_amount, public_token, rooms(room_code), tenants(line_user_id)")
-    .eq("id", billId)
-    .single();
-
-  if (!bill) return;
-  const tenant = Array.isArray(bill.tenants) ? bill.tenants[0] : bill.tenants;
-  const room = Array.isArray(bill.rooms) ? bill.rooms[0] : bill.rooms;
-  if (!tenant?.line_user_id) return;
-
-  const amount = Number(bill.total_amount).toLocaleString("th-TH", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
-  const roomText = room?.room_code || "-";
-  const messages: Record<string, string> = {
-    paid: `Home39 ยืนยันการชำระเงินแล้ว\nห้อง ${roomText}\nยอด ${amount} บาท\nขอบคุณค่ะ`,
-    verifying: `Home39 ได้รับสลิปของห้อง ${roomText} แล้ว\nกำลังตรวจสอบหลักฐานการชำระเงิน`,
-    rejected: `Home39 ตรวจสอบสลิปห้อง ${roomText} ไม่ผ่าน\nกรุณาตรวจสอบและส่งสลิปใหม่ที่ ${publicAppUrl()}/pay/${bill.public_token}`,
-  };
-
-  await pushLineText(tenant.line_user_id, messages[newStatus]);
-}
-
-async function setBillStatus(
-  billId: string,
-  newStatus: string,
-  reason: string
-) {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) redirect("/login");
-
-  const { error } = await supabase.rpc("update_bill_status", {
-    p_bill_id: billId,
-    p_new_status: newStatus,
-    p_reason: reason,
-  });
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  try {
-    await notifyTenantAboutStatus(supabase, billId, newStatus);
-  } catch (notificationError) {
-    console.error("LINE status notification failed:", notificationError);
-  }
-}
-
-async function markBillAsPaid(formData: FormData) {
-  "use server";
-
-  const billId = String(formData.get("billId") || "");
-  const roomCode = String(formData.get("roomCode") || "");
-
-  if (!billId || !roomCode) {
-    throw new Error("ข้อมูลบิลไม่ครบ");
-  }
-
-  await setBillStatus(billId, "paid", "บันทึกชำระเงินโดยผู้ดูแล");
-  redirect(`/rooms/${roomCode}/bills/${billId}`);
-}
-
-async function rejectBillSlip(formData: FormData) {
-  "use server";
-
-  const billId = String(formData.get("billId") || "");
-  const roomCode = String(formData.get("roomCode") || "");
-
-  if (!billId || !roomCode) {
-    throw new Error("ข้อมูลบิลไม่ครบ");
-  }
-
-  await setBillStatus(
-    billId,
-    "rejected",
-    "ผู้ดูแลตรวจสอบแล้วว่าสลิปไม่ถูกต้อง"
-  );
-  redirect(`/rooms/${roomCode}/bills/${billId}`);
-}
-
-async function updateBillStatus(formData: FormData) {
-  "use server";
-
-  const billId = String(formData.get("billId") || "");
-  const roomCode = String(formData.get("roomCode") || "");
-  const newStatus = String(formData.get("newStatus") || "");
-  const reason = String(formData.get("reason") || "").trim();
-
-  if (!billId || !roomCode || !newStatus || !reason) {
-    throw new Error("กรุณากรอกข้อมูลให้ครบ");
-  }
-
-  const allowedStatuses = [
-    "unpaid",
-    "paid",
-    "overdue",
-    "slip_submitted",
-    "verifying",
-    "rejected",
-    "draft",
-  ];
-
-  if (!allowedStatuses.includes(newStatus)) {
-    throw new Error("สถานะไม่ถูกต้อง");
-  }
-
-  await setBillStatus(billId, newStatus, reason);
-  redirect(`/rooms/${roomCode}/bills/${billId}`);
-}
 
 export default async function BillDetailPage({ params }: Props) {
   const { roomCode, billId } = await params;
@@ -233,115 +109,15 @@ export default async function BillDetailPage({ params }: Props) {
           </div>
         </div>
 
-        <div className="mt-8 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-          <div className="border-b px-6 py-5">
-            <p className="text-xl font-bold">
-              {thaiMonths[bill.billing_month - 1]} {bill.billing_year + 543}
-            </p>
-            <p className="mt-1 text-sm text-slate-500">
-              กำหนดชำระ: {formatThaiDateShort(bill.due_date)}
-            </p>
-          </div>
-
-          <div className="border-b px-6 py-5">
-            <div className="flex justify-between">
-              <span>ค่าเช่า</span>
-              <span className="font-semibold">{formatMoney(bill.rent_amount)} บาท</span>
-            </div>
-          </div>
-
-          <div className="border-b px-6 py-5">
-            <div className="flex justify-between">
-              <div>
-                <p>ค่าน้ำ</p>
-                <p className="mt-1 text-sm text-slate-500">
-                  {bill.occupant_count} คน × {formatNumber(bill.water_rate_per_person)} บาท
-                </p>
-              </div>
-              <span className="font-semibold">{formatMoney(bill.water_amount)} บาท</span>
-            </div>
-          </div>
-
-          <div className="border-b px-6 py-5">
-            <h2 className="font-semibold">ค่าไฟฟ้า</h2>
-            <div className="mt-4 space-y-3 text-sm">
-              <div className="flex justify-between">
-                <span className="text-slate-500">มิเตอร์ครั้งก่อน</span>
-                <span>{bill.previous_meter != null ? formatNumber(bill.previous_meter) : "-"}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-500">มิเตอร์ครั้งนี้</span>
-                <span>{bill.current_meter != null ? formatNumber(bill.current_meter) : "-"}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-500">หน่วยไฟที่ใช้</span>
-                <span>{formatNumber(bill.electricity_units)} หน่วย</span>
-              </div>
-              <div className="flex justify-between pt-2">
-                <span>
-                  ค่าไฟ {formatNumber(bill.electricity_units)} × {formatNumber(bill.electricity_rate)}
-                </span>
-                <span className="font-semibold">{formatMoney(bill.electricity_amount)} บาท</span>
-              </div>
-            </div>
-          </div>
-
-          {billItems.length > 0 && (
-            <div className="border-b px-6 py-5">
-              <h2 className="mb-4 font-semibold">ค่าใช้จ่ายอื่น</h2>
-              <div className="space-y-3">
-                {billItems.map((item) => (
-                  <div key={item.id} className="flex justify-between">
-                    <span>{item.item_name}</span>
-                    <span className="font-semibold">{formatMoney(item.amount)} บาท</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          <div className="bg-slate-50 px-6 py-6">
-            <div className="flex items-center justify-between">
-              <span className="text-lg font-bold">ยอดรวม</span>
-              <span className="text-2xl font-bold">{formatMoney(bill.total_amount)} บาท</span>
-            </div>
-          </div>
-        </div>
+        <BillBreakdown bill={bill} items={billItems} />
 
         {bill.slip_path && (
-          <section className="mt-6 rounded-2xl border border-blue-200 bg-blue-50 p-6">
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <div>
-                <h2 className="font-bold text-blue-950">หลักฐานการชำระเงิน</h2>
-                <p className="mt-1 text-sm text-blue-700">
-                  {bill.slip_original_name || "ไฟล์สลิป"}
-                  {bill.slip_submitted_at
-                    ? ` · ส่งเมื่อ ${new Date(bill.slip_submitted_at).toLocaleString("th-TH", {
-                        dateStyle: "medium",
-                        timeStyle: "short",
-                        timeZone: "Asia/Bangkok",
-                      })}`
-                    : ""}
-                </p>
-              </div>
-              {slipUrl ? (
-                <SlipViewer
-                  slipUrl={slipUrl}
-                  previewUrl={slipPreviewUrl}
-                  fileName={bill.slip_original_name || "ไฟล์สลิป"}
-                  billId={bill.id}
-                  roomCode={bill.rooms.room_code}
-                  isPaid={bill.status === "paid"}
-                  canReject={!['paid', 'rejected'].includes(bill.status)}
-                  contentType={bill.slip_content_type || ""}
-                  markBillAsPaid={markBillAsPaid}
-                  rejectBillSlip={rejectBillSlip}
-                />
-              ) : (
-                <span className="text-sm text-red-700">ไม่สามารถเปิดไฟล์สลิปได้</span>
-              )}
-            </div>
-          </section>
+          <SlipSection
+            bill={bill}
+            roomCode={bill.rooms.room_code}
+            slipUrl={slipUrl}
+            slipPreviewUrl={slipPreviewUrl}
+          />
         )}
 
         <div className="mt-6 flex flex-wrap items-start justify-end gap-3">
@@ -379,3 +155,4 @@ export default async function BillDetailPage({ params }: Props) {
     </main>
   );
 }
+

@@ -41,3 +41,8 @@ export function formatThaiMonth(date: string | null | undefined) {
 export function currentPeriod() {
   return new Date().toISOString().slice(0, 7);
 }
+
+export const thaiMonthNames = [
+  "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
+  "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม",
+];

@@ -1,11 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { publicAppUrl, pushLineFlex } from "@/lib/line";
-
-const thaiMonths = [
-  "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
-  "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม",
-];
+import { thaiMonthNames } from "@/lib/format";
 
 export async function POST(
   _request: Request,
@@ -44,7 +40,7 @@ export async function POST(
     ? new Date(`${bill.due_date}T00:00:00+07:00`).toLocaleDateString("th-TH", { dateStyle: "long" })
     : "ไม่ระบุ";
   const billUrl = `${publicAppUrl()}/pay/${bill.public_token}`;
-  const period = `${thaiMonths[bill.billing_month - 1]} ${bill.billing_year + 543}`;
+  const period = `${thaiMonthNames[bill.billing_month - 1]} ${bill.billing_year + 543}`;
   const roomCode = room?.room_code || "-";
   const flexContents = {
     type: "bubble",
