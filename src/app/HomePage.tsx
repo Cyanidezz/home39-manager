@@ -115,23 +115,21 @@ export default function HomePage({ rooms, isLoggedIn, settings, homepageRooms }:
         style={
           settings.banner_image_url
             ? {
-                backgroundImage: `linear-gradient(115deg, rgba(30,64,175,.94), rgba(37,99,235,.72)), url(${homepageImageDisplayUrl(settings.banner_image_url)})`,
+                backgroundImage: `url(${homepageImageDisplayUrl(settings.banner_image_url)})`,
               }
             : undefined
         }
       >
-        <div className="absolute -left-24 top-20 h-72 w-72 rounded-full bg-white/10" />
-        <div className="absolute -right-20 -top-20 h-96 w-96 rounded-full bg-blue-300/20" />
-        <div className="relative mx-auto grid min-h-[470px] max-w-7xl items-center gap-10 px-4 py-16 sm:px-8 lg:grid-cols-[1.1fr_0.9fr]">
+        <div className="relative mx-auto grid min-h-[470px] max-w-7xl items-center px-4 py-16 sm:px-8">
           <div>
             <p className="mb-4 inline-flex rounded-full border border-white/25 bg-white/10 px-4 py-2 text-sm font-medium">
               {settings.banner_badge}
             </p>
-            <h1 className="max-w-2xl text-4xl font-bold leading-tight sm:text-6xl">
+            <h1 className="max-w-2xl text-4xl font-bold leading-tight drop-shadow-md sm:text-6xl">
               {settings.banner_title}
-              <span className="block text-blue-100">{settings.banner_highlight}</span>
+              <span className="block">{settings.banner_highlight}</span>
             </h1>
-            <p className="mt-6 max-w-xl text-lg leading-8 text-blue-50">
+            <p className="mt-6 max-w-xl text-lg leading-8 text-white drop-shadow-md">
               {settings.banner_description}
             </p>
             <a
@@ -140,17 +138,6 @@ export default function HomePage({ rooms, isLoggedIn, settings, homepageRooms }:
             >
               ดูห้องพัก ↓
             </a>
-          </div>
-
-          <div className="relative mx-auto flex h-72 w-full max-w-md items-end justify-center rounded-[2rem] border border-white/20 bg-white/10 p-8 shadow-2xl backdrop-blur-sm">
-            <div className="absolute inset-x-10 bottom-8 top-10 rounded-t-[2rem] border-4 border-white/80 bg-white/10">
-              <div className="grid h-full grid-cols-3 gap-4 p-5">
-                {Array.from({ length: 9 }).map((_, index) => (
-                  <span key={index} className="rounded-md bg-blue-100/90 shadow-inner" />
-                ))}
-              </div>
-            </div>
-            <div className="relative h-16 w-20 rounded-t-xl bg-white/90" />
           </div>
         </div>
       </section>
@@ -246,17 +233,16 @@ export default function HomePage({ rooms, isLoggedIn, settings, homepageRooms }:
             <p className="mt-4 leading-7 text-slate-500">
               {settings.location_description}
             </p>
-            <div className="mt-7 rounded-xl border border-slate-200 bg-slate-50 p-5">
+            <div className="mt-7">
               <p className="font-semibold">สถานที่ใกล้เคียง</p>
-              <div className="mt-4 flex items-start gap-3">
-                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-100">🎓</span>
-                <div>
-                  <p className="font-medium">{settings.nearby_place}</p>
-                  <p className="mt-1 text-sm text-slate-500">
-                    {settings.nearby_description}
-                  </p>
-                </div>
-              </div>
+              <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+                {settings.nearby_places.map((place, index) => (
+                  <li key={`${place}-${index}`} className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-100">📍</span>
+                    <span className="font-medium">{place}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </div>

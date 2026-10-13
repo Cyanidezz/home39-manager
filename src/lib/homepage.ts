@@ -8,8 +8,7 @@ export type HomepageSettings = {
   location_title: string;
   location_description: string;
   map_url: string;
-  nearby_place: string;
-  nearby_description: string;
+  nearby_places: string[];
   contact_title: string;
   contact_description: string;
   facebook_url: string;
@@ -59,8 +58,7 @@ export const defaultHomepageSettings: HomepageSettings = {
   location_description:
     "เปิดแผนที่เพื่อดูเส้นทางมายัง Home 39 และตรวจสอบระยะทางจากตำแหน่งของคุณ",
   map_url: "https://share.google/9SpwEy5eYMnBt4cnd",
-  nearby_place: "โรงเรียนหาดใหญ่วิทยาลัย (ญ.ว.)",
-  nearby_description: "สถานศึกษาสำคัญในพื้นที่หาดใหญ่",
+  nearby_places: ["โรงเรียนหาดใหญ่วิทยาลัย (ญ.ว.)"],
   contact_title: "สนใจจองห้องพัก?",
   contact_description:
     "ติดต่อสอบถามสถานะห้อง ราคา และรายละเอียดเพิ่มเติมได้ทุกช่องทาง",

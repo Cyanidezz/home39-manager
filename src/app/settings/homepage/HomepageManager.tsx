@@ -249,12 +249,51 @@ export default function HomepageManager({ initialSettings, initialRooms }: Props
               <label className="block text-sm font-semibold md:col-span-2">รายละเอียด
                 <textarea className={`${inputClass} min-h-24`} value={settings.location_description} onChange={(e) => updateSetting("location_description", e.target.value)} required />
               </label>
-              <label className="block text-sm font-semibold">สถานที่ใกล้เคียง
-                <input className={inputClass} value={settings.nearby_place} onChange={(e) => updateSetting("nearby_place", e.target.value)} required />
-              </label>
-              <label className="block text-sm font-semibold">รายละเอียดสถานที่
-                <input className={inputClass} value={settings.nearby_description} onChange={(e) => updateSetting("nearby_description", e.target.value)} required />
-              </label>
+              <div className="md:col-span-2">
+                <div className="flex items-center justify-between gap-4">
+                  <p className="text-sm font-semibold">สถานที่ใกล้เคียง</p>
+                  <button
+                    type="button"
+                    onClick={() => updateSetting("nearby_places", [...settings.nearby_places, ""])}
+                    className="text-sm font-semibold text-blue-700 hover:underline"
+                  >
+                    + เพิ่มสถานที่
+                  </button>
+                </div>
+                <div className="mt-2 space-y-3">
+                  {settings.nearby_places.map((place, index) => (
+                    <div key={index} className="flex items-center gap-3">
+                      <input
+                        className={inputClass}
+                        value={place}
+                        onChange={(event) =>
+                          updateSetting(
+                            "nearby_places",
+                            settings.nearby_places.map((current, placeIndex) =>
+                              placeIndex === index ? event.target.value : current
+                            )
+                          )
+                        }
+                        aria-label={`สถานที่ใกล้เคียง ${index + 1}`}
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          updateSetting(
+                            "nearby_places",
+                            settings.nearby_places.filter((_, placeIndex) => placeIndex !== index)
+                          )
+                        }
+                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-xl text-slate-500 hover:bg-red-50 hover:text-red-600"
+                        aria-label={`ลบสถานที่ใกล้เคียง ${index + 1}`}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </section>
 
