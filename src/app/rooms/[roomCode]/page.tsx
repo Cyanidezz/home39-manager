@@ -1,65 +1,17 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { formatThaiDate, formatThaiMonth } from "@/lib/format";
+import { formatThaiDate } from "@/lib/format";
+import RoomInfoCard from "./_components/RoomInfoCard";
+import TenantCard from "./_components/TenantCard";
+import ContractCard from "./_components/ContractCard";
+import LatestBillCard from "./_components/LatestBillCard";
 
 type Props = {
   params: Promise<{
     roomCode: string;
   }>;
 };
-
-function getBillStatusLabel(status: string) {
-  switch (status) {
-    case "paid":
-      return {
-        text: "ชำระแล้ว",
-        className: "text-green-600",
-      };
-
-    case "unpaid":
-      return {
-        text: "ยังไม่ชำระ",
-        className: "text-red-600",
-      };
-
-    case "overdue":
-      return {
-        text: "เกินกำหนด",
-        className: "text-orange-600",
-      };
-
-    case "slip_submitted":
-      return {
-        text: "ส่งสลิปแล้ว",
-        className: "text-blue-600",
-      };
-
-    case "verifying":
-      return {
-        text: "กำลังตรวจสอบ",
-        className: "text-yellow-600",
-      };
-
-    case "rejected":
-      return {
-        text: "สลิปไม่ผ่าน",
-        className: "text-red-600",
-      };
-
-    case "draft":
-      return {
-        text: "ฉบับร่าง",
-        className: "text-slate-600",
-      };
-
-    default:
-      return {
-        text: status,
-        className: "text-slate-600",
-      };
-  }
-}
 
 export default async function RoomPage({ params }: Props) {
   const { roomCode } = await params;
@@ -127,10 +79,6 @@ export default async function RoomPage({ params }: Props) {
 
   const activeTenant = tenants?.[0];
   const latestBill = bills?.[0];
-
-  const latestBillStatus = latestBill
-    ? getBillStatusLabel(latestBill.status)
-    : null;
 
   const { data: contracts } = await supabase
     .from("contracts")
@@ -213,239 +161,14 @@ export default async function RoomPage({ params }: Props) {
         </div>
 
         <div className="mt-8 grid gap-6 md:grid-cols-2">
-          <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-xl font-semibold">
-              🏠 ข้อมูลห้อง
-            </h2>
-
-            <div className="mt-5 space-y-3">
-              <p>
-                ค่าเช่า{" "}
-                <strong>
-                  {Number(room.monthly_rent).toLocaleString()} บาท/เดือน
-                </strong>
-              </p>
-
-              <p>
-                จำนวนผู้พัก{" "}
-                <strong>{room.occupant_count} คน</strong>
-              </p>
-
-              <p>
-                ค่าน้ำ{" "}
-                <strong>
-                  {room.occupant_count} × 150 ={" "}
-                  {(room.occupant_count * 150).toLocaleString()} บาท
-                </strong>
-              </p>
-
-              <p>
-                ค่าไฟ <strong>7 บาท/หน่วย</strong>
-              </p>
-            </div>
-          </section>
-
-          <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-xl font-semibold">
-              👤 ผู้เช่า
-            </h2>
-
-            <div className="mt-5">
-              {tenants && tenants.length > 0 ? (
-                tenants.map((tenant) => (
-                  <div key={tenant.id}>
-                    <p className="text-lg font-medium">
-                      {tenant.full_name}
-                    </p>
-
-                    <p className="mt-2 text-slate-600">
-                      โทร: {tenant.phone || "-"}
-                    </p>
-
-                    <p className="text-slate-600">
-                      เริ่มเช่า: {formatThaiDate(tenant.move_in_date)}
-                    </p>
-
-                    <div className="mt-4 grid gap-2 rounded-xl bg-slate-50 p-4 text-sm text-slate-700 sm:grid-cols-2">
-                      <p>
-                        ค่าเช่าล่วงหน้า{" "}
-                        <strong>{tenant.advance_rent_amount != null
-                          ? `${Number(tenant.advance_rent_amount).toLocaleString()} บาท`
-                          : "-"}</strong>
-                      </p>
-                      <p>
-                        ค่ามัดจำ{" "}
-                        <strong>{tenant.deposit_amount != null
-                          ? `${Number(tenant.deposit_amount).toLocaleString()} บาท`
-                          : "-"}</strong>
-                      </p>
-                      <p className="sm:col-span-2">
-                        มิเตอร์ไฟตอนเข้าอยู่{" "}
-                        <strong>{tenant.initial_electricity_meter ?? "ยังไม่ได้ระบุ"}</strong>
-                      </p>
-                    </div>
-
-                    <Link
-                      href={`/rooms/${room.room_code}/tenant/${tenant.id}/edit`}
-                      className="mt-4 inline-block rounded-lg border px-4 py-2 text-sm hover:bg-slate-50"
-                    >
-                      ✏️ แก้ไขข้อมูลผู้เช่า
-                    </Link>
-
-                    {tenant.planned_move_out_date && (
-                      <div className="mt-4 rounded-xl border border-orange-200 bg-orange-50 p-4 text-sm text-orange-900">
-                        <p className="font-semibold">
-                          ผู้เช่าแจ้งย้ายออก {formatThaiDate(tenant.planned_move_out_date)}
-                        </p>
-                        <p className="mt-1">
-                          แจ้งเมื่อ {formatThaiDate(tenant.termination_notice_date)}
-                        </p>
-                        <p className="mt-1">
-                          ค่าเช่าเดือน {formatThaiMonth(tenant.termination_notice_date)} ใช้ค่าเช่าล่วงหน้า
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                ))
-              ) : (
-                <p className="text-slate-500">
-                  ยังไม่มีข้อมูลผู้เช่า
-                </p>
-              )}
-            </div>
-          </section>
-
-          <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-xl font-semibold">
-              📄 สัญญาเช่า
-            </h2>
-
-            {latestContract ? (
-              <div className="mt-5">
-                <p className="font-medium">
-                  {latestContract.original_file_name || "สัญญาเช่า"}
-                </p>
-
-                <div className="mt-3 space-y-1 text-sm text-slate-600">
-                  <p>
-                    เริ่มสัญญา: {latestContract.contract_start || "-"}
-                  </p>
-
-                  <p>
-                    สิ้นสุดสัญญา: {latestContract.contract_end || "-"}
-                  </p>
-
-                  <p>
-                    เงินประกัน:{" "}
-                    {latestContract.deposit_amount != null
-                      ? `${Number(
-                          latestContract.deposit_amount
-                        ).toLocaleString()} บาท`
-                      : "-"}
-                  </p>
-                </div>
-
-                <div className="mt-5 flex flex-wrap gap-3">
-                  {contractUrl && (
-                    <a
-                      href={contractUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white"
-                    >
-                      👁 ดูสัญญา
-                    </a>
-                  )}
-
-                  <Link
-                    href={`/rooms/${room.room_code}/contract/new`}
-                    className="rounded-lg border px-4 py-2 text-sm hover:bg-slate-50"
-                  >
-                    ⬆ Upload สัญญาใหม่
-                  </Link>
-                </div>
-              </div>
-            ) : (
-              <div className="mt-4">
-                <p className="text-slate-500">
-                  ยังไม่มีสัญญาเช่า
-                </p>
-
-                <Link
-                  href={`/rooms/${room.room_code}/contract/new`}
-                  className="mt-4 inline-block rounded-lg border px-4 py-2 hover:bg-slate-50"
-                >
-                  ⬆ Upload สัญญา
-                </Link>
-              </div>
-            )}
-          </section>
-
-          <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-xl font-semibold">
-              ⚡ ข้อมูลล่าสุด
-            </h2>
-
-            {latestBill ? (
-              <div className="mt-5 space-y-2">
-                <p>
-                  มิเตอร์ไฟล่าสุด{" "}
-                  <strong>
-                    {latestBill.current_meter ?? "-"}
-                  </strong>
-                </p>
-
-                <p>
-                  บิลล่าสุด{" "}
-                  <strong>
-                    {latestBill.billing_month}/
-                    {latestBill.billing_year}
-                  </strong>
-                </p>
-
-                <p>
-                  ยอด{" "}
-                  <strong>
-                    {Number(latestBill.total_amount).toLocaleString(
-                      undefined,
-                      {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      }
-                    )}{" "}
-                    บาท
-                  </strong>
-                </p>
-
-                <p>
-                  สถานะ{" "}
-                  <strong className={latestBillStatus?.className}>
-                    {latestBillStatus?.text}
-                  </strong>
-                </p>
-
-                <Link
-                  href={`/rooms/${room.room_code}/bills`}
-                  className="mt-5 inline-block rounded-lg border px-4 py-2 text-sm hover:bg-slate-50"
-                >
-                  🧾 ดูประวัติบิลทั้งหมด
-                </Link>
-              </div>
-            ) : (
-              <div className="mt-4">
-                <p className="text-slate-500">
-                  ยังไม่มีประวัติบิล
-                </p>
-
-                <Link
-                  href={`/rooms/${room.room_code}/bills/new`}
-                  className="mt-4 inline-block rounded-lg border px-4 py-2 text-sm hover:bg-slate-50"
-                >
-                  🧾 ออกบิลแรก
-                </Link>
-              </div>
-            )}
-          </section>
+          <RoomInfoCard room={room} />
+          <TenantCard roomCode={room.room_code} tenants={tenants ?? []} />
+          <ContractCard
+            roomCode={room.room_code}
+            contract={latestContract}
+            contractUrl={contractUrl}
+          />
+          <LatestBillCard roomCode={room.room_code} bill={latestBill} />
         </div>
       </div>
     </main>
