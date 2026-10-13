@@ -1,15 +1,9 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { requireUser } from "@/lib/data/session";
 import { formatThaiDate } from "@/lib/format";
 
 export default async function RoomsPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) redirect("/");
+  const { supabase } = await requireUser("/");
 
   const { data: rooms, error } = await supabase
     .from("rooms")

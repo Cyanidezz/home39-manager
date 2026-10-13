@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { notFound } from "next/navigation";
+import { requireUser } from "@/lib/data/session";
 import { formatThaiDate } from "@/lib/format";
 import RoomInfoCard from "./_components/RoomInfoCard";
 import TenantCard from "./_components/TenantCard";
@@ -16,15 +16,7 @@ type Props = {
 export default async function RoomPage({ params }: Props) {
   const { roomCode } = await params;
 
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login");
-  }
+  const { supabase } = await requireUser();
 
   const { data: room, error } = await supabase
     .from("rooms")

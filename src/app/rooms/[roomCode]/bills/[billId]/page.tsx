@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { notFound } from "next/navigation";
+import { requireUser } from "@/lib/data/session";
 import StatusEditor from "./StatusEditor";
 import BillBreakdown from "./_components/BillBreakdown";
 import SlipSection from "./_components/SlipSection";
@@ -17,13 +17,7 @@ type Props = {
 
 export default async function BillDetailPage({ params }: Props) {
   const { roomCode, billId } = await params;
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) redirect("/login");
+  const { supabase } = await requireUser();
 
   const { data: bill, error } = await supabase
     .from("bills")

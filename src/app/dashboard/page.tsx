@@ -1,13 +1,8 @@
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { requireUser } from "@/lib/data/session";
 import SlipNotificationBell from "@/components/SlipNotificationBell";
 import { currentPeriod, formatThaiMonth } from "@/lib/format";
-import {
-  summarizeMonth,
-  type DashboardBill,
-  type DashboardExpense,
-  type DashboardRoom,
-} from "@/lib/dashboard";
+import { summarizeMonth } from "@/lib/dashboard";
+import { fetchMonthData } from "@/lib/data/dashboard";
 import SummaryCards from "./_components/SummaryCards";
 import UtilityCards from "./_components/UtilityCards";
 import IncomeAndTasks from "./_components/IncomeAndTasks";
@@ -18,12 +13,7 @@ type Props = {
 };
 
 export default async function DashboardPage({ searchParams }: Props) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) redirect("/login");
+  const { supabase } = await requireUser();
 
   const query = await searchParams;
   const selectedPeriod = /^\d{4}-(0[1-9]|1[0-2])$/.test(query.month || "")
@@ -31,32 +21,11 @@ export default async function DashboardPage({ searchParams }: Props) {
     : currentPeriod();
   const [year, month] = selectedPeriod.split("-").map(Number);
 
-  const [roomsResult, billsResult, expensesResult] = await Promise.all([
-    supabase
-      .from("rooms")
-      .select(
-        "id, room_code, monthly_rent, occupant_count, status, tenants(full_name, planned_move_out_date, is_active, line_user_id)"
-      )
-      .order("room_code"),
-    supabase
-      .from("bills")
-      .select(
-        "id, room_id, rent_amount, water_amount, electricity_amount, electricity_units, other_amount, total_amount, status"
-      )
-      .eq("billing_year", year)
-      .eq("billing_month", month),
-    supabase
-      .from("expenses")
-      .select("id, category, amount")
-      .eq("billing_year", year)
-      .eq("billing_month", month),
-  ]);
-
-  const rooms = (roomsResult.data || []) as DashboardRoom[];
-  const bills = (billsResult.data || []) as DashboardBill[];
-  const expenses = (expensesResult.data || []) as DashboardExpense[];
-  const pageError =
-    roomsResult.error || billsResult.error || expensesResult.error;
+  const { rooms, bills, expenses, error: pageError } = await fetchMonthData(
+    supabase,
+    year,
+    month
+  );
   const summary = summarizeMonth(rooms, bills, expenses);
 
   return (

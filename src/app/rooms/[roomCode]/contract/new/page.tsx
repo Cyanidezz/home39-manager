@@ -1,5 +1,5 @@
-import { notFound, redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { notFound } from "next/navigation";
+import { requireUser } from "@/lib/data/session";
 import ContractForm from "./ContractForm";
 
 type Props = {
@@ -11,15 +11,7 @@ type Props = {
 export default async function NewContractPage({ params }: Props) {
   const { roomCode } = await params;
 
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login");
-  }
+  const { supabase } = await requireUser();
 
   const { data: room } = await supabase
     .from("rooms")

@@ -1,5 +1,4 @@
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { requireUser } from "@/lib/data/session";
 import {
   defaultHomepageRooms,
   defaultHomepageSettings,
@@ -11,12 +10,7 @@ import HomepageManager from "./HomepageManager";
 export const dynamic = "force-dynamic";
 
 export default async function HomepageSettingsPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) redirect("/login");
+  const { supabase } = await requireUser();
 
   const [{ data: settings }, { data: rooms }] = await Promise.all([
     supabase.from("homepage_settings").select("*").eq("id", "default").maybeSingle(),

@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { requireUser } from "@/lib/data/session";
 import PaymentSettingsForm from "./PaymentSettingsForm";
 
 const defaultSettings = {
@@ -11,14 +10,7 @@ const defaultSettings = {
 };
 
 export default async function PaymentSettingsPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login");
-  }
+  const { supabase } = await requireUser();
 
   const { data, error } = await supabase
     .from("payment_settings")

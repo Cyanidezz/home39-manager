@@ -1,5 +1,5 @@
-import { notFound, redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { notFound } from "next/navigation";
+import { requireUser } from "@/lib/data/session";
 import LineConnectionCard from "@/components/LineConnectionCard";
 import EditTenantForm from "./EditTenantForm";
 import EndTenancyButton from "./EndTenancyButton";
@@ -14,15 +14,7 @@ type Props = {
 export default async function EditTenantPage({ params }: Props) {
   const { roomCode, tenantId } = await params;
 
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login");
-  }
+  const { supabase } = await requireUser();
 
   const { data: room } = await supabase
     .from("rooms")

@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { requireUser } from "@/lib/data/session";
 import ExpenseManager from "./ExpenseManager";
 
 type Props = {
@@ -12,12 +11,7 @@ function currentPeriod() {
 }
 
 export default async function ExpensesPage({ searchParams }: Props) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) redirect("/login");
+  const { supabase } = await requireUser();
 
   const query = await searchParams;
   const selectedPeriod = /^\d{4}-(0[1-9]|1[0-2])$/.test(query.month || "")

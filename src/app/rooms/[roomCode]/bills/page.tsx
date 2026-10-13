@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { notFound } from "next/navigation";
+import { requireUser } from "@/lib/data/session";
 import { formatMoney, formatThaiDateShort, thaiMonths } from "@/lib/format";
 import { getBillStatus } from "@/lib/billStatus";
 
@@ -12,15 +12,7 @@ type Props = {
 
 export default async function BillsHistoryPage({ params }: Props) {
   const { roomCode } = await params;
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login");
-  }
+  const { supabase } = await requireUser();
 
   // 1) หา room ก่อน แบบตรงไปตรงมาและเสถียรกว่า nested relation
   const { data: room, error: roomError } = await supabase
