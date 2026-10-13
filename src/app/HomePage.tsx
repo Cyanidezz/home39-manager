@@ -3,15 +3,14 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import HomepageImage from "@/components/HomepageImage";
-import { googleMapsEmbedUrl, homepageImageDisplayUrl, type HomepageRoom, type HomepageSettings } from "@/lib/homepage";
-
-type Room = {
-  room_code: string;
-  monthly_rent: number | string;
-  occupant_count: number;
-  status: string;
-};
+import type { HomepageRoom, HomepageSettings } from "@/lib/homepage";
+import Hero from "./_components/home/Hero";
+import RoomCards from "./_components/home/RoomCards";
+import LocationSection from "./_components/home/LocationSection";
+import ContactSection from "./_components/home/ContactSection";
+import LoginDialog from "./_components/home/LoginDialog";
+import RoomDialog from "./_components/home/RoomDialog";
+import type { DisplayRoom, Room } from "./_components/home/types";
 
 type Props = {
   rooms: Room[];
@@ -19,12 +18,6 @@ type Props = {
   settings: HomepageSettings;
   homepageRooms: HomepageRoom[];
 };
-
-type DisplayRoom = Room & HomepageRoom;
-
-function money(value: number | string) {
-  return Number(value || 0).toLocaleString("th-TH");
-}
 
 export default function HomePage({ rooms, isLoggedIn, settings, homepageRooms }: Props) {
   const router = useRouter();
@@ -111,183 +104,10 @@ export default function HomePage({ rooms, isLoggedIn, settings, homepageRooms }:
         </div>
       </header>
 
-      <section
-        className="relative overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-blue-500 text-white"
-      >
-        {settings.banner_image_url && (
-          <div
-            className="pointer-events-none absolute inset-0 bg-cover"
-            style={{
-              backgroundImage: `url(${homepageImageDisplayUrl(settings.banner_image_url)})`,
-              backgroundPosition: `${settings.banner_image_position_x}% ${settings.banner_image_position_y}%`,
-              transform: `scale(${settings.banner_image_zoom / 100})`,
-            }}
-          />
-        )}
-        <div className="relative mx-auto grid min-h-[470px] max-w-7xl items-center px-4 py-16 sm:px-8">
-          <div>
-            <p className="mb-4 inline-flex rounded-full border border-white/25 bg-white/10 px-4 py-2 text-sm font-medium">
-              {settings.banner_badge}
-            </p>
-            <h1 className="max-w-2xl text-4xl font-bold leading-tight drop-shadow-md sm:text-6xl">
-              {settings.banner_title}
-              <span className="block">{settings.banner_highlight}</span>
-            </h1>
-            <p className="mt-6 max-w-xl text-lg leading-8 text-white drop-shadow-md">
-              {settings.banner_description}
-            </p>
-            <a
-              href="#rooms"
-              className="mt-8 inline-flex rounded-xl bg-white px-6 py-3 font-semibold text-blue-700 shadow-lg hover:bg-blue-50"
-            >
-              ดูห้องพัก ↓
-            </a>
-          </div>
-        </div>
-      </section>
-
-      <section id="rooms" className="mx-auto max-w-7xl px-4 py-16 sm:px-8">
-        <div className="text-center">
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-600">
-            Our rooms
-          </p>
-          <h2 className="mt-2 text-3xl font-bold">ห้องพัก Home 39</h2>
-          <p className="mx-auto mt-3 max-w-xl text-slate-500">
-            เลือกห้องเพื่อดูรายละเอียด สถานะ และรูปภาพเพิ่มเติม
-          </p>
-        </div>
-
-        <div className="mt-10 grid gap-6 md:grid-cols-3">
-          {displayRooms.map((room) => {
-            const vacant = room.status !== "occupied";
-            return (
-              <button
-                key={room.room_code}
-                type="button"
-                onClick={() => setSelectedRoom(room)}
-                className="group overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-sm hover:-translate-y-1 hover:border-blue-300 hover:shadow-xl"
-              >
-                <div className="relative flex h-52 items-center justify-center overflow-hidden bg-gradient-to-br from-blue-100 via-slate-100 to-blue-50">
-                  {room.cover_image_url ? (
-                    <HomepageImage
-                      src={room.cover_image_url}
-                      alt={room.title}
-                      className="absolute inset-0 h-full w-full object-cover transition duration-300 group-hover:scale-105"
-                    />
-                  ) : (
-                    <span className="relative rounded-full bg-white/90 px-4 py-2 text-sm font-semibold text-blue-700 shadow">
-                      รูปห้อง {room.room_code}
-                    </span>
-                  )}
-                </div>
-                <div className="p-5">
-                  <div className="flex items-center justify-between gap-3">
-                    <h3 className="text-xl font-bold">{room.title}</h3>
-                    <span
-                      className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                        vacant
-                          ? "bg-blue-50 text-blue-700"
-                          : "bg-slate-100 text-slate-600"
-                      }`}
-                    >
-                      {vacant ? "ห้องว่าง" : "มีผู้เช่า"}
-                    </span>
-                  </div>
-                  <p className="mt-3 line-clamp-2 text-sm leading-6 text-slate-500">
-                    {room.description}
-                  </p>
-                  {Number(room.monthly_price) > 0 && (
-                    <p className="mt-4 font-semibold text-blue-700">
-                      {money(room.monthly_price)} บาท/เดือน
-                    </p>
-                  )}
-                  <p className="mt-4 border-t border-slate-100 pt-4 text-sm font-semibold text-blue-600">
-                    ดูรายละเอียดและรูปภาพ →
-                  </p>
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      </section>
-
-      <section className="border-y border-slate-200 bg-white">
-        <div className="mx-auto grid max-w-7xl gap-8 px-4 py-16 sm:px-8 lg:grid-cols-[1.1fr_0.9fr]">
-          <div className="aspect-[4/3] w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-100">
-            <iframe
-              src={googleMapsEmbedUrl(settings.map_url)}
-              title={`แผนที่ ${settings.location_title}`}
-              className="h-full w-full border-0"
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              allowFullScreen
-            />
-          </div>
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-600">
-              Location
-            </p>
-            <h2 className="mt-2 text-3xl font-bold">{settings.location_title}</h2>
-            <p className="mt-4 leading-7 text-slate-500">
-              {settings.location_description}
-            </p>
-            <a
-              href={settings.map_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-5 inline-flex rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700"
-            >
-              เปิดเส้นทางใน Google Maps
-            </a>
-            <div className="mt-7">
-              <p className="font-semibold">สถานที่ใกล้เคียง</p>
-              <ul className="mt-4 grid gap-3 sm:grid-cols-2">
-                {settings.nearby_places.map((place, index) => (
-                  <li key={`${place}-${index}`} className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-100">📍</span>
-                    <span className="font-medium">{place}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-8">
-        <div className="overflow-hidden rounded-3xl bg-gradient-to-r from-blue-700 to-blue-600 p-8 text-white shadow-xl sm:p-12">
-          <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
-            <div>
-              <h2 className="text-3xl font-bold">{settings.contact_title}</h2>
-              <p className="mt-3 text-blue-100">
-                {settings.contact_description}
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <a
-                href={settings.facebook_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-xl bg-white px-5 py-3 font-semibold text-blue-700 hover:bg-blue-50"
-              >
-                Facebook
-              </a>
-              <a
-                href={settings.line_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-white hover:bg-emerald-600"
-              >
-                LINE {settings.line_id}
-              </a>
-            </div>
-          </div>
-          <div className="mt-8 flex flex-wrap gap-x-8 gap-y-3 border-t border-white/20 pt-6 text-blue-50">
-            <a href={`tel:${settings.phone_primary.replace(/\D/g, "")}`}>โทร {settings.phone_primary}</a>
-            <a href={`tel:${settings.phone_secondary.replace(/\D/g, "")}`}>โทร {settings.phone_secondary}</a>
-          </div>
-        </div>
-      </section>
+      <Hero settings={settings} />
+      <RoomCards rooms={displayRooms} onSelect={setSelectedRoom} />
+      <LocationSection settings={settings} />
+      <ContactSection settings={settings} />
 
       <footer className="border-t border-slate-200 bg-white">
         <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-6 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-8">
@@ -297,135 +117,24 @@ export default function HomePage({ rooms, isLoggedIn, settings, homepageRooms }:
       </footer>
 
       {loginOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4" role="dialog" aria-modal="true">
-          <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-7 shadow-2xl">
-            <div className="flex items-start justify-between">
-              <div>
-                <h2 className="text-2xl font-bold">เข้าสู่ระบบ</h2>
-                <p className="mt-1 text-sm text-slate-500">สำหรับผู้ดูแล Home 39</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setLoginOpen(false)}
-                className="text-2xl text-slate-400 hover:text-slate-700"
-                aria-label="ปิด"
-              >
-                ×
-              </button>
-            </div>
-
-            <form onSubmit={login} className="mt-7 space-y-5">
-              <div>
-                <label className="mb-2 block text-sm font-medium">อีเมล</label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(event) => setEmail(event.target.value)}
-                  className="w-full rounded-xl border px-4 py-3"
-                  autoComplete="email"
-                  required
-                />
-              </div>
-              <div>
-                <label className="mb-2 block text-sm font-medium">รหัสผ่าน</label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(event) => setPassword(event.target.value)}
-                  className="w-full rounded-xl border px-4 py-3"
-                  autoComplete="current-password"
-                  required
-                />
-              </div>
-              {error && (
-                <p className="rounded-xl bg-red-50 p-3 text-sm text-red-700">{error}</p>
-              )}
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full rounded-xl bg-blue-600 py-3 font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
-              >
-                {loading ? "กำลังเข้าสู่ระบบ..." : "เข้าสู่ระบบ"}
-              </button>
-            </form>
-          </div>
-        </div>
+        <LoginDialog
+          email={email}
+          password={password}
+          loading={loading}
+          error={error}
+          onEmailChange={setEmail}
+          onPasswordChange={setPassword}
+          onSubmit={login}
+          onClose={() => setLoginOpen(false)}
+        />
       )}
 
       {selectedRoom && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4" role="dialog" aria-modal="true">
-          <div className="max-h-[92vh] w-full max-w-4xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
-            <div className="sticky top-0 z-10 flex items-start justify-between border-b border-slate-200 bg-white px-6 py-5">
-              <div>
-                <h2 className="text-2xl font-bold">{selectedRoom.title}</h2>
-                <p className="mt-1 text-sm text-slate-500">
-                  {selectedRoom.description}
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setSelectedRoom(null)}
-                className="text-2xl text-slate-400 hover:text-slate-700"
-                aria-label="ปิด"
-              >
-                ×
-              </button>
-            </div>
-
-            <div className="p-6">
-              <div className="grid gap-3 sm:grid-cols-2">
-                {(selectedRoom.image_urls.length
-                  ? selectedRoom.image_urls
-                  : ["", "", "", ""]
-                ).map((imageUrl, index) => (
-                    <div
-                      key={imageUrl || index}
-                      className="flex aspect-[4/3] items-center justify-center rounded-xl border border-blue-100 bg-gradient-to-br from-blue-50 to-slate-100"
-                    >
-                      {imageUrl ? (
-                        <HomepageImage
-                          src={imageUrl}
-                          alt={`${selectedRoom.title} รูปที่ ${index + 1}`}
-                          className="h-full w-full rounded-xl object-cover"
-                        />
-                      ) : (
-                        <div className="text-center">
-                          <span className="text-4xl">🛏️</span>
-                          <p className="mt-3 text-sm font-semibold text-blue-700">
-                            รูปห้อง {selectedRoom.room_code}
-                          </p>
-                          <p className="mt-1 text-xs text-slate-400">ภาพที่ {index + 1}</p>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-              </div>
-
-              <div className="mt-6 grid gap-4 rounded-xl bg-slate-50 p-5 sm:grid-cols-3">
-                <div>
-                  <p className="text-xs text-slate-500">สถานะ</p>
-                  <p className="mt-1 font-semibold text-blue-700">
-                    {selectedRoom.status === "occupied" ? "มีผู้เช่า" : "ห้องว่าง"}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs text-slate-500">ค่าเช่ารายเดือน</p>
-                  <p className="mt-1 font-semibold">
-                    {Number(selectedRoom.monthly_price) > 0
-                      ? `${money(selectedRoom.monthly_price)} บาท`
-                      : "กรุณาสอบถาม"}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs text-slate-500">สอบถามเพิ่มเติม</p>
-                  <a href={`tel:${settings.phone_primary.replace(/\D/g, "")}`} className="mt-1 block font-semibold text-blue-700">
-                    {settings.phone_primary}
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <RoomDialog
+          room={selectedRoom}
+          settings={settings}
+          onClose={() => setSelectedRoom(null)}
+        />
       )}
     </main>
   );
