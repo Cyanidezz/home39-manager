@@ -8,6 +8,8 @@ const allowedTypes = new Set([
   "image/jpeg",
   "image/png",
   "image/webp",
+  "image/heic",
+  "image/heif",
   "application/pdf",
 ]);
 const maxFileSize = 8 * 1024 * 1024;
@@ -17,6 +19,8 @@ function extensionFor(file: File) {
     "image/jpeg": "jpg",
     "image/png": "png",
     "image/webp": "webp",
+    "image/heic": "heic",
+    "image/heif": "heif",
     "application/pdf": "pdf",
   };
   return byType[file.type];
@@ -41,7 +45,7 @@ export async function POST(
 
   if (!allowedTypes.has(slip.type)) {
     return NextResponse.json(
-      { error: "รองรับเฉพาะ JPG, PNG, WebP หรือ PDF" },
+      { error: "รองรับ JPG, PNG, WebP, HEIC, HEIF หรือ PDF" },
       { status: 415 }
     );
   }
