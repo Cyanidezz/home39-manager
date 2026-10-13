@@ -5,6 +5,9 @@ export type HomepageSettings = {
   banner_highlight: string;
   banner_description: string;
   banner_image_url: string | null;
+  banner_image_position_x: number;
+  banner_image_position_y: number;
+  banner_image_zoom: number;
   location_title: string;
   location_description: string;
   map_url: string;
@@ -72,6 +75,9 @@ export const defaultHomepageSettings: HomepageSettings = {
   banner_description:
     "ตรวจสอบสถานะห้องพัก ดูรายละเอียด และติดต่อสอบถามห้องว่างได้ในหน้าเดียว",
   banner_image_url: null,
+  banner_image_position_x: 50,
+  banner_image_position_y: 50,
+  banner_image_zoom: 100,
   location_title: "เดินทางสะดวกในหาดใหญ่",
   location_description:
     "เปิดแผนที่เพื่อดูเส้นทางมายัง Home 39 และตรวจสอบระยะทางจากตำแหน่งของคุณ",

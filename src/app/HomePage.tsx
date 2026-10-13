@@ -111,15 +111,18 @@ export default function HomePage({ rooms, isLoggedIn, settings, homepageRooms }:
       </header>
 
       <section
-        className="relative overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-blue-500 bg-cover bg-center text-white"
-        style={
-          settings.banner_image_url
-            ? {
-                backgroundImage: `url(${homepageImageDisplayUrl(settings.banner_image_url)})`,
-              }
-            : undefined
-        }
+        className="relative overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-blue-500 text-white"
       >
+        {settings.banner_image_url && (
+          <div
+            className="pointer-events-none absolute inset-0 bg-cover"
+            style={{
+              backgroundImage: `url(${homepageImageDisplayUrl(settings.banner_image_url)})`,
+              backgroundPosition: `${settings.banner_image_position_x}% ${settings.banner_image_position_y}%`,
+              transform: `scale(${settings.banner_image_zoom / 100})`,
+            }}
+          />
+        )}
         <div className="relative mx-auto grid min-h-[470px] max-w-7xl items-center px-4 py-16 sm:px-8">
           <div>
             <p className="mb-4 inline-flex rounded-full border border-white/25 bg-white/10 px-4 py-2 text-sm font-medium">
