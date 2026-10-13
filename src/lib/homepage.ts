@@ -46,6 +46,24 @@ export function homepageImageDisplayUrl(imageUrl: string) {
   return imageUrl;
 }
 
+export function googleMapsEmbedUrl(mapUrl: string) {
+  const defaultQuery = "7.0199642,100.4747884";
+  let query = defaultQuery;
+
+  try {
+    const url = new URL(mapUrl);
+    query = url.searchParams.get("query") || url.searchParams.get("q") || query;
+    if (query === defaultQuery) {
+      const placeSlug = url.pathname.match(/\/maps\/place\/([^/]+)/)?.[1];
+      if (placeSlug) query = decodeURIComponent(placeSlug.replaceAll("+", " "));
+    }
+  } catch {
+    query = defaultQuery;
+  }
+
+  return `https://maps.google.com/maps?q=${encodeURIComponent(query)}&output=embed`;
+}
+
 export const defaultHomepageSettings: HomepageSettings = {
   id: "default",
   banner_badge: "ห้องพักในเมืองหาดใหญ่",
@@ -57,7 +75,7 @@ export const defaultHomepageSettings: HomepageSettings = {
   location_title: "เดินทางสะดวกในหาดใหญ่",
   location_description:
     "เปิดแผนที่เพื่อดูเส้นทางมายัง Home 39 และตรวจสอบระยะทางจากตำแหน่งของคุณ",
-  map_url: "https://share.google/9SpwEy5eYMnBt4cnd",
+  map_url: "https://share.google/X6GXLKehq7lfD7DdZ",
   nearby_places: ["โรงเรียนหาดใหญ่วิทยาลัย (ญ.ว.)"],
   contact_title: "สนใจจองห้องพัก?",
   contact_description:

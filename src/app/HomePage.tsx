@@ -3,7 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { homepageImageDisplayUrl, type HomepageRoom, type HomepageSettings } from "@/lib/homepage";
+import { googleMapsEmbedUrl, homepageImageDisplayUrl, type HomepageRoom, type HomepageSettings } from "@/lib/homepage";
 
 type Room = {
   room_code: string;
@@ -209,22 +209,16 @@ export default function HomePage({ rooms, isLoggedIn, settings, homepageRooms }:
 
       <section className="border-y border-slate-200 bg-white">
         <div className="mx-auto grid max-w-7xl gap-8 px-4 py-16 sm:px-8 lg:grid-cols-[1.1fr_0.9fr]">
-          <div className="relative flex min-h-80 items-center justify-center overflow-hidden rounded-2xl border border-blue-100 bg-blue-50">
-            <div className="absolute inset-0 opacity-40 [background-image:linear-gradient(#93c5fd_1px,transparent_1px),linear-gradient(90deg,#93c5fd_1px,transparent_1px)] [background-size:32px_32px]" />
-            <div className="relative text-center">
-              <span className="text-6xl">📍</span>
-              <p className="mt-3 font-bold text-blue-800">Home 39 Hatyai</p>
-              <a
-                href={settings.map_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-5 inline-flex rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700"
-              >
-                เปิดเส้นทางใน Google Maps
-              </a>
-            </div>
+          <div className="aspect-[4/3] w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-100">
+            <iframe
+              src={googleMapsEmbedUrl(settings.map_url)}
+              title={`แผนที่ ${settings.location_title}`}
+              className="h-full w-full border-0"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              allowFullScreen
+            />
           </div>
-
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-600">
               Location
@@ -233,6 +227,14 @@ export default function HomePage({ rooms, isLoggedIn, settings, homepageRooms }:
             <p className="mt-4 leading-7 text-slate-500">
               {settings.location_description}
             </p>
+            <a
+              href={settings.map_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-5 inline-flex rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700"
+            >
+              เปิดเส้นทางใน Google Maps
+            </a>
             <div className="mt-7">
               <p className="font-semibold">สถานที่ใกล้เคียง</p>
               <ul className="mt-4 grid gap-3 sm:grid-cols-2">
