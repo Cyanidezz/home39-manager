@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import HomepageImage from "@/components/HomepageImage";
 import { googleMapsEmbedUrl, homepageImageDisplayUrl, type HomepageRoom, type HomepageSettings } from "@/lib/homepage";
 
 type Room = {
@@ -168,8 +169,8 @@ export default function HomePage({ rooms, isLoggedIn, settings, homepageRooms }:
               >
                 <div className="relative flex h-52 items-center justify-center overflow-hidden bg-gradient-to-br from-blue-100 via-slate-100 to-blue-50">
                   {room.cover_image_url ? (
-                    <img
-                      src={homepageImageDisplayUrl(room.cover_image_url)}
+                    <HomepageImage
+                      src={room.cover_image_url}
                       alt={room.title}
                       className="absolute inset-0 h-full w-full object-cover transition duration-300 group-hover:scale-105"
                     />
@@ -382,8 +383,8 @@ export default function HomePage({ rooms, isLoggedIn, settings, homepageRooms }:
                       className="flex aspect-[4/3] items-center justify-center rounded-xl border border-blue-100 bg-gradient-to-br from-blue-50 to-slate-100"
                     >
                       {imageUrl ? (
-                        <img
-                          src={homepageImageDisplayUrl(imageUrl)}
+                        <HomepageImage
+                          src={imageUrl}
                           alt={`${selectedRoom.title} รูปที่ ${index + 1}`}
                           className="h-full w-full rounded-xl object-cover"
                         />
