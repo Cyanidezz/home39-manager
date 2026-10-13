@@ -1,51 +1,14 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { formatMoney, formatThaiDateShort, thaiMonths } from "@/lib/format";
+import { getBillStatus } from "@/lib/billStatus";
 
 type Props = {
   params: Promise<{
     roomCode: string;
   }>;
 };
-
-const thaiMonths = [
-  "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.",
-  "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค.",
-];
-
-function formatMoney(value: number | string | null) {
-  return Number(value || 0).toLocaleString("th-TH", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
-}
-
-function formatThaiDate(date: string | null) {
-  if (!date) return "-";
-  const [year, month, day] = date.split("-");
-  return `${day}/${month}/${Number(year) + 543}`;
-}
-
-function getStatus(status: string) {
-  switch (status) {
-    case "paid":
-      return { text: "ชำระแล้ว", className: "bg-green-100 text-green-700" };
-    case "unpaid":
-      return { text: "ยังไม่ชำระ", className: "bg-red-100 text-red-700" };
-    case "overdue":
-      return { text: "เกินกำหนด", className: "bg-orange-100 text-orange-700" };
-    case "slip_submitted":
-      return { text: "ส่งสลิปแล้ว", className: "bg-blue-100 text-blue-700" };
-    case "verifying":
-      return { text: "กำลังตรวจสอบ", className: "bg-yellow-100 text-yellow-700" };
-    case "rejected":
-      return { text: "สลิปไม่ผ่าน", className: "bg-red-100 text-red-700" };
-    case "draft":
-      return { text: "ฉบับร่าง", className: "bg-slate-100 text-slate-700" };
-    default:
-      return { text: status, className: "bg-slate-100 text-slate-700" };
-  }
-}
 
 export default async function BillsHistoryPage({ params }: Props) {
   const { roomCode } = await params;
@@ -127,7 +90,7 @@ export default async function BillsHistoryPage({ params }: Props) {
             </div>
           ) : (
             bills.map((bill) => {
-              const status = getStatus(bill.status);
+              const status = getBillStatus(bill.status);
 
               return (
                 <Link
@@ -142,7 +105,7 @@ export default async function BillsHistoryPage({ params }: Props) {
                     </p>
 
                     <p className="mt-1 text-sm text-slate-500">
-                      กำหนดชำระ: {formatThaiDate(bill.due_date)}
+                      กำหนดชำระ: {formatThaiDateShort(bill.due_date)}
                     </p>
                   </div>
 

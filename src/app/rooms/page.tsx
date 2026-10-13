@@ -1,16 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-
-const thaiMonths = [
-  "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.",
-  "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค.",
-];
-
-function formatThaiDate(date: string) {
-  const [year, month, day] = date.split("-").map(Number);
-  return `${day} ${thaiMonths[month - 1]} ${year + 543}`;
-}
+import { formatThaiDate } from "@/lib/format";
 
 export default async function RoomsPage() {
   const supabase = await createClient();

@@ -1,29 +1,13 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { formatThaiDate, formatThaiMonth } from "@/lib/format";
 
 type Props = {
   params: Promise<{
     roomCode: string;
   }>;
 };
-
-const thaiMonths = [
-  "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.",
-  "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค.",
-];
-
-function formatThaiDate(date: string | null) {
-  if (!date) return "-";
-  const [year, month, day] = date.split("-").map(Number);
-  return `${day} ${thaiMonths[month - 1]} ${year + 543}`;
-}
-
-function formatThaiMonth(date: string | null) {
-  if (!date) return "-";
-  const [year, month] = date.split("-").map(Number);
-  return `${thaiMonths[month - 1]} ${year + 543}`;
-}
 
 function getBillStatusLabel(status: string) {
   switch (status) {
