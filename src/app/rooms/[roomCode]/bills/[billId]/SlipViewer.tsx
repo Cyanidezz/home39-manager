@@ -26,6 +26,7 @@ export default function SlipViewer({
   rejectBillSlip,
 }: Props) {
   const [open, setOpen] = useState(false);
+  const [imagePreviewFailed, setImagePreviewFailed] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -81,13 +82,22 @@ export default function SlipViewer({
             </header>
 
             <div className="min-h-0 flex-1 bg-slate-100 p-2 sm:p-4">
-              {contentType.startsWith("image/") ? (
+              {contentType.startsWith("image/") && !imagePreviewFailed ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={slipUrl}
                   alt={`สลิป ${fileName}`}
+                  onError={() => setImagePreviewFailed(true)}
                   className="h-full w-full object-contain"
                 />
+              ) : contentType.startsWith("image/") ? (
+                <div className="flex h-full flex-col items-center justify-center gap-3 rounded-lg bg-white p-6 text-center text-slate-700">
+                  <p className="font-semibold">เบราว์เซอร์นี้ไม่สามารถแสดงตัวอย่างไฟล์ HEIC/HEIF ได้</p>
+                  <p className="text-sm text-slate-500">ดาวน์โหลดหรือเปิดไฟล์ด้วยแอปที่รองรับ HEIC/HEIF เพื่อตรวจสอบสลิป</p>
+                  <a href={slipUrl} download={fileName} className="rounded-lg bg-blue-700 px-4 py-2 font-semibold text-white hover:bg-blue-800">
+                    ดาวน์โหลดไฟล์สลิป
+                  </a>
+                </div>
               ) : (
                 <iframe
                   src={slipUrl}
