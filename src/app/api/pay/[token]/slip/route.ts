@@ -29,7 +29,7 @@ function normalizedType(file: File) {
 }
 
 function extensionFor(file: File, contentType: string) {
-  const byType: Record<string, string> {
+  const byType: Record<string, string> = {
     "image/jpeg": "jpg",
     "image/png": "png",
     "image/webp": "webp",
