@@ -43,7 +43,7 @@ export default function SlipUploadForm({ token }: Props) {
   return (
     <form onSubmit={handleSubmit} className="border-t bg-white px-6 py-6">
       <h2 className="font-bold text-slate-900">ส่งหลักฐานการโอนเงิน</h2>
-      <p className="mt-1 text-sm text-slate-500">รองรับ JPG, PNG, WebP หรือ PDF ขนาดไม่เกิน 8 MB</p>
+      <p className="mt-1 text-sm text-slate-500">รองรับ JPG, PNG, WebP, HEIC, HEIF หรือ PDF ขนาดไม่เกิน 8 MB</p>
 
       <label className="mt-4 block cursor-pointer rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 p-5 text-center transition hover:border-blue-400 hover:bg-blue-50">
         <span className="block font-medium text-slate-700">
@@ -52,7 +52,7 @@ export default function SlipUploadForm({ token }: Props) {
         <input
           type="file"
           name="slip"
-          accept="image/jpeg,image/png,image/webp,application/pdf"
+          accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif,application/pdf"
           required
           className="sr-only"
           onChange={(event) => setFile(event.target.files?.[0] || null)}
