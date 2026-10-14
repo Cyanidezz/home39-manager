@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/data/session";
+import { fetchContractContext } from "@/lib/data/roomPages";
 import ContractForm from "./ContractForm";
 
 type Props = {
@@ -13,23 +14,10 @@ export default async function NewContractPage({ params }: Props) {
 
   const { supabase } = await requireUser();
 
-  const { data: room } = await supabase
-    .from("rooms")
-    .select("id, room_code")
-    .eq("room_code", roomCode.toUpperCase())
-    .single();
+  const context = await fetchContractContext(supabase, roomCode);
+  if (!context) notFound();
 
-  if (!room) {
-    notFound();
-  }
-
-  const { data: tenant } = await supabase
-    .from("tenants")
-    .select("id, full_name")
-    .eq("room_id", room.id)
-    .eq("is_active", true)
-    .limit(1)
-    .maybeSingle();
+  const { room, tenant } = context;
 
   if (!tenant) {
     return (

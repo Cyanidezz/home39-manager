@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/data/session";
+import { fetchBillHistory } from "@/lib/data/roomPages";
 import { formatMoney, formatThaiDateShort, thaiMonths } from "@/lib/format";
 import { getBillStatus } from "@/lib/billStatus";
 
@@ -14,42 +15,10 @@ export default async function BillsHistoryPage({ params }: Props) {
   const { roomCode } = await params;
   const { supabase } = await requireUser();
 
-  // 1) หา room ก่อน แบบตรงไปตรงมาและเสถียรกว่า nested relation
-  const { data: room, error: roomError } = await supabase
-    .from("rooms")
-    .select("id, room_code")
-    .eq("room_code", roomCode)
-    .single();
+  const history = await fetchBillHistory(supabase, roomCode);
+  if (!history) notFound();
 
-  if (roomError) {
-    console.error("Bills history - room query error:", roomError);
-  }
-
-  if (!room) {
-    notFound();
-  }
-
-  // 2) ดึงเฉพาะข้อมูลที่หน้า history ต้องใช้
-  const { data: bills, error: billsError } = await supabase
-    .from("bills")
-    .select(`
-      id,
-      billing_year,
-      billing_month,
-      total_amount,
-      due_date,
-      status,
-      created_at
-    `)
-    .eq("room_id", room.id)
-    .order("billing_year", { ascending: false })
-    .order("billing_month", { ascending: false })
-    .order("created_at", { ascending: false });
-
-  if (billsError) {
-    console.error("Bills history - bills query error:", billsError);
-    throw new Error(`โหลดประวัติบิลไม่สำเร็จ: ${billsError.message}`);
-  }
+  const { room, bills } = history;
 
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-10">
