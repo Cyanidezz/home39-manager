@@ -3,7 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import type { HomepageRoom, HomepageSettings } from "@/lib/homepage";
+import { googleMapsEmbedUrl, homepageImageDisplayUrl, type HomepageRoom, type HomepageSettings } from "@/lib/homepage";
 
 type Room = {
   room_code: string;
@@ -111,27 +111,28 @@ export default function HomePage({ rooms, isLoggedIn, settings, homepageRooms }:
       </header>
 
       <section
-        className="relative overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-blue-500 bg-cover bg-center text-white"
-        style={
-          settings.banner_image_url
-            ? {
-                backgroundImage: `linear-gradient(115deg, rgba(30,64,175,.94), rgba(37,99,235,.72)), url(${settings.banner_image_url})`,
-              }
-            : undefined
-        }
+        className="relative overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-blue-500 text-white"
       >
-        <div className="absolute -left-24 top-20 h-72 w-72 rounded-full bg-white/10" />
-        <div className="absolute -right-20 -top-20 h-96 w-96 rounded-full bg-blue-300/20" />
-        <div className="relative mx-auto grid min-h-[470px] max-w-7xl items-center gap-10 px-4 py-16 sm:px-8 lg:grid-cols-[1.1fr_0.9fr]">
+        {settings.banner_image_url && (
+          <div
+            className="pointer-events-none absolute inset-0 bg-cover"
+            style={{
+              backgroundImage: `url(${homepageImageDisplayUrl(settings.banner_image_url)})`,
+              backgroundPosition: `${settings.banner_image_position_x}% ${settings.banner_image_position_y}%`,
+              transform: `scale(${settings.banner_image_zoom / 100})`,
+            }}
+          />
+        )}
+        <div className="relative mx-auto grid min-h-[470px] max-w-7xl items-center px-4 py-16 sm:px-8">
           <div>
             <p className="mb-4 inline-flex rounded-full border border-white/25 bg-white/10 px-4 py-2 text-sm font-medium">
               {settings.banner_badge}
             </p>
-            <h1 className="max-w-2xl text-4xl font-bold leading-tight sm:text-6xl">
+            <h1 className="max-w-2xl text-4xl font-bold leading-tight drop-shadow-md sm:text-6xl">
               {settings.banner_title}
-              <span className="block text-blue-100">{settings.banner_highlight}</span>
+              <span className="block">{settings.banner_highlight}</span>
             </h1>
-            <p className="mt-6 max-w-xl text-lg leading-8 text-blue-50">
+            <p className="mt-6 max-w-xl text-lg leading-8 text-white drop-shadow-md">
               {settings.banner_description}
             </p>
             <a
@@ -140,17 +141,6 @@ export default function HomePage({ rooms, isLoggedIn, settings, homepageRooms }:
             >
               ดูห้องพัก ↓
             </a>
-          </div>
-
-          <div className="relative mx-auto flex h-72 w-full max-w-md items-end justify-center rounded-[2rem] border border-white/20 bg-white/10 p-8 shadow-2xl backdrop-blur-sm">
-            <div className="absolute inset-x-10 bottom-8 top-10 rounded-t-[2rem] border-4 border-white/80 bg-white/10">
-              <div className="grid h-full grid-cols-3 gap-4 p-5">
-                {Array.from({ length: 9 }).map((_, index) => (
-                  <span key={index} className="rounded-md bg-blue-100/90 shadow-inner" />
-                ))}
-              </div>
-            </div>
-            <div className="relative h-16 w-20 rounded-t-xl bg-white/90" />
           </div>
         </div>
       </section>
@@ -179,7 +169,7 @@ export default function HomePage({ rooms, isLoggedIn, settings, homepageRooms }:
                 <div className="relative flex h-52 items-center justify-center overflow-hidden bg-gradient-to-br from-blue-100 via-slate-100 to-blue-50">
                   {room.cover_image_url ? (
                     <img
-                      src={room.cover_image_url}
+                      src={homepageImageDisplayUrl(room.cover_image_url)}
                       alt={room.title}
                       className="absolute inset-0 h-full w-full object-cover transition duration-300 group-hover:scale-105"
                     />
@@ -222,22 +212,16 @@ export default function HomePage({ rooms, isLoggedIn, settings, homepageRooms }:
 
       <section className="border-y border-slate-200 bg-white">
         <div className="mx-auto grid max-w-7xl gap-8 px-4 py-16 sm:px-8 lg:grid-cols-[1.1fr_0.9fr]">
-          <div className="relative flex min-h-80 items-center justify-center overflow-hidden rounded-2xl border border-blue-100 bg-blue-50">
-            <div className="absolute inset-0 opacity-40 [background-image:linear-gradient(#93c5fd_1px,transparent_1px),linear-gradient(90deg,#93c5fd_1px,transparent_1px)] [background-size:32px_32px]" />
-            <div className="relative text-center">
-              <span className="text-6xl">📍</span>
-              <p className="mt-3 font-bold text-blue-800">Home 39 Hatyai</p>
-              <a
-                href={settings.map_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-5 inline-flex rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700"
-              >
-                เปิดเส้นทางใน Google Maps
-              </a>
-            </div>
+          <div className="aspect-[4/3] w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-100">
+            <iframe
+              src={googleMapsEmbedUrl(settings.map_url)}
+              title={`แผนที่ ${settings.location_title}`}
+              className="h-full w-full border-0"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              allowFullScreen
+            />
           </div>
-
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-600">
               Location
@@ -246,17 +230,24 @@ export default function HomePage({ rooms, isLoggedIn, settings, homepageRooms }:
             <p className="mt-4 leading-7 text-slate-500">
               {settings.location_description}
             </p>
-            <div className="mt-7 rounded-xl border border-slate-200 bg-slate-50 p-5">
+            <a
+              href={settings.map_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-5 inline-flex rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700"
+            >
+              เปิดเส้นทางใน Google Maps
+            </a>
+            <div className="mt-7">
               <p className="font-semibold">สถานที่ใกล้เคียง</p>
-              <div className="mt-4 flex items-start gap-3">
-                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-100">🎓</span>
-                <div>
-                  <p className="font-medium">{settings.nearby_place}</p>
-                  <p className="mt-1 text-sm text-slate-500">
-                    {settings.nearby_description}
-                  </p>
-                </div>
-              </div>
+              <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+                {settings.nearby_places.map((place, index) => (
+                  <li key={`${place}-${index}`} className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-100">📍</span>
+                    <span className="font-medium">{place}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </div>
@@ -392,7 +383,7 @@ export default function HomePage({ rooms, isLoggedIn, settings, homepageRooms }:
                     >
                       {imageUrl ? (
                         <img
-                          src={imageUrl}
+                          src={homepageImageDisplayUrl(imageUrl)}
                           alt={`${selectedRoom.title} รูปที่ ${index + 1}`}
                           className="h-full w-full rounded-xl object-cover"
                         />

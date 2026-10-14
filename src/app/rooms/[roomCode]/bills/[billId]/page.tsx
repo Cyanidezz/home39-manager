@@ -218,12 +218,20 @@ export default async function BillDetailPage({ params }: Props) {
 
   const status = getStatus(bill.status);
   let slipUrl: string | null = null;
+  let slipPreviewUrl: string | null = null;
 
   if (bill.slip_path) {
     const { data: slipData } = await supabase.storage
       .from("payment-slips")
       .createSignedUrl(bill.slip_path, 60 * 10);
     slipUrl = slipData?.signedUrl ?? null;
+  }
+
+  if (bill.slip_preview_path) {
+    const { data: previewData } = await supabase.storage
+      .from("payment-slips")
+      .createSignedUrl(bill.slip_preview_path, 60 * 10);
+    slipPreviewUrl = previewData?.signedUrl ?? null;
   }
 
   const billItems = [...(bill.bill_items || [])].sort(
@@ -362,6 +370,7 @@ export default async function BillDetailPage({ params }: Props) {
               {slipUrl ? (
                 <SlipViewer
                   slipUrl={slipUrl}
+                  previewUrl={slipPreviewUrl}
                   fileName={bill.slip_original_name || "ไฟล์สลิป"}
                   billId={bill.id}
                   roomCode={bill.rooms.room_code}

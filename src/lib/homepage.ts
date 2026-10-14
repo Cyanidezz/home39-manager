@@ -5,11 +5,13 @@ export type HomepageSettings = {
   banner_highlight: string;
   banner_description: string;
   banner_image_url: string | null;
+  banner_image_position_x: number;
+  banner_image_position_y: number;
+  banner_image_zoom: number;
   location_title: string;
   location_description: string;
   map_url: string;
-  nearby_place: string;
-  nearby_description: string;
+  nearby_places: string[];
   contact_title: string;
   contact_description: string;
   facebook_url: string;
@@ -28,6 +30,43 @@ export type HomepageRoom = {
   image_urls: string[];
 };
 
+export function homepageImageDisplayUrl(imageUrl: string) {
+  try {
+    const url = new URL(imageUrl);
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    if (
+      supabaseUrl &&
+      url.origin === new URL(supabaseUrl).origin &&
+      url.pathname.startsWith("/storage/v1/object/public/homepage/") &&
+      /\.(heic|heif)$/i.test(url.pathname)
+    ) {
+      return `/api/homepage-image?url=${encodeURIComponent(url.toString())}`;
+    }
+  } catch {
+    return imageUrl;
+  }
+
+  return imageUrl;
+}
+
+export function googleMapsEmbedUrl(mapUrl: string) {
+  const defaultQuery = "7.0199642,100.4747884";
+  let query = defaultQuery;
+
+  try {
+    const url = new URL(mapUrl);
+    query = url.searchParams.get("query") || url.searchParams.get("q") || query;
+    if (query === defaultQuery) {
+      const placeSlug = url.pathname.match(/\/maps\/place\/([^/]+)/)?.[1];
+      if (placeSlug) query = decodeURIComponent(placeSlug.replaceAll("+", " "));
+    }
+  } catch {
+    query = defaultQuery;
+  }
+
+  return `https://maps.google.com/maps?q=${encodeURIComponent(query)}&output=embed`;
+}
+
 export const defaultHomepageSettings: HomepageSettings = {
   id: "default",
   banner_badge: "ห้องพักในเมืองหาดใหญ่",
@@ -36,12 +75,14 @@ export const defaultHomepageSettings: HomepageSettings = {
   banner_description:
     "ตรวจสอบสถานะห้องพัก ดูรายละเอียด และติดต่อสอบถามห้องว่างได้ในหน้าเดียว",
   banner_image_url: null,
+  banner_image_position_x: 50,
+  banner_image_position_y: 50,
+  banner_image_zoom: 100,
   location_title: "เดินทางสะดวกในหาดใหญ่",
   location_description:
     "เปิดแผนที่เพื่อดูเส้นทางมายัง Home 39 และตรวจสอบระยะทางจากตำแหน่งของคุณ",
-  map_url: "https://share.google/9SpwEy5eYMnBt4cnd",
-  nearby_place: "โรงเรียนหาดใหญ่วิทยาลัย (ญ.ว.)",
-  nearby_description: "สถานศึกษาสำคัญในพื้นที่หาดใหญ่",
+  map_url: "https://share.google/X6GXLKehq7lfD7DdZ",
+  nearby_places: ["โรงเรียนหาดใหญ่วิทยาลัย (ญ.ว.)"],
   contact_title: "สนใจจองห้องพัก?",
   contact_description:
     "ติดต่อสอบถามสถานะห้อง ราคา และรายละเอียดเพิ่มเติมได้ทุกช่องทาง",
