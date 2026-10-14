@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { convertHeicToJpeg } from "@/lib/image";
 import { matchesDeclaredType } from "@/lib/fileSignature";
+import { clientAddressHash } from "@/lib/rateLimit";
 
 export const runtime = "nodejs";
 
@@ -104,6 +105,21 @@ export async function POST(
     return NextResponse.json(
       { error: "บิลนี้ยังไม่สามารถส่งสลิปได้ หรือสลิปกำลังอยู่ระหว่างตรวจสอบ" },
       { status: 409 }
+    );
+  }
+
+  // Fail open: if the limiter is unavailable (e.g. migration not applied yet),
+  // tenants must still be able to pay.
+  const { data: allowed, error: rateError } = await supabase.rpc("check_slip_upload_rate", {
+    p_bill_id: bill.id,
+    p_ip_hash: clientAddressHash(request.headers),
+  });
+  if (rateError) {
+    console.error("Slip upload rate check failed:", rateError);
+  } else if (allowed === false) {
+    return NextResponse.json(
+      { error: "ส่งสลิปบ่อยเกินไป กรุณารอสักครู่แล้วลองใหม่" },
+      { status: 429, headers: { "Retry-After": "600" } }
     );
   }
 
