@@ -16,11 +16,11 @@ type Props = {
 
 export default function SlipSection({ bill, roomCode, slipUrl, slipPreviewUrl }: Props) {
   return (
-    <section className="mt-6 rounded-2xl border border-blue-200 bg-blue-50 p-6">
+    <section className="mt-6 rounded-2xl border border-brand-200 bg-brand-50 p-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h2 className="font-bold text-blue-950">หลักฐานการชำระเงิน</h2>
-          <p className="mt-1 text-sm text-blue-700">
+          <h2 className="font-bold text-brand-950">หลักฐานการชำระเงิน</h2>
+          <p className="mt-1 text-sm text-brand-700">
             {bill.slip_original_name || "ไฟล์สลิป"}
             {bill.slip_submitted_at
               ? ` · ส่งเมื่อ ${new Date(bill.slip_submitted_at).toLocaleString("th-TH", {

@@ -25,7 +25,7 @@ export default function RoomDialog({ room, settings, onClose }: Props) {
 
   return (
       <div
-        className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4"
+        className="fixed inset-0 z-50 flex items-center justify-center bg-sand-950/70 p-4"
         onMouseDown={closeOnBackdrop}
       >
         <div
@@ -36,17 +36,17 @@ export default function RoomDialog({ room, settings, onClose }: Props) {
           tabIndex={-1}
           className="max-h-[92vh] w-full max-w-4xl overflow-y-auto rounded-2xl bg-white shadow-2xl outline-none"
         >
-          <div className="sticky top-0 z-10 flex items-start justify-between border-b border-slate-200 bg-white px-6 py-5">
+          <div className="sticky top-0 z-10 flex items-start justify-between border-b border-sand-200 bg-white px-6 py-5">
             <div>
               <h2 id="room-dialog-title" className="text-2xl font-bold">{room.title}</h2>
-              <p className="mt-1 text-sm text-slate-500">
+              <p className="mt-1 text-sm text-sand-500">
                 {room.description}
               </p>
             </div>
             <button
               type="button"
               onClick={onClose}
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-2xl text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-2xl text-sand-400 hover:bg-sand-100 hover:text-sand-700"
               aria-label="ปิด"
             >
               ×
@@ -61,7 +61,7 @@ export default function RoomDialog({ room, settings, onClose }: Props) {
               ).map((imageUrl, index) => (
                   <div
                     key={imageUrl || index}
-                    className="flex aspect-[4/3] items-center justify-center rounded-xl border border-blue-100 bg-gradient-to-br from-blue-50 to-slate-100"
+                    className="flex aspect-[4/3] items-center justify-center rounded-xl border border-brand-100 bg-gradient-to-br from-brand-50 to-sand-100"
                   >
                     {imageUrl ? (
                       <HomepageImage
@@ -72,25 +72,25 @@ export default function RoomDialog({ room, settings, onClose }: Props) {
                     ) : (
                       <div className="text-center">
                         <span className="text-4xl">🛏️</span>
-                        <p className="mt-3 text-sm font-semibold text-blue-700">
+                        <p className="mt-3 text-sm font-semibold text-brand-700">
                           รูปห้อง {room.room_code}
                         </p>
-                        <p className="mt-1 text-xs text-slate-400">ภาพที่ {index + 1}</p>
+                        <p className="mt-1 text-xs text-sand-400">ภาพที่ {index + 1}</p>
                       </div>
                     )}
                   </div>
                 ))}
             </div>
 
-            <div className="mt-6 grid gap-4 rounded-xl bg-slate-50 p-5 sm:grid-cols-3">
+            <div className="mt-6 grid gap-4 rounded-xl bg-sand-50 p-5 sm:grid-cols-3">
               <div>
-                <p className="text-xs text-slate-500">สถานะ</p>
-                <p className="mt-1 font-semibold text-blue-700">
+                <p className="text-xs text-sand-500">สถานะ</p>
+                <p className="mt-1 font-semibold text-brand-700">
                   {room.status === "occupied" ? "มีผู้เช่า" : "ห้องว่าง"}
                 </p>
               </div>
               <div>
-                <p className="text-xs text-slate-500">ค่าเช่ารายเดือน</p>
+                <p className="text-xs text-sand-500">ค่าเช่ารายเดือน</p>
                 <p className="mt-1 font-semibold">
                   {Number(room.monthly_price) > 0
                     ? `${money(room.monthly_price)} บาท`
@@ -98,8 +98,8 @@ export default function RoomDialog({ room, settings, onClose }: Props) {
                 </p>
               </div>
               <div>
-                <p className="text-xs text-slate-500">สอบถามเพิ่มเติม</p>
-                <a href={`tel:${settings.phone_primary.replace(/\D/g, "")}`} className="mt-1 block font-semibold text-blue-700">
+                <p className="text-xs text-sand-500">สอบถามเพิ่มเติม</p>
+                <a href={`tel:${settings.phone_primary.replace(/\D/g, "")}`} className="mt-1 block font-semibold text-brand-700">
                   {settings.phone_primary}
                 </a>
               </div>

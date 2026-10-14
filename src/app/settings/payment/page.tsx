@@ -9,18 +9,18 @@ export default async function PaymentSettingsPage() {
   const { settings: initialSettings, error } = await fetchPaymentSettings(supabase);
 
   return (
-    <main className="min-h-screen bg-slate-50 px-4 py-10">
+    <main className="min-h-screen bg-sand-50 px-4 py-10">
       <div className="mx-auto max-w-xl">
         <Link
           href="/dashboard"
-          className="text-sm font-medium text-slate-600 hover:text-blue-700"
+          className="text-sm font-medium text-sand-600 hover:text-brand-700"
         >
           ← กลับ Dashboard
         </Link>
 
-        <div className="mt-5 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="mt-5 rounded-2xl border border-sand-200 bg-white p-6 shadow-sm">
           <h1 className="text-2xl font-bold">ตั้งค่าบัญชีรับโอน</h1>
-          <p className="mt-2 text-sm text-slate-500">
+          <p className="mt-2 text-sm text-sand-500">
             ข้อมูลนี้จะแสดงในหน้าบิลลูกค้าที่ยังไม่ได้ชำระ
           </p>
 

@@ -19,7 +19,7 @@ export default function BannerCropEditor({
 }) {
   return (
     <div>
-      <div className="relative aspect-[16/7] overflow-hidden rounded-xl border border-slate-200 bg-slate-100">
+      <div className="relative aspect-[16/7] overflow-hidden rounded-xl border border-sand-200 bg-sand-100">
         {src ? (
           <HomepageImage
             src={src}
@@ -31,38 +31,38 @@ export default function BannerCropEditor({
             }}
           />
         ) : (
-          <div className="flex h-full items-center justify-center text-sm text-slate-400">
+          <div className="flex h-full items-center justify-center text-sm text-sand-400">
             ยังไม่มีรูปภาพ
           </div>
         )}
       </div>
       <div className="mt-4 space-y-4">
         <label className="block text-sm font-semibold">
-          ตำแหน่งแนวนอน <span className="font-normal text-slate-500">{positionX}%</span>
+          ตำแหน่งแนวนอน <span className="font-normal text-sand-500">{positionX}%</span>
           <input
             type="range"
             min="0"
             max="100"
             value={positionX}
             onChange={(event) => onPositionXChange(Number(event.target.value))}
-            className="mt-2 w-full accent-blue-600"
+            className="mt-2 w-full accent-brand-600"
             aria-label="ตำแหน่งภาพแนวนอน"
           />
         </label>
         <label className="block text-sm font-semibold">
-          ตำแหน่งแนวตั้ง <span className="font-normal text-slate-500">{positionY}%</span>
+          ตำแหน่งแนวตั้ง <span className="font-normal text-sand-500">{positionY}%</span>
           <input
             type="range"
             min="0"
             max="100"
             value={positionY}
             onChange={(event) => onPositionYChange(Number(event.target.value))}
-            className="mt-2 w-full accent-blue-600"
+            className="mt-2 w-full accent-brand-600"
             aria-label="ตำแหน่งภาพแนวตั้ง"
           />
         </label>
         <label className="block text-sm font-semibold">
-          ซูม <span className="font-normal text-slate-500">{zoom}%</span>
+          ซูม <span className="font-normal text-sand-500">{zoom}%</span>
           <input
             type="range"
             min="100"
@@ -70,7 +70,7 @@ export default function BannerCropEditor({
             step="5"
             value={zoom}
             onChange={(event) => onZoomChange(Number(event.target.value))}
-            className="mt-2 w-full accent-blue-600"
+            className="mt-2 w-full accent-brand-600"
             aria-label="ซูมรูป Banner"
           />
         </label>

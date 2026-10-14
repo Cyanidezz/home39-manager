@@ -1,8 +1,40 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  --background: #faf7f2;
+  --foreground: #231e1a;
+}
+
+/*
+ * Warm "homie" palette. `brand` is the terracotta accent (buttons, links,
+ * highlights); `sand` is the warm neutral scale (surfaces, borders, text).
+ * Status colours (green, red, amber, orange) keep Tailwind's defaults so
+ * paid / overdue / rejected stay instantly recognisable.
+ */
+@theme {
+  --color-brand-50: #fdf6f0;
+  --color-brand-100: #fbe9db;
+  --color-brand-200: #f6d0b3;
+  --color-brand-300: #eeb085;
+  --color-brand-400: #e08a55;
+  --color-brand-500: #cf6e33;
+  --color-brand-600: #b5551f;
+  --color-brand-700: #964419;
+  --color-brand-800: #7a3818;
+  --color-brand-900: #632f17;
+  --color-brand-950: #38170a;
+
+  --color-sand-50: #faf7f2;
+  --color-sand-100: #f4efe8;
+  --color-sand-200: #e8e0d5;
+  --color-sand-300: #d6cabb;
+  --color-sand-400: #a8998a;
+  --color-sand-500: #7d6f62;
+  --color-sand-600: #5f5348;
+  --color-sand-700: #4a4037;
+  --color-sand-800: #342d27;
+  --color-sand-900: #231e1a;
+  --color-sand-950: #14110f;
 }
 
 @theme inline {
@@ -19,8 +51,8 @@ body {
 }
 
 ::selection {
-  background: #bfdbfe;
-  color: #172554;
+  background: #f6d0b3;
+  color: #38170a;
 }
 
 button,
@@ -40,14 +72,14 @@ textarea {
 input,
 select,
 textarea {
-  border-color: #cbd5e1;
+  border-color: #d6cabb;
   background-color: #ffffff;
 }
 
 input:focus,
 select:focus,
 textarea:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgb(59 130 246 / 0.12);
+  border-color: #cf6e33;
+  box-shadow: 0 0 0 3px rgb(207 110 51 / 0.16);
   outline: none;
 }

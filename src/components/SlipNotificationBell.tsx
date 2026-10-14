@@ -115,7 +115,7 @@ export default function SlipNotificationBell() {
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
-        className="relative flex h-11 w-11 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300"
+        className="relative flex h-11 w-11 items-center justify-center rounded-lg border border-sand-200 bg-white text-sand-600 shadow-sm transition hover:border-brand-200 hover:bg-brand-50 hover:text-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-300"
         aria-label={
           notifications.length > 0
             ? `มีสลิปใหม่ ${notifications.length} รายการ`
@@ -145,11 +145,11 @@ export default function SlipNotificationBell() {
       </button>
 
       {open && (
-        <section className="absolute right-0 top-14 w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-slate-200 bg-white text-slate-900 shadow-2xl">
-          <header className="flex items-center justify-between border-b border-slate-100 px-4 py-3.5">
+        <section className="absolute right-0 top-14 w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-sand-200 bg-white text-sand-900 shadow-2xl">
+          <header className="flex items-center justify-between border-b border-sand-100 px-4 py-3.5">
             <div>
               <h2 className="font-bold">สลิปรอตรวจสอบ</h2>
-              <p className="mt-0.5 text-xs text-slate-500">
+              <p className="mt-0.5 text-xs text-sand-500">
                 {notifications.length > 0
                   ? `${notifications.length} รายการใหม่`
                   : "ไม่มีรายการใหม่"}
@@ -164,7 +164,7 @@ export default function SlipNotificationBell() {
 
           <div className="max-h-[min(26rem,65vh)] overflow-y-auto">
             {loading ? (
-              <p className="px-4 py-8 text-center text-sm text-slate-500">
+              <p className="px-4 py-8 text-center text-sm text-sand-500">
                 กำลังโหลด...
               </p>
             ) : loadFailed ? (
@@ -176,7 +176,7 @@ export default function SlipNotificationBell() {
                 <span className="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
                   ✓
                 </span>
-                <p className="mt-3 text-sm font-medium text-slate-700">
+                <p className="mt-3 text-sm font-medium text-sand-700">
                   ตรวจสอบสลิปครบแล้ว
                 </p>
               </div>
@@ -191,22 +191,22 @@ export default function SlipNotificationBell() {
                     key={notification.id}
                     href={`/rooms/${encodeURIComponent(roomCode)}/bills/${notification.id}`}
                     onClick={() => setOpen(false)}
-                    className="flex gap-3 border-b border-slate-100 px-4 py-3.5 transition last:border-b-0 hover:bg-blue-50"
+                    className="flex gap-3 border-b border-sand-100 px-4 py-3.5 transition last:border-b-0 hover:bg-brand-50"
                   >
-                    <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-700">
+                    <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-100 text-brand-700">
                       ▤
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="flex items-center justify-between gap-3">
                         <strong className="text-sm">ห้อง {roomCode}</strong>
-                        <span className="shrink-0 text-sm font-semibold text-blue-700">
+                        <span className="shrink-0 text-sm font-semibold text-brand-700">
                           {formatMoney(notification.total_amount)} บาท
                         </span>
                       </span>
-                      <span className="mt-1 block truncate text-xs text-slate-500">
+                      <span className="mt-1 block truncate text-xs text-sand-500">
                         {tenant?.full_name || "ไม่ระบุชื่อผู้เช่า"}
                       </span>
-                      <span className="mt-1 block text-xs text-slate-400">
+                      <span className="mt-1 block text-xs text-sand-400">
                         {formatSubmittedAt(notification.slip_submitted_at)}
                       </span>
                     </span>

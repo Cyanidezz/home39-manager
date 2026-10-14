@@ -12,21 +12,21 @@ export default async function RoomsPage() {
   const vacant = (rooms || []).length - occupied;
 
   return (
-    <main className="min-h-screen bg-slate-50 px-4 py-8 sm:p-8">
+    <main className="min-h-screen bg-sand-50 px-4 py-8 sm:p-8">
       <div className="mx-auto max-w-6xl">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-sm font-semibold text-blue-600">ROOM MANAGEMENT</p>
+            <p className="text-sm font-semibold text-brand-600">ROOM MANAGEMENT</p>
             <h1 className="mt-2 text-3xl font-bold">ห้องพักทั้งหมด</h1>
-            <p className="mt-2 text-slate-500">
+            <p className="mt-2 text-sand-500">
               ดูสถานะ ผู้เช่า และข้อมูลค่าเช่าของแต่ละห้อง
             </p>
           </div>
           <div className="flex gap-3">
-            <div className="rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm">
-              มีผู้เช่า <strong className="ml-2 text-blue-700">{occupied}</strong>
+            <div className="rounded-xl border border-brand-100 bg-brand-50 px-4 py-3 text-sm">
+              มีผู้เช่า <strong className="ml-2 text-brand-700">{occupied}</strong>
             </div>
-            <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm">
+            <div className="rounded-xl border border-sand-200 bg-white px-4 py-3 text-sm">
               ห้องว่าง <strong className="ml-2">{vacant}</strong>
             </div>
           </div>
@@ -48,16 +48,16 @@ export default async function RoomsPage() {
               <Link
                 key={room.id}
                 href={`/rooms/${room.room_code}`}
-                className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:-translate-y-1 hover:border-blue-300 hover:shadow-lg"
+                className="group rounded-2xl border border-sand-200 bg-white p-6 shadow-sm hover:-translate-y-1 hover:border-brand-300 hover:shadow-lg"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-center gap-3">
-                    <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-xl">
+                    <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-xl">
                       🏠
                     </span>
                     <div>
                       <h2 className="text-2xl font-bold">ห้อง {room.room_code}</h2>
-                      <p className="mt-1 text-sm text-slate-500">
+                      <p className="mt-1 text-sm text-sand-500">
                         {tenant?.full_name || "ยังไม่มีผู้เช่า"}
                       </p>
                     </div>
@@ -67,8 +67,8 @@ export default async function RoomsPage() {
                       movingOut
                         ? "bg-amber-50 text-amber-700"
                         : vacantRoom
-                          ? "bg-slate-100 text-slate-600"
-                          : "bg-blue-50 text-blue-700"
+                          ? "bg-sand-100 text-sand-600"
+                          : "bg-brand-50 text-brand-700"
                     }`}
                   >
                     {movingOut
@@ -79,24 +79,24 @@ export default async function RoomsPage() {
                   </span>
                 </div>
 
-                <div className="mt-6 divide-y divide-slate-100 rounded-xl bg-slate-50 px-4">
+                <div className="mt-6 divide-y divide-sand-100 rounded-xl bg-sand-50 px-4">
                   <div className="flex justify-between py-3 text-sm">
-                    <span className="text-slate-500">ค่าเช่า</span>
+                    <span className="text-sand-500">ค่าเช่า</span>
                     <strong>
                       {Number(room.monthly_rent).toLocaleString("th-TH")} บาท/เดือน
                     </strong>
                   </div>
                   <div className="flex justify-between py-3 text-sm">
-                    <span className="text-slate-500">จำนวนผู้พัก</span>
+                    <span className="text-sand-500">จำนวนผู้พัก</span>
                     <strong>{room.occupant_count} คน</strong>
                   </div>
                   <div className="flex justify-between py-3 text-sm">
-                    <span className="text-slate-500">เบอร์โทร</span>
+                    <span className="text-sand-500">เบอร์โทร</span>
                     <strong>{tenant?.phone || "-"}</strong>
                   </div>
                 </div>
 
-                <div className="mt-5 rounded-xl border border-blue-200 py-2.5 text-center text-sm font-semibold text-blue-600 group-hover:bg-blue-50">
+                <div className="mt-5 rounded-xl border border-brand-200 py-2.5 text-center text-sm font-semibold text-brand-600 group-hover:bg-brand-50">
                   ดูและจัดการห้อง →
                 </div>
               </Link>
@@ -105,7 +105,7 @@ export default async function RoomsPage() {
         </div>
 
         {!error && (rooms || []).length === 0 && (
-          <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-10 text-center text-slate-500">
+          <div className="mt-8 rounded-2xl border border-sand-200 bg-white p-10 text-center text-sand-500">
             ยังไม่มีข้อมูลห้องพัก
           </div>
         )}

@@ -198,8 +198,8 @@ export default function BillForm({
 
   return (
     <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-      <p className="text-sm text-slate-500">
-        ผู้เช่า: <strong className="text-slate-800">{tenantName}</strong>
+      <p className="text-sm text-sand-500">
+        ผู้เช่า: <strong className="text-sand-800">{tenantName}</strong>
       </p>
 
       <div className="grid grid-cols-2 gap-4">
@@ -227,13 +227,13 @@ export default function BillForm({
         </div>
       </div>
 
-      <div className="rounded-xl bg-slate-50 p-5">
+      <div className="rounded-xl bg-sand-50 p-5">
         <div className="flex justify-between gap-4">
           <span>ค่าเช่า</span>
           <strong>
             {isRentWaived ? (
               <>
-                <span className="mr-2 font-normal text-slate-400 line-through">
+                <span className="mr-2 font-normal text-sand-400 line-through">
                   {monthlyRent.toLocaleString()}
                 </span>
                 0 บาท
@@ -259,7 +259,7 @@ export default function BillForm({
         <input
           value={previousMeter ?? ""}
           disabled
-          className="w-full rounded-lg border bg-slate-100 px-4 py-3"
+          className="w-full rounded-lg border bg-sand-100 px-4 py-3"
         />
       </div>
 
@@ -276,7 +276,7 @@ export default function BillForm({
         />
       </div>
 
-      <div className="rounded-xl bg-blue-50 p-5">
+      <div className="rounded-xl bg-brand-50 p-5">
         <div className="flex justify-between">
           <span>หน่วยไฟที่ใช้</span>
           <strong>{electricityUnits.toFixed(2)} หน่วย</strong>
@@ -323,7 +323,7 @@ export default function BillForm({
       </div>
 
       {tenantHasLine ? (
-        <label className="flex items-start gap-3 rounded-xl border border-slate-200 p-4">
+        <label className="flex items-start gap-3 rounded-xl border border-sand-200 p-4">
           <input
             type="checkbox"
             checked={sendLine}
@@ -332,13 +332,13 @@ export default function BillForm({
           />
           <span>
             <span className="font-medium">ส่งบิลให้ผู้เช่าทาง LINE ทันทีหลังบันทึก</span>
-            <span className="mt-1 block text-sm text-slate-500">
+            <span className="mt-1 block text-sm text-sand-500">
               ไม่ติ๊กไว้ก็ได้ แล้วตรวจบิลก่อนกดส่งเองจากหน้ารายละเอียดบิล
             </span>
           </span>
         </label>
       ) : (
-        <p className="rounded-xl bg-slate-50 p-4 text-sm text-slate-500">
+        <p className="rounded-xl bg-sand-50 p-4 text-sm text-sand-500">
           ผู้เช่ายังไม่ได้ผูก LINE จึงไม่ส่งบิลอัตโนมัติ
         </p>
       )}
@@ -351,7 +351,7 @@ export default function BillForm({
         <button
           type="submit"
           disabled={loading}
-          className="rounded-lg bg-blue-600 px-6 py-3 text-white disabled:opacity-50"
+          className="rounded-lg bg-brand-600 px-6 py-3 text-white disabled:opacity-50"
         >
           {loading ? "กำลังบันทึก..." : "🧾 บันทึกและออกบิล"}
         </button>

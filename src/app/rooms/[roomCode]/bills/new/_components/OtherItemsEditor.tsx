@@ -16,7 +16,7 @@ export default function OtherItemsEditor({ items, total, onAdd, onChange, onRemo
           <button
             type="button"
             onClick={onAdd}
-            className="rounded-lg border px-3 py-2 text-sm hover:bg-slate-50"
+            className="rounded-lg border px-3 py-2 text-sm hover:bg-sand-50"
           >
             + เพิ่มรายการ
           </button>
@@ -43,7 +43,7 @@ export default function OtherItemsEditor({ items, total, onAdd, onChange, onRemo
               <button
                 type="button"
                 onClick={() => onRemove(index)}
-                className="rounded-lg border px-3 text-slate-500 hover:bg-red-50 hover:text-red-600"
+                className="rounded-lg border px-3 text-sand-500 hover:bg-red-50 hover:text-red-600"
                 title="ลบรายการ"
               >
                 ✕
@@ -53,7 +53,7 @@ export default function OtherItemsEditor({ items, total, onAdd, onChange, onRemo
         </div>
 
         <div className="mt-4 flex justify-end">
-          <span className="text-sm text-slate-600">
+          <span className="text-sm text-sand-600">
             รวมค่าใช้จ่ายอื่น{" "}
             <strong className="text-black">
               {total.toLocaleString(undefined, {

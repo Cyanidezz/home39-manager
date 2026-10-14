@@ -26,14 +26,14 @@ export default async function DashboardPage({ searchParams }: Props) {
   const summary = summarizeMonth(rooms, bills, expenses);
 
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-900">
-      <header className="border-b border-slate-200 bg-white">
+    <main className="min-h-screen bg-sand-50 text-sand-900">
+      <header className="border-b border-sand-200 bg-white">
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-8">
           <div>
             <h1 className="text-2xl font-bold tracking-tight">
               ภาพรวมประจำเดือน
             </h1>
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-sm text-sand-500">
               รายรับ รายจ่าย และสถานะห้องพัก · {formatThaiMonth(selectedPeriod)}
             </p>
           </div>
@@ -46,12 +46,12 @@ export default async function DashboardPage({ searchParams }: Props) {
                 name="month"
                 type="month"
                 defaultValue={selectedPeriod}
-                className="h-11 rounded-lg border border-slate-200 bg-white px-3 text-sm font-medium outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                className="h-11 rounded-lg border border-sand-200 bg-white px-3 text-sm font-medium outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
               />
             </div>
             <button
               type="submit"
-              className="h-11 rounded-lg border border-blue-200 px-4 text-sm font-semibold text-blue-700 transition hover:bg-blue-50"
+              className="h-11 rounded-lg border border-brand-200 px-4 text-sm font-semibold text-brand-700 transition hover:bg-brand-50"
             >
               ดูข้อมูล
             </button>

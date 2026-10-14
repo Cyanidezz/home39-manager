@@ -31,14 +31,14 @@ export default async function EditBillPage({ params }: Props) {
     .map((item) => ({ name: item.item_name, amount: String(item.amount) }));
 
   return (
-    <main className="min-h-screen bg-slate-50 px-4 py-10">
+    <main className="min-h-screen bg-sand-50 px-4 py-10">
       <div className="mx-auto max-w-3xl">
-        <Link href={`/rooms/${roomCode}/bills/${billId}`} className="text-sm text-slate-500 hover:text-blue-700">
+        <Link href={`/rooms/${roomCode}/bills/${billId}`} className="text-sm text-sand-500 hover:text-brand-700">
           ← กลับรายละเอียดบิล
         </Link>
-        <div className="mt-5 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+        <div className="mt-5 rounded-2xl border border-sand-200 bg-white p-6 shadow-sm sm:p-8">
           <h1 className="text-3xl font-bold">แก้ไขข้อมูลบิล</h1>
-          <p className="mt-2 text-slate-500">ห้อง {roomCode}</p>
+          <p className="mt-2 text-sand-500">ห้อง {roomCode}</p>
           <BillEditForm
             billId={bill.id}
             roomCode={roomCode}

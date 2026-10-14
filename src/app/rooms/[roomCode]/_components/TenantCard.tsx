@@ -24,7 +24,7 @@ function baht(value: number | string | null) {
 
 export default function TenantCard({ roomCode, tenants }: Props) {
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+    <section className="rounded-2xl border border-sand-200 bg-white p-6 shadow-sm">
       <h2 className="text-xl font-semibold">👤 ผู้เช่า</h2>
 
       <div className="mt-5">
@@ -33,13 +33,13 @@ export default function TenantCard({ roomCode, tenants }: Props) {
             <div key={tenant.id}>
               <p className="text-lg font-medium">{tenant.full_name}</p>
 
-              <p className="mt-2 text-slate-600">โทร: {tenant.phone || "-"}</p>
+              <p className="mt-2 text-sand-600">โทร: {tenant.phone || "-"}</p>
 
-              <p className="text-slate-600">
+              <p className="text-sand-600">
                 เริ่มเช่า: {formatThaiDate(tenant.move_in_date)}
               </p>
 
-              <div className="mt-4 grid gap-2 rounded-xl bg-slate-50 p-4 text-sm text-slate-700 sm:grid-cols-2">
+              <div className="mt-4 grid gap-2 rounded-xl bg-sand-50 p-4 text-sm text-sand-700 sm:grid-cols-2">
                 <p>
                   ค่าเช่าล่วงหน้า <strong>{baht(tenant.advance_rent_amount)}</strong>
                 </p>
@@ -54,7 +54,7 @@ export default function TenantCard({ roomCode, tenants }: Props) {
 
               <Link
                 href={`/rooms/${roomCode}/tenant/${tenant.id}/edit`}
-                className="mt-4 inline-block rounded-lg border px-4 py-2 text-sm hover:bg-slate-50"
+                className="mt-4 inline-block rounded-lg border px-4 py-2 text-sm hover:bg-sand-50"
               >
                 ✏️ แก้ไขข้อมูลผู้เช่า
               </Link>
@@ -75,7 +75,7 @@ export default function TenantCard({ roomCode, tenants }: Props) {
             </div>
           ))
         ) : (
-          <p className="text-slate-500">ยังไม่มีข้อมูลผู้เช่า</p>
+          <p className="text-sand-500">ยังไม่มีข้อมูลผู้เช่า</p>
         )}
       </div>
     </section>

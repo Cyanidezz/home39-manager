@@ -27,11 +27,11 @@ export default async function RoomPage({ params }: Props) {
   const latestBill = bills[0];
 
   return (
-    <main className="min-h-screen bg-slate-50 p-8">
+    <main className="min-h-screen bg-sand-50 p-8">
       <div className="mx-auto max-w-5xl">
         <Link
           href="/dashboard"
-          className="text-sm text-slate-500 hover:text-blue-700"
+          className="text-sm text-sand-500 hover:text-brand-700"
         >
           ← กลับ Dashboard
         </Link>
@@ -42,7 +42,7 @@ export default async function RoomPage({ params }: Props) {
               ห้อง {room.room_code}
             </h1>
 
-            <p className="mt-1 text-slate-500">
+            <p className="mt-1 text-sand-500">
               จัดการข้อมูลห้องพัก
             </p>
           </div>
@@ -51,14 +51,14 @@ export default async function RoomPage({ params }: Props) {
             {activeTenant ? (
               <Link
                 href={`/rooms/${room.room_code}/bills/new`}
-                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700"
               >
                 🧾 ออกบิลใหม่
               </Link>
             ) : (
               <Link
                 href={`/rooms/${room.room_code}/tenant/new`}
-                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700"
               >
                 + สร้างผู้เช่าใหม่
               </Link>
@@ -69,7 +69,7 @@ export default async function RoomPage({ params }: Props) {
                 ? "bg-orange-100 text-orange-700"
                 : room.status === "occupied"
                   ? "bg-green-100 text-green-700"
-                  : "bg-slate-100 text-slate-700"
+                  : "bg-sand-100 text-sand-700"
             }`}>
               {activeTenant?.planned_move_out_date
                 ? `ผู้เช่าแจ้งย้ายออก ${formatThaiDate(activeTenant.planned_move_out_date)}`

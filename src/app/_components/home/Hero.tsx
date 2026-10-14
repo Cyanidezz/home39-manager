@@ -5,7 +5,7 @@ type Props = { settings: HomepageSettings };
 export default function Hero({ settings }: Props) {
   return (
     <section
-      className="relative overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-blue-500 text-white"
+      className="relative overflow-hidden bg-gradient-to-br from-brand-700 via-brand-600 to-brand-500 text-white"
     >
       {settings.banner_image_url && (
         <div
@@ -31,7 +31,7 @@ export default function Hero({ settings }: Props) {
           </p>
           <a
             href="#rooms"
-            className="mt-8 inline-flex rounded-xl bg-white px-6 py-3 font-semibold text-blue-700 shadow-lg hover:bg-blue-50"
+            className="mt-8 inline-flex rounded-xl bg-white px-6 py-3 font-semibold text-brand-700 shadow-lg hover:bg-brand-50"
           >
             ดูห้องพัก ↓
           </a>

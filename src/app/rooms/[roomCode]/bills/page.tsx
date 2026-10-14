@@ -21,11 +21,11 @@ export default async function BillsHistoryPage({ params }: Props) {
   const { room, bills } = history;
 
   return (
-    <main className="min-h-screen bg-slate-50 px-4 py-10">
+    <main className="min-h-screen bg-sand-50 px-4 py-10">
       <div className="mx-auto max-w-4xl">
         <Link
           href={`/rooms/${room.room_code}`}
-          className="text-sm text-slate-500 hover:text-blue-700"
+          className="text-sm text-sand-500 hover:text-brand-700"
         >
           ← กลับห้อง {room.room_code}
         </Link>
@@ -33,20 +33,20 @@ export default async function BillsHistoryPage({ params }: Props) {
         <div className="mt-5 flex items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold">🧾 ประวัติบิล</h1>
-            <p className="mt-2 text-slate-500">ห้อง {room.room_code}</p>
+            <p className="mt-2 text-sand-500">ห้อง {room.room_code}</p>
           </div>
 
           <Link
             href={`/rooms/${room.room_code}/bills/new`}
-            className="rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700"
+            className="rounded-xl bg-brand-600 px-5 py-3 font-semibold text-white hover:bg-brand-700"
           >
             + ออกบิลใหม่
           </Link>
         </div>
 
-        <div className="mt-8 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div className="mt-8 overflow-hidden rounded-2xl border border-sand-200 bg-white shadow-sm">
           {!bills || bills.length === 0 ? (
-            <div className="px-6 py-10 text-center text-slate-500">
+            <div className="px-6 py-10 text-center text-sand-500">
               ยังไม่มีประวัติบิล
             </div>
           ) : (
@@ -57,7 +57,7 @@ export default async function BillsHistoryPage({ params }: Props) {
                 <Link
                   key={bill.id}
                   href={`/rooms/${room.room_code}/bills/${bill.id}`}
-                  className="flex items-center justify-between gap-4 border-b px-6 py-5 last:border-b-0 hover:bg-slate-50"
+                  className="flex items-center justify-between gap-4 border-b px-6 py-5 last:border-b-0 hover:bg-sand-50"
                 >
                   <div>
                     <p className="font-bold">
@@ -65,7 +65,7 @@ export default async function BillsHistoryPage({ params }: Props) {
                       {bill.billing_year + 543}
                     </p>
 
-                    <p className="mt-1 text-sm text-slate-500">
+                    <p className="mt-1 text-sm text-sand-500">
                       กำหนดชำระ: {formatThaiDateShort(bill.due_date)}
                     </p>
                   </div>
@@ -81,7 +81,7 @@ export default async function BillsHistoryPage({ params }: Props) {
                       {status.text}
                     </span>
 
-                    <span className="text-slate-400">›</span>
+                    <span className="text-sand-400">›</span>
                   </div>
                 </Link>
               );

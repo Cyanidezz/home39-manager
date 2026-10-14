@@ -217,7 +217,7 @@ export default function TenantForm({
             onChange={(e) => setOccupantCount(Number(e.target.value))}
             className="w-full rounded-lg border px-4 py-3"
           />
-          <p className="mt-2 text-sm text-slate-500">
+          <p className="mt-2 text-sm text-sand-500">
             ค่าน้ำ {occupantCount || 0} × {WATER_RATE} ={" "}
             <strong>{((occupantCount || 0) * WATER_RATE).toLocaleString()} บาท/เดือน</strong>
           </p>
@@ -256,7 +256,7 @@ export default function TenantForm({
               }}
               className="w-full rounded-lg border px-4 py-3"
             />
-            <p className="mt-2 text-sm text-slate-500">คำนวณเริ่มต้นเท่ากับค่าเช่า 1 เดือน</p>
+            <p className="mt-2 text-sm text-sand-500">คำนวณเริ่มต้นเท่ากับค่าเช่า 1 เดือน</p>
           </div>
 
           <div>
@@ -273,11 +273,11 @@ export default function TenantForm({
               }}
               className="w-full rounded-lg border px-4 py-3"
             />
-            <p className="mt-2 text-sm text-slate-500">คำนวณเริ่มต้นเท่ากับค่าเช่า 2 เดือน</p>
+            <p className="mt-2 text-sm text-sand-500">คำนวณเริ่มต้นเท่ากับค่าเช่า 2 เดือน</p>
           </div>
         </div>
 
-        <div className="rounded-xl bg-blue-50 p-4 text-sm text-blue-950">
+        <div className="rounded-xl bg-brand-50 p-4 text-sm text-brand-950">
           <div className="flex justify-between gap-4">
             <span>ค่าเช่าล่วงหน้า</span>
             <strong>{money(advanceRent)} บาท</strong>
@@ -286,7 +286,7 @@ export default function TenantForm({
             <span>ค่ามัดจำห้อง</span>
             <strong>{money(depositAmount)} บาท</strong>
           </div>
-          <div className="mt-3 flex justify-between gap-4 border-t border-blue-200 pt-3">
+          <div className="mt-3 flex justify-between gap-4 border-t border-brand-200 pt-3">
             <span className="font-semibold">รวมรับเมื่อทำสัญญา</span>
             <strong>{money(String((Number(advanceRent) || 0) + (Number(depositAmount) || 0)))} บาท</strong>
           </div>
@@ -307,7 +307,7 @@ export default function TenantForm({
             className="w-full rounded-lg border px-4 py-3"
             placeholder="ใส่ภายหลังได้"
           />
-          <p className="mt-2 text-sm text-slate-500">
+          <p className="mt-2 text-sm text-sand-500">
             หากกรอก ระบบจะใช้เป็นเลขมิเตอร์ครั้งก่อนของบิลแรก
           </p>
         </div>
@@ -320,11 +320,11 @@ export default function TenantForm({
             onChange={(e) => setContractFile(e.target.files?.[0] ?? null)}
             className="w-full rounded-lg border px-4 py-3"
           />
-          <p className="mt-2 text-sm text-slate-500">
+          <p className="mt-2 text-sm text-sand-500">
             ไม่บังคับ • PDF ขนาดไม่เกิน 10 MB • เพิ่มภายหลังได้
           </p>
           {contractFile && (
-            <p className="mt-2 text-sm font-medium text-slate-700">📎 {contractFile.name}</p>
+            <p className="mt-2 text-sm font-medium text-sand-700">📎 {contractFile.name}</p>
           )}
         </div>
 
@@ -347,7 +347,7 @@ export default function TenantForm({
         <button
           type="submit"
           disabled={loading}
-          className="rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white disabled:opacity-50"
+          className="rounded-lg bg-brand-600 px-6 py-3 font-semibold text-white disabled:opacity-50"
         >
           {loading ? "กำลังบันทึก..." : "บันทึกและสร้างผู้เช่า"}
         </button>

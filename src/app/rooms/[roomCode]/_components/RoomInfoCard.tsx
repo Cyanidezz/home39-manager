@@ -7,7 +7,7 @@ type Props = {
 
 export default function RoomInfoCard({ room }: Props) {
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+    <section className="rounded-2xl border border-sand-200 bg-white p-6 shadow-sm">
       <h2 className="text-xl font-semibold">🏠 ข้อมูลห้อง</h2>
 
       <div className="mt-5 space-y-3">

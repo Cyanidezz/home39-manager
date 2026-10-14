@@ -69,11 +69,11 @@ export default async function BillDetailPage({ params, searchParams }: Props) {
   );
 
   return (
-    <main className="min-h-screen bg-slate-50 px-4 py-10">
+    <main className="min-h-screen bg-sand-50 px-4 py-10">
       <div className="mx-auto max-w-3xl">
         <Link
           href={`/rooms/${bill.rooms.room_code}/bills`}
-          className="text-sm text-slate-500 hover:text-blue-700"
+          className="text-sm text-sand-500 hover:text-brand-700"
         >
           ← กลับประวัติบิล
         </Link>
@@ -92,10 +92,10 @@ export default async function BillDetailPage({ params, searchParams }: Props) {
         <div className="mt-5 flex items-start justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold">🧾 รายละเอียดบิล</h1>
-            <p className="mt-2 text-slate-500">ห้อง {bill.rooms.room_code}</p>
-            <p className="text-slate-500">
+            <p className="mt-2 text-sand-500">ห้อง {bill.rooms.room_code}</p>
+            <p className="text-sand-500">
               ผู้เช่า:{" "}
-              <span className="font-medium text-slate-900">
+              <span className="font-medium text-sand-900">
                 {bill.tenants?.full_name || "-"}
               </span>
             </p>
@@ -131,7 +131,7 @@ export default async function BillDetailPage({ params, searchParams }: Props) {
           <SendBillLineButton billId={bill.id} />
           <Link
             href={`/rooms/${bill.rooms.room_code}/bills/${bill.id}/edit`}
-            className="rounded-xl border border-slate-300 bg-white px-5 py-3 font-medium text-slate-700 hover:bg-slate-50"
+            className="rounded-xl border border-sand-300 bg-white px-5 py-3 font-medium text-sand-700 hover:bg-sand-50"
           >
             แก้ไขข้อมูลบิล
           </Link>
@@ -141,7 +141,7 @@ export default async function BillDetailPage({ params, searchParams }: Props) {
             target="_blank"
             rel="noopener noreferrer"
             prefetch={false}
-            className="rounded-xl border border-slate-300 bg-white px-5 py-3 font-medium text-slate-700 hover:bg-slate-50"
+            className="rounded-xl border border-sand-300 bg-white px-5 py-3 font-medium text-sand-700 hover:bg-sand-50"
           >
             👁 ดูบิลสำหรับผู้เช่า
           </Link>
@@ -149,7 +149,7 @@ export default async function BillDetailPage({ params, searchParams }: Props) {
         </div>
 
         {bill.status === "paid" && bill.paid_at && (
-          <p className="mt-4 text-right text-sm text-slate-500">
+          <p className="mt-4 text-right text-sm text-sand-500">
             ชำระเมื่อ:{" "}
             {new Date(bill.paid_at).toLocaleString("th-TH", {
               dateStyle: "medium",
