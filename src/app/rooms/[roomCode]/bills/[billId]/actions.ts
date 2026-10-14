@@ -66,25 +66,32 @@ async function setBillStatus(
   }
 }
 
-export async function markBillAsPaid(formData: FormData) {
+const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const roomCodePattern = /^[A-Za-z0-9_-]{1,20}$/;
+
+/** Reads and validates the bill/room pair every status form posts. */
+function readTarget(formData: FormData) {
   const billId = String(formData.get("billId") || "");
   const roomCode = String(formData.get("roomCode") || "");
 
   if (!billId || !roomCode) {
     throw new Error("ข้อมูลบิลไม่ครบ");
   }
+  if (!uuidPattern.test(billId) || !roomCodePattern.test(roomCode)) {
+    throw new Error("ข้อมูลบิลไม่ถูกต้อง");
+  }
+  return { billId, roomCode };
+}
+
+export async function markBillAsPaid(formData: FormData) {
+  const { billId, roomCode } = readTarget(formData);
 
   await setBillStatus(billId, "paid", "บันทึกชำระเงินโดยผู้ดูแล");
   redirect(`/rooms/${roomCode}/bills/${billId}`);
 }
 
 export async function rejectBillSlip(formData: FormData) {
-  const billId = String(formData.get("billId") || "");
-  const roomCode = String(formData.get("roomCode") || "");
-
-  if (!billId || !roomCode) {
-    throw new Error("ข้อมูลบิลไม่ครบ");
-  }
+  const { billId, roomCode } = readTarget(formData);
 
   await setBillStatus(
     billId,
@@ -95,12 +102,11 @@ export async function rejectBillSlip(formData: FormData) {
 }
 
 export async function updateBillStatus(formData: FormData) {
-  const billId = String(formData.get("billId") || "");
-  const roomCode = String(formData.get("roomCode") || "");
+  const { billId, roomCode } = readTarget(formData);
   const newStatus = String(formData.get("newStatus") || "");
   const reason = String(formData.get("reason") || "").trim();
 
-  if (!billId || !roomCode || !newStatus || !reason) {
+  if (!newStatus || !reason) {
     throw new Error("กรุณากรอกข้อมูลให้ครบ");
   }
 

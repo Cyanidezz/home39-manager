@@ -3,7 +3,7 @@
 import { ChangeEvent, FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { type HomepageRoom, type HomepageSettings } from "@/lib/homepage";
+import { safeHttpUrl, type HomepageRoom, type HomepageSettings } from "@/lib/homepage";
 import { uploadHomepageImage } from "@/lib/homepageUpload";
 import BannerSection from "./_components/BannerSection";
 import LocationSection from "./_components/LocationSection";
@@ -92,8 +92,19 @@ export default function HomepageManager({ initialSettings, initialRooms }: Props
 
   async function saveSettings(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setSaving(true);
     setMessage(null);
+
+    const badUrl = [
+      ["ลิงก์ Google Maps", settings.map_url],
+      ["Facebook URL", settings.facebook_url],
+      ["LINE URL", settings.line_url],
+    ].find(([, value]) => safeHttpUrl(value, "") === "");
+    if (badUrl) {
+      setMessage({ type: "error", text: `${badUrl[0]} ต้องขึ้นต้นด้วย http:// หรือ https://` });
+      return;
+    }
+
+    setSaving(true);
 
     const { error } = await supabase.from("homepage_settings").upsert({
       ...settings,

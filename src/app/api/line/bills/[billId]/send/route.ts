@@ -3,11 +3,21 @@ import { createClient } from "@/lib/supabase/server";
 import { publicAppUrl, pushLineFlex } from "@/lib/line";
 import { thaiMonthNames } from "@/lib/format";
 
+const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
 export async function POST(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ billId: string }> }
 ) {
+  const origin = request.headers.get("origin");
+  if (origin && origin !== new URL(request.url).origin) {
+    return NextResponse.json({ error: "คำขอไม่ถูกต้อง" }, { status: 403 });
+  }
+
   const { billId } = await params;
+  if (!uuidPattern.test(billId)) {
+    return NextResponse.json({ error: "รหัสบิลไม่ถูกต้อง" }, { status: 400 });
+  }
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 

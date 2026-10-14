@@ -1,4 +1,4 @@
-import type { HomepageSettings } from "@/lib/homepage";
+import { safeHttpUrl, type HomepageSettings } from "@/lib/homepage";
 
 type Props = { settings: HomepageSettings };
 
@@ -15,7 +15,7 @@ export default function ContactSection({ settings }: Props) {
           </div>
           <div className="flex flex-wrap gap-3">
             <a
-              href={settings.facebook_url}
+              href={safeHttpUrl(settings.facebook_url)}
               target="_blank"
               rel="noopener noreferrer"
               className="rounded-xl bg-white px-5 py-3 font-semibold text-blue-700 hover:bg-blue-50"
@@ -23,7 +23,7 @@ export default function ContactSection({ settings }: Props) {
               Facebook
             </a>
             <a
-              href={settings.line_url}
+              href={safeHttpUrl(settings.line_url)}
               target="_blank"
               rel="noopener noreferrer"
               className="rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-white hover:bg-emerald-600"

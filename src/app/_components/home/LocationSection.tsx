@@ -1,4 +1,4 @@
-import { googleMapsEmbedUrl, type HomepageSettings } from "@/lib/homepage";
+import { googleMapsEmbedUrl, safeHttpUrl, type HomepageSettings } from "@/lib/homepage";
 
 type Props = { settings: HomepageSettings };
 
@@ -25,7 +25,7 @@ export default function LocationSection({ settings }: Props) {
             {settings.location_description}
           </p>
           <a
-            href={settings.map_url}
+            href={safeHttpUrl(settings.map_url)}
             target="_blank"
             rel="noopener noreferrer"
             className="mt-5 inline-flex rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700"
