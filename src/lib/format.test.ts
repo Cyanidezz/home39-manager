@@ -44,6 +44,16 @@ describe("format", () => {
       vi.setSystemTime(new Date("2026-10-13T05:00:00Z"));
       expect(currentPeriod()).toBe("2026-10");
     });
+
+    it("uses Bangkok time at the month boundary", () => {
+      // 17:00 UTC on Sep 30 is 00:00 on Oct 1 in Bangkok (UTC+7)
+      expect(currentPeriod(new Date("2026-09-30T17:00:00Z"))).toBe("2026-10");
+      expect(currentPeriod(new Date("2026-09-30T16:59:00Z"))).toBe("2026-09");
+    });
+
+    it("handles the year boundary", () => {
+      expect(currentPeriod(new Date("2026-12-31T18:00:00Z"))).toBe("2027-01");
+    });
   });
 });
 

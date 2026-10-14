@@ -37,9 +37,21 @@ export function formatThaiMonth(date: string | null | undefined) {
   return `${thaiMonths[month - 1]} ${year + 543}`;
 }
 
-/** Current month as "YYYY-MM" */
-export function currentPeriod() {
-  return new Date().toISOString().slice(0, 7);
+/** Today's date in Bangkok as "YYYY-MM-DD" (the server runs in UTC). */
+export function bangkokDate(now = new Date()) {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Bangkok",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(now);
+  const value = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${value.year}-${value.month}-${value.day}`;
+}
+
+/** Current month in Bangkok as "YYYY-MM" */
+export function currentPeriod(now = new Date()) {
+  return bangkokDate(now).slice(0, 7);
 }
 
 export const thaiMonthNames = [

@@ -51,6 +51,7 @@ export default function EndTenancyButton({
   const [actualMoveOutDate, setActualMoveOutDate] = useState(getToday);
   const [completing, setCompleting] = useState(false);
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
   const minimumMoveOutDate = useMemo(() => addOneMonth(noticeDate), [noticeDate]);
 
   async function save() {
@@ -73,11 +74,17 @@ export default function EndTenancyButton({
       });
       const result = (await response.json().catch(() => ({}))) as {
         error?: string;
+        skippedPaidBills?: number;
       };
       if (!response.ok) {
         setError(result.error || "บันทึกข้อมูลไม่สำเร็จ");
         return;
       }
+      setNotice(
+        result.skippedPaidBills
+          ? `บิลเดือนที่แจ้งที่ชำระแล้ว ${result.skippedPaidBills} ใบ ไม่ถูกปรับยอด หากต้องการปรับให้แก้ไขบิลเอง`
+          : ""
+      );
       setOpen(false);
       router.refresh();
     } catch {
@@ -191,6 +198,12 @@ export default function EndTenancyButton({
           </>
         )}
       </div>
+
+      {notice && !open && !completeOpen && (
+        <p className="mt-3 rounded-lg bg-amber-50 p-3 text-sm text-amber-800">
+          {notice}
+        </p>
+      )}
 
       {error && !open && !completeOpen && (
         <p className="mt-3 rounded-lg bg-red-50 p-3 text-sm text-red-700">

@@ -12,7 +12,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "กรุณาเข้าสู่ระบบ" }, { status: 401 });
   }
 
-  const body = (await request.json()) as { tenantId?: string };
+  let body: { tenantId?: string };
+  try {
+    body = (await request.json()) as { tenantId?: string };
+  } catch {
+    return NextResponse.json({ error: "ข้อมูลไม่ถูกต้อง" }, { status: 400 });
+  }
   if (!body.tenantId) {
     return NextResponse.json({ error: "ข้อมูลผู้เช่าไม่ครบ" }, { status: 400 });
   }

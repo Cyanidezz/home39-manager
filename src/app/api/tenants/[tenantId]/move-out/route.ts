@@ -87,7 +87,7 @@ export async function PATCH(
 
   const { data: existingBills, error: billLookupError } = await admin
     .from("bills")
-    .select("id, rent_amount, total_amount")
+    .select("id, status, rent_amount, total_amount")
     .eq("tenant_id", tenantId)
     .eq("room_id", roomId)
     .eq("billing_year", rentWaivedYear)
@@ -98,7 +98,11 @@ export async function PATCH(
     return NextResponse.json({ error: "บันทึกวันย้ายออกแล้ว แต่ปรับบิลเดิมไม่สำเร็จ" }, { status: 500 });
   }
 
-  for (const bill of existingBills || []) {
+  // Paid bills are closed books: never rewrite their amounts.
+  const adjustable = (existingBills || []).filter((bill) => bill.status !== "paid");
+  const skippedPaidBills = (existingBills || []).length - adjustable.length;
+
+  for (const bill of adjustable) {
     const rentAmount = Number(bill.rent_amount || 0);
     if (rentAmount <= 0) continue;
     const { error } = await admin.from("bills").update({
@@ -117,7 +121,8 @@ export async function PATCH(
     ok: true,
     rentWaivedYear,
     rentWaivedMonth,
-    adjustedBills: existingBills?.length || 0,
+    adjustedBills: adjustable.length,
+    skippedPaidBills,
   });
 }
 

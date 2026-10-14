@@ -37,7 +37,12 @@ export async function PATCH(
     .single();
   if (!visibleBill) return NextResponse.json({ error: "ไม่พบบิล" }, { status: 404 });
 
-  const body = (await request.json()) as Record<string, unknown>;
+  let body: Record<string, unknown>;
+  try {
+    body = (await request.json()) as Record<string, unknown>;
+  } catch {
+    return NextResponse.json({ error: "ข้อมูลไม่ถูกต้อง" }, { status: 400 });
+  }
   const billingYear = numeric(body.billingYear);
   const billingMonth = numeric(body.billingMonth);
   const rentAmount = numeric(body.rentAmount);
