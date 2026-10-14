@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/data/session";
+import { fetchRoomOverview } from "@/lib/data/room";
 import { formatThaiDate } from "@/lib/format";
 import RoomInfoCard from "./_components/RoomInfoCard";
 import TenantCard from "./_components/TenantCard";
@@ -18,87 +19,12 @@ export default async function RoomPage({ params }: Props) {
 
   const { supabase } = await requireUser();
 
-  const { data: room, error } = await supabase
-    .from("rooms")
-    .select(`
-      id,
-      room_code,
-      monthly_rent,
-      occupant_count,
-      status,
-      note
-    `)
-    .eq("room_code", roomCode.toUpperCase())
-    .single();
+  const overview = await fetchRoomOverview(supabase, roomCode);
+  if (!overview) notFound();
 
-  if (error || !room) {
-    notFound();
-  }
-
-  const { data: tenants } = await supabase
-    .from("tenants")
-    .select(`
-      id,
-      full_name,
-      phone,
-      move_in_date,
-      move_out_date,
-      is_active,
-      note,
-      termination_notice_date,
-      planned_move_out_date,
-      advance_rent_amount,
-      deposit_amount,
-      initial_electricity_meter
-    `)
-    .eq("room_id", room.id)
-    .eq("is_active", true);
-
-  const { data: bills } = await supabase
-    .from("bills")
-    .select(`
-      id,
-      billing_year,
-      billing_month,
-      total_amount,
-      status,
-      current_meter
-    `)
-    .eq("room_id", room.id)
-    .order("billing_year", { ascending: false })
-    .order("billing_month", { ascending: false })
-    .limit(5);
-
-  const activeTenant = tenants?.[0];
-  const latestBill = bills?.[0];
-
-  const { data: contracts } = await supabase
-    .from("contracts")
-    .select(`
-      id,
-      contract_start,
-      contract_end,
-      deposit_amount,
-      file_path,
-      original_file_name,
-      note,
-      created_at
-    `)
-    .eq("room_id", room.id)
-    .order("created_at", { ascending: false })
-    .limit(1);
-
-  const latestContract = contracts?.[0];
-
-  let contractUrl: string | null = null;
-
-  if (latestContract?.file_path) {
-    const { data } = await supabase.storage
-      .from("contracts")
-      .createSignedUrl(latestContract.file_path, 60 * 10);
-
-    contractUrl = data?.signedUrl ?? null;
-  }
+  const { room, tenants, bills, latestContract, contractUrl } = overview;
+  const activeTenant = tenants[0];
+  const latestBill = bills[0];
 
   return (
     <main className="min-h-screen bg-slate-50 p-8">
@@ -154,7 +80,7 @@ export default async function RoomPage({ params }: Props) {
 
         <div className="mt-8 grid gap-6 md:grid-cols-2">
           <RoomInfoCard room={room} />
-          <TenantCard roomCode={room.room_code} tenants={tenants ?? []} />
+          <TenantCard roomCode={room.room_code} tenants={tenants} />
           <ContractCard
             roomCode={room.room_code}
             contract={latestContract}
