@@ -649,6 +649,42 @@ export type Database = {
         }
         Relationships: []
       }
+      slip_upload_attempts: {
+        Row: {
+          bill_id: string
+          created_at: string
+          id: number
+          ip_hash: string
+        }
+        Insert: {
+          bill_id: string
+          created_at?: string
+          id?: never
+          ip_hash: string
+        }
+        Update: {
+          bill_id?: string
+          created_at?: string
+          id?: never
+          ip_hash?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "slip_upload_attempts_bill_id_fkey"
+            columns: ["bill_id"]
+            isOneToOne: false
+            referencedRelation: "bill_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "slip_upload_attempts_bill_id_fkey"
+            columns: ["bill_id"]
+            isOneToOne: false
+            referencedRelation: "bills"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tenants: {
         Row: {
           advance_rent_amount: number | null
