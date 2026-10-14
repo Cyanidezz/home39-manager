@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import ConfirmSubmitButton from "@/components/ConfirmSubmitButton";
 
 type Props = {
   slipUrl: string;
@@ -136,23 +137,23 @@ export default function SlipViewer({
                     <form action={rejectBillSlip}>
                       <input type="hidden" name="billId" value={billId} />
                       <input type="hidden" name="roomCode" value={roomCode} />
-                      <button
-                        type="submit"
+                      <ConfirmSubmitButton
+                        confirmMessage="ยืนยันว่าสลิปไม่ถูกต้อง? ระบบจะแจ้งผู้เช่าทาง LINE ให้ส่งสลิปใหม่"
                         className="rounded-xl bg-red-600 px-5 py-3 font-semibold text-white hover:bg-red-700"
                       >
                         สลิปไม่ถูกต้อง
-                      </button>
+                      </ConfirmSubmitButton>
                     </form>
                   )}
                   <form action={markBillAsPaid}>
                     <input type="hidden" name="billId" value={billId} />
                     <input type="hidden" name="roomCode" value={roomCode} />
-                    <button
-                      type="submit"
+                    <ConfirmSubmitButton
+                      confirmMessage="ยืนยันว่าได้รับเงินแล้วและบันทึกเป็นชำระแล้ว? ระบบจะแจ้งผู้เช่าทาง LINE"
                       className="rounded-xl bg-green-600 px-5 py-3 font-semibold text-white hover:bg-green-700"
                     >
                       ยืนยันสลิปและบันทึกชำระเงิน
-                    </button>
+                    </ConfirmSubmitButton>
                   </form>
                 </div>
               )}

@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { addOneMonth, bangkokDate, formatThaiMonth } from "@/lib/format";
 
 type Props = {
   tenantId: string;
@@ -9,31 +10,6 @@ type Props = {
   initialNoticeDate: string | null;
   initialMoveOutDate: string | null;
 };
-
-const thaiMonths = [
-  "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.",
-  "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค.",
-];
-
-function addOneMonth(value: string) {
-  if (!value) return "";
-  const [year, month, day] = value.split("-").map(Number);
-  const lastDay = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
-  const result = new Date(Date.UTC(year, month, Math.min(day, lastDay)));
-  return result.toISOString().slice(0, 10);
-}
-
-function formatThaiMonth(value: string) {
-  if (!value) return "-";
-  const [year, month] = value.split("-").map(Number);
-  return `${thaiMonths[month - 1]} ${year + 543}`;
-}
-
-function getToday() {
-  const now = new Date();
-  const localDate = new Date(now.getTime() - now.getTimezoneOffset() * 60_000);
-  return localDate.toISOString().slice(0, 10);
-}
 
 export default function EndTenancyButton({
   tenantId,
@@ -48,9 +24,10 @@ export default function EndTenancyButton({
   const [loading, setLoading] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   const [completeOpen, setCompleteOpen] = useState(false);
-  const [actualMoveOutDate, setActualMoveOutDate] = useState(getToday);
+  const [actualMoveOutDate, setActualMoveOutDate] = useState(bangkokDate);
   const [completing, setCompleting] = useState(false);
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
   const minimumMoveOutDate = useMemo(() => addOneMonth(noticeDate), [noticeDate]);
 
   async function save() {
@@ -73,11 +50,17 @@ export default function EndTenancyButton({
       });
       const result = (await response.json().catch(() => ({}))) as {
         error?: string;
+        skippedPaidBills?: number;
       };
       if (!response.ok) {
         setError(result.error || "บันทึกข้อมูลไม่สำเร็จ");
         return;
       }
+      setNotice(
+        result.skippedPaidBills
+          ? `บิลเดือนที่แจ้งที่ชำระแล้ว ${result.skippedPaidBills} ใบ ไม่ถูกปรับยอด หากต้องการปรับให้แก้ไขบิลเอง`
+          : ""
+      );
       setOpen(false);
       router.refresh();
     } catch {
@@ -191,6 +174,12 @@ export default function EndTenancyButton({
           </>
         )}
       </div>
+
+      {notice && !open && !completeOpen && (
+        <p className="mt-3 rounded-lg bg-amber-50 p-3 text-sm text-amber-800">
+          {notice}
+        </p>
+      )}
 
       {error && !open && !completeOpen && (
         <p className="mt-3 rounded-lg bg-red-50 p-3 text-sm text-red-700">

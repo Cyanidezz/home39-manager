@@ -1,5 +1,6 @@
-import { notFound, redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { notFound } from "next/navigation";
+import { requireUser } from "@/lib/data/session";
+import { fetchBillingContext } from "@/lib/data/roomPages";
 import BillForm from "./BillForm";
 
 type Props = {
@@ -11,59 +12,12 @@ type Props = {
 export default async function NewBillPage({ params }: Props) {
   const { roomCode } = await params;
 
-  const supabase = await createClient();
+  const { supabase } = await requireUser();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const context = await fetchBillingContext(supabase, roomCode);
+  if (!context) notFound();
 
-  if (!user) {
-    redirect("/login");
-  }
-
-  const { data: room } = await supabase
-    .from("rooms")
-    .select(`
-      id,
-      room_code,
-      monthly_rent,
-      occupant_count
-    `)
-    .eq("room_code", roomCode.toUpperCase())
-    .single();
-
-  if (!room) {
-    notFound();
-  }
-
-  // ดึงผู้เช่าปัจจุบันของห้อง
-  const { data: tenant } = await supabase
-    .from("tenants")
-    .select(`
-      id,
-      full_name,
-      rent_waived_year,
-      rent_waived_month,
-      initial_electricity_meter
-    `)
-    .eq("room_id", room.id)
-    .eq("is_active", true)
-    .maybeSingle();
-
-  // ดึงบิลล่าสุดเพื่อใช้มิเตอร์ครั้งก่อน
-  const { data: latestBill } = await supabase
-    .from("bills")
-    .select(`
-      billing_year,
-      billing_month,
-      current_meter
-    `)
-    .eq("room_id", room.id)
-    .not("current_meter", "is", null)
-    .order("billing_year", { ascending: false })
-    .order("billing_month", { ascending: false })
-    .limit(1)
-    .maybeSingle();
+  const { room, tenant, previousMeter } = context;
 
   return (
     <main className="min-h-screen bg-slate-50 p-8">
@@ -94,15 +48,10 @@ export default async function NewBillPage({ params }: Props) {
               roomCode={room.room_code}
               monthlyRent={Number(room.monthly_rent)}
               occupantCount={room.occupant_count}
-              previousMeter={
-                latestBill?.current_meter != null
-                  ? Number(latestBill.current_meter)
-                  : tenant.initial_electricity_meter != null
-                    ? Number(tenant.initial_electricity_meter)
-                    : null
-              }
+              previousMeter={previousMeter}
               tenantId={tenant.id}
               tenantName={tenant.full_name}
+              tenantHasLine={Boolean(tenant.line_user_id)}
               rentWaivedYear={tenant.rent_waived_year}
               rentWaivedMonth={tenant.rent_waived_month}
             />

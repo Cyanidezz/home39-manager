@@ -1,5 +1,6 @@
-import { notFound, redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { notFound } from "next/navigation";
+import { requireUser } from "@/lib/data/session";
+import { fetchTenantEditContext } from "@/lib/data/roomPages";
 import LineConnectionCard from "@/components/LineConnectionCard";
 import EditTenantForm from "./EditTenantForm";
 import EndTenancyButton from "./EndTenancyButton";
@@ -14,46 +15,12 @@ type Props = {
 export default async function EditTenantPage({ params }: Props) {
   const { roomCode, tenantId } = await params;
 
-  const supabase = await createClient();
+  const { supabase } = await requireUser();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const context = await fetchTenantEditContext(supabase, roomCode, tenantId);
+  if (!context) notFound();
 
-  if (!user) {
-    redirect("/login");
-  }
-
-  const { data: room } = await supabase
-    .from("rooms")
-    .select("id, room_code, occupant_count")
-    .eq("room_code", roomCode.toUpperCase())
-    .single();
-
-  if (!room) {
-    notFound();
-  }
-
-  const { data: tenant } = await supabase
-    .from("tenants")
-    .select(`
-      id,
-      full_name,
-      phone,
-      move_in_date,
-      note,
-      room_id,
-      line_user_id,
-      termination_notice_date,
-      planned_move_out_date
-    `)
-    .eq("id", tenantId)
-    .eq("room_id", room.id)
-    .single();
-
-  if (!tenant) {
-    notFound();
-  }
+  const { room, tenant } = context;
 
   return (
     <main className="min-h-screen bg-slate-50 p-8">

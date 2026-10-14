@@ -3,6 +3,17 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import {
+  ELECTRICITY_RATE,
+  WATER_RATE,
+  electricityUnitsUsed,
+  hasInvalidOtherItem,
+  isValidOtherItem,
+  type OtherItem,
+} from "@/lib/billing";
+import { thaiMonthNames } from "@/lib/format";
+import OtherItemsEditor from "./_components/OtherItemsEditor";
+import { nullable } from "@/lib/supabase/rpc";
 
 type Props = {
   roomId: string;
@@ -12,17 +23,10 @@ type Props = {
   previousMeter: number | null;
   tenantId: string;
   tenantName: string;
+  tenantHasLine: boolean;
   rentWaivedYear: number | null;
   rentWaivedMonth: number | null;
 };
-
-type OtherItem = {
-  name: string;
-  amount: string;
-};
-
-const WATER_RATE = 150;
-const ELECTRICITY_RATE = 7;
 
 export default function BillForm({
   roomId,
@@ -32,6 +36,7 @@ export default function BillForm({
   previousMeter,
   tenantId,
   tenantName,
+  tenantHasLine,
   rentWaivedYear,
   rentWaivedMonth,
 }: Props) {
@@ -46,27 +51,20 @@ export default function BillForm({
     { name: "", amount: "" },
   ]);
   const [dueDate, setDueDate] = useState("");
+  const [sendLine, setSendLine] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const waterAmount = occupantCount * WATER_RATE;
 
-  const electricityUnits = useMemo(() => {
-    if (previousMeter === null || currentMeter === "") return 0;
-    const current = Number(currentMeter);
-    if (!Number.isFinite(current)) return 0;
-    return Math.max(0, current - previousMeter);
-  }, [currentMeter, previousMeter]);
+  const electricityUnits = useMemo(
+    () => electricityUnitsUsed(previousMeter, currentMeter),
+    [currentMeter, previousMeter]
+  );
 
   const electricityAmount = electricityUnits * ELECTRICITY_RATE;
 
-  const validOtherItems = otherItems.filter(
-    (item) =>
-      item.name.trim() !== "" &&
-      item.amount !== "" &&
-      Number.isFinite(Number(item.amount)) &&
-      Number(item.amount) > 0
-  );
+  const validOtherItems = otherItems.filter(isValidOtherItem);
 
   const other = validOtherItems.reduce(
     (sum, item) => sum + Number(item.amount),
@@ -129,17 +127,7 @@ export default function BillForm({
       return;
     }
 
-    const invalidOtherItem = otherItems.some((item) => {
-      const hasName = item.name.trim() !== "";
-      const hasAmount = item.amount !== "";
-      const amount = Number(item.amount);
-
-      if (!hasName && !hasAmount) return false;
-      if (!hasName || !hasAmount) return true;
-      return !Number.isFinite(amount) || amount <= 0;
-    });
-
-    if (invalidOtherItem) {
+    if (hasInvalidOtherItem(otherItems)) {
       setError(
         "กรุณากรอกชื่อรายการและจำนวนเงินของค่าใช้จ่ายอื่นให้ครบ และจำนวนเงินต้องมากกว่า 0"
       );
@@ -171,7 +159,7 @@ export default function BillForm({
         p_electricity_amount: electricityAmount,
         p_other_amount: other,
         p_total_amount: totalAmount,
-        p_due_date: dueDate || null,
+        p_due_date: nullable(dueDate || null),
         p_items: items,
       }
     );
@@ -187,13 +175,24 @@ export default function BillForm({
       return;
     }
 
-    try {
-      await fetch(`/api/line/bills/${newBillId}/send`, { method: "POST" });
-    } catch {
-      // เปิดดูบิลและส่งซ้ำจากหน้ารายละเอียดได้ หาก LINE ยังไม่พร้อม
+    // The bill is already saved; a failed LINE push is reported on the detail page,
+    // where it can be resent with the "send via LINE" button.
+    let lineResult: "sent" | "failed" | null = null;
+    if (tenantHasLine && sendLine) {
+      try {
+        const response = await fetch(`/api/line/bills/${newBillId}/send`, {
+          method: "POST",
+          signal: AbortSignal.timeout(15000),
+        });
+        lineResult = response.ok ? "sent" : "failed";
+      } catch {
+        lineResult = "failed";
+      }
     }
 
-    router.push(`/rooms/${roomCode}/bills/${newBillId}`);
+    router.push(
+      `/rooms/${roomCode}/bills/${newBillId}${lineResult ? `?lineSend=${lineResult}` : ""}`
+    );
     router.refresh();
   }
 
@@ -211,20 +210,7 @@ export default function BillForm({
             onChange={(e) => setBillingMonth(Number(e.target.value))}
             className="w-full rounded-lg border px-4 py-3"
           >
-            {[
-              "มกราคม",
-              "กุมภาพันธ์",
-              "มีนาคม",
-              "เมษายน",
-              "พฤษภาคม",
-              "มิถุนายน",
-              "กรกฎาคม",
-              "สิงหาคม",
-              "กันยายน",
-              "ตุลาคม",
-              "พฤศจิกายน",
-              "ธันวาคม",
-            ].map((month, index) => (
+            {thaiMonthNames.map((month, index) => (
               <option key={month} value={index + 1}>{month}</option>
             ))}
           </select>
@@ -306,60 +292,13 @@ export default function BillForm({
         </div>
       </div>
 
-      <div>
-        <div className="mb-3 flex items-center justify-between">
-          <label className="font-medium">ค่าใช้จ่ายอื่น</label>
-          <button
-            type="button"
-            onClick={addOtherItem}
-            className="rounded-lg border px-3 py-2 text-sm hover:bg-slate-50"
-          >
-            + เพิ่มรายการ
-          </button>
-        </div>
-
-        <div className="space-y-3">
-          {otherItems.map((item, index) => (
-            <div key={index} className="grid grid-cols-[1fr_160px_auto] gap-3">
-              <input
-                value={item.name}
-                onChange={(e) => updateOtherItem(index, "name", e.target.value)}
-                className="rounded-lg border px-4 py-3"
-                placeholder="ชื่อรายการ เช่น ค่ากุญแจ"
-              />
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                value={item.amount}
-                onChange={(e) => updateOtherItem(index, "amount", e.target.value)}
-                className="rounded-lg border px-4 py-3 text-right"
-                placeholder="จำนวนเงิน"
-              />
-              <button
-                type="button"
-                onClick={() => removeOtherItem(index)}
-                className="rounded-lg border px-3 text-slate-500 hover:bg-red-50 hover:text-red-600"
-                title="ลบรายการ"
-              >
-                ✕
-              </button>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-4 flex justify-end">
-          <span className="text-sm text-slate-600">
-            รวมค่าใช้จ่ายอื่น{" "}
-            <strong className="text-black">
-              {other.toLocaleString(undefined, {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })} บาท
-            </strong>
-          </span>
-        </div>
-      </div>
+      <OtherItemsEditor
+        items={otherItems}
+        total={other}
+        onAdd={addOtherItem}
+        onChange={updateOtherItem}
+        onRemove={removeOtherItem}
+      />
 
       <div>
         <label className="mb-2 block font-medium">กำหนดชำระ</label>
@@ -382,6 +321,27 @@ export default function BillForm({
           </strong>
         </div>
       </div>
+
+      {tenantHasLine ? (
+        <label className="flex items-start gap-3 rounded-xl border border-slate-200 p-4">
+          <input
+            type="checkbox"
+            checked={sendLine}
+            onChange={(e) => setSendLine(e.target.checked)}
+            className="mt-1 h-4 w-4"
+          />
+          <span>
+            <span className="font-medium">ส่งบิลให้ผู้เช่าทาง LINE ทันทีหลังบันทึก</span>
+            <span className="mt-1 block text-sm text-slate-500">
+              ไม่ติ๊กไว้ก็ได้ แล้วตรวจบิลก่อนกดส่งเองจากหน้ารายละเอียดบิล
+            </span>
+          </span>
+        </label>
+      ) : (
+        <p className="rounded-xl bg-slate-50 p-4 text-sm text-slate-500">
+          ผู้เช่ายังไม่ได้ผูก LINE จึงไม่ส่งบิลอัตโนมัติ
+        </p>
+      )}
 
       {error && (
         <div className="rounded-lg bg-red-50 p-4 text-red-600">{error}</div>
@@ -407,3 +367,4 @@ export default function BillForm({
     </form>
   );
 }
+

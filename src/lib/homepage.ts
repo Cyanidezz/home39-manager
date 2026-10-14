@@ -49,6 +49,16 @@ export function homepageImageDisplayUrl(imageUrl: string) {
   return imageUrl;
 }
 
+/** Returns the URL only when it is http(s); blocks javascript:/data: links saved in settings. */
+export function safeHttpUrl(value: string, fallback = "#") {
+  try {
+    const url = new URL(value);
+    return url.protocol === "http:" || url.protocol === "https:" ? url.toString() : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
 export function googleMapsEmbedUrl(mapUrl: string) {
   const defaultQuery = "7.0199642,100.4747884";
   let query = defaultQuery;

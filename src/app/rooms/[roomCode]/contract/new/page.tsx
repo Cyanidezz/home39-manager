@@ -1,5 +1,6 @@
-import { notFound, redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { notFound } from "next/navigation";
+import { requireUser } from "@/lib/data/session";
+import { fetchContractContext } from "@/lib/data/roomPages";
 import ContractForm from "./ContractForm";
 
 type Props = {
@@ -11,33 +12,12 @@ type Props = {
 export default async function NewContractPage({ params }: Props) {
   const { roomCode } = await params;
 
-  const supabase = await createClient();
+  const { supabase } = await requireUser();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const context = await fetchContractContext(supabase, roomCode);
+  if (!context) notFound();
 
-  if (!user) {
-    redirect("/login");
-  }
-
-  const { data: room } = await supabase
-    .from("rooms")
-    .select("id, room_code")
-    .eq("room_code", roomCode.toUpperCase())
-    .single();
-
-  if (!room) {
-    notFound();
-  }
-
-  const { data: tenant } = await supabase
-    .from("tenants")
-    .select("id, full_name")
-    .eq("room_id", room.id)
-    .eq("is_active", true)
-    .limit(1)
-    .maybeSingle();
+  const { room, tenant } = context;
 
   if (!tenant) {
     return (

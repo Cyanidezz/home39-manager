@@ -1,40 +1,57 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Home39 Manager
 
-## Getting Started
+ระบบจัดการหอพัก Home 39 (หาดใหญ่): หน้าเว็บสาธารณะสำหรับดูห้องว่าง และหลังบ้านสำหรับผู้ดูแลจัดการห้อง ผู้เช่า สัญญา บิลรายเดือน ค่าใช้จ่าย และการแจ้งเตือนผ่าน LINE
 
-First, run the development server:
+Stack: Next.js 15 (App Router), React 19, Tailwind CSS 4, Supabase (Postgres, Auth, Storage), LINE Messaging API
+
+## Getting started
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+cp .env.example .env.local   # then fill in the values (see Production setup)
+npm run dev                  # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+| Command | What it does |
+| --- | --- |
+| `npm run dev` | Dev server |
+| `npm run build` | Production build |
+| `npm run lint` | ESLint |
+| `npm test` | Unit tests (Vitest) |
+| `npx tsc --noEmit` | Type check |
+| `npm run gen:types` | Regenerate `src/lib/supabase/database.types.ts` from the linked Supabase project (run after every migration) |
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+CI runs lint, type check, and tests on every pull request.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Project layout
 
-## Learn More
+```text
+src/
+  app/
+    page.tsx, HomePage.tsx, _components/home/   Public homepage
+    login/                                      Admin sign-in
+    dashboard/                                  Monthly overview (+ _components/)
+    rooms/[roomCode]/                           Room, tenant, contract, bills
+    expenses/                                   Monthly expenses
+    settings/{homepage,payment}/                Homepage content and payment info
+    pay/[token]/                                Public bill page and slip upload
+    api/                                        Bills, LINE webhook, cron, slips, move-out
+  components/                                   Shared UI (AdminShell, HomepageImage, ...)
+  lib/
+    format.ts, billStatus.ts, billing.ts        Pure helpers (tested)
+    dashboard.ts                                Monthly summary calculation (tested)
+    data/                                       Supabase data access (session, dashboard)
+    supabase/                                   Browser, server, admin and public clients
+    line.ts, image.ts, homepage.ts              LINE, HEIC conversion, homepage content
+supabase/migrations/                            Database schema changes
+```
 
-To learn more about Next.js, take a look at the following resources:
+Conventions:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-
+- Private route folders use an `_components` directory next to the page that owns them.
+- Pages under the admin area call `requireUser()` from `src/lib/data/session.ts`; API routes return 401 JSON instead of redirecting.
+- Dates are stored as `YYYY-MM-DD` and displayed in the Buddhist era via `src/lib/format.ts`.
+- Water (150 baht/person) and electricity (7 baht/unit) rates live in `src/lib/billing.ts`.
 
 ## Production setup
 

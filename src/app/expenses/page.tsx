@@ -1,37 +1,20 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { requireUser } from "@/lib/data/session";
+import { fetchMonthExpenses } from "@/lib/data/lists";
+import { parsePeriod } from "@/lib/format";
 import ExpenseManager from "./ExpenseManager";
 
 type Props = {
   searchParams: Promise<{ month?: string }>;
 };
 
-function currentPeriod() {
-  return new Date().toISOString().slice(0, 7);
-}
-
 export default async function ExpensesPage({ searchParams }: Props) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) redirect("/login");
+  const { supabase } = await requireUser();
 
   const query = await searchParams;
-  const selectedPeriod = /^\d{4}-(0[1-9]|1[0-2])$/.test(query.month || "")
-    ? query.month!
-    : currentPeriod();
-  const [year, month] = selectedPeriod.split("-").map(Number);
+  const { period: selectedPeriod, year, month } = parsePeriod(query.month);
 
-  const { data: expenses, error } = await supabase
-    .from("expenses")
-    .select("id, expense_date, category, amount, billing_year, billing_month, note")
-    .eq("billing_year", year)
-    .eq("billing_month", month)
-    .order("expense_date", { ascending: false })
-    .order("created_at", { ascending: false });
+  const { data: expenses, error } = await fetchMonthExpenses(supabase, year, month);
 
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-8 sm:p-8">

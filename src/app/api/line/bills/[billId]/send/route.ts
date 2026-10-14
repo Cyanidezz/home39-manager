@@ -1,17 +1,23 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { publicAppUrl, pushLineFlex } from "@/lib/line";
+import { thaiMonthNames } from "@/lib/format";
 
-const thaiMonths = [
-  "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
-  "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม",
-];
+const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 export async function POST(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ billId: string }> }
 ) {
+  const origin = request.headers.get("origin");
+  if (origin && origin !== new URL(request.url).origin) {
+    return NextResponse.json({ error: "คำขอไม่ถูกต้อง" }, { status: 403 });
+  }
+
   const { billId } = await params;
+  if (!uuidPattern.test(billId)) {
+    return NextResponse.json({ error: "รหัสบิลไม่ถูกต้อง" }, { status: 400 });
+  }
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -44,7 +50,7 @@ export async function POST(
     ? new Date(`${bill.due_date}T00:00:00+07:00`).toLocaleDateString("th-TH", { dateStyle: "long" })
     : "ไม่ระบุ";
   const billUrl = `${publicAppUrl()}/pay/${bill.public_token}`;
-  const period = `${thaiMonths[bill.billing_month - 1]} ${bill.billing_year + 543}`;
+  const period = `${thaiMonthNames[bill.billing_month - 1]} ${bill.billing_year + 543}`;
   const roomCode = room?.room_code || "-";
   const flexContents = {
     type: "bubble",

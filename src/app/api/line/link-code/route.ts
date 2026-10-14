@@ -5,6 +5,11 @@ import { createClient } from "@/lib/supabase/server";
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
+  const origin = request.headers.get("origin");
+  if (origin && origin !== new URL(request.url).origin) {
+    return NextResponse.json({ error: "คำขอไม่ถูกต้อง" }, { status: 403 });
+  }
+
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -12,7 +17,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "กรุณาเข้าสู่ระบบ" }, { status: 401 });
   }
 
-  const body = (await request.json()) as { tenantId?: string };
+  let body: { tenantId?: string };
+  try {
+    body = (await request.json()) as { tenantId?: string };
+  } catch {
+    return NextResponse.json({ error: "ข้อมูลไม่ถูกต้อง" }, { status: 400 });
+  }
   if (!body.tenantId) {
     return NextResponse.json({ error: "ข้อมูลผู้เช่าไม่ครบ" }, { status: 400 });
   }

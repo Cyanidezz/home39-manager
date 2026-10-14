@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import { addOneMonth } from "@/lib/format";
 
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const datePattern = /^\d{4}-\d{2}-\d{2}$/;
@@ -9,14 +10,6 @@ function parseDate(value: unknown) {
   if (typeof value !== "string" || !datePattern.test(value)) return null;
   const date = new Date(`${value}T00:00:00.000Z`);
   return Number.isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== value ? null : date;
-}
-
-function addOneMonth(date: Date) {
-  const year = date.getUTCFullYear();
-  const month = date.getUTCMonth();
-  const day = date.getUTCDate();
-  const lastDay = new Date(Date.UTC(year, month + 2, 0)).getUTCDate();
-  return new Date(Date.UTC(year, month + 1, Math.min(day, lastDay)));
 }
 
 export async function PATCH(
@@ -45,6 +38,10 @@ export async function PATCH(
     .eq("is_active", true)
     .single();
   if (!tenant) return NextResponse.json({ error: "ไม่พบผู้เช่าปัจจุบัน" }, { status: 404 });
+  if (!tenant.room_id) {
+    return NextResponse.json({ error: "ผู้เช่ายังไม่ได้ผูกกับห้อง" }, { status: 400 });
+  }
+  const roomId = tenant.room_id;
 
   let body: Record<string, unknown>;
   try {
@@ -58,12 +55,12 @@ export async function PATCH(
   if (!noticeDate || !moveOutDate) {
     return NextResponse.json({ error: "กรุณากรอกวันที่ให้ถูกต้อง" }, { status: 400 });
   }
-  if (moveOutDate < addOneMonth(noticeDate)) {
+  const noticeDateString = noticeDate.toISOString().slice(0, 10);
+  const moveOutDateString = moveOutDate.toISOString().slice(0, 10);
+  if (moveOutDateString < addOneMonth(noticeDateString)) {
     return NextResponse.json({ error: "วันที่ย้ายออกต้องห่างจากวันที่แจ้งอย่างน้อย 1 เดือน" }, { status: 400 });
   }
 
-  const noticeDateString = noticeDate.toISOString().slice(0, 10);
-  const moveOutDateString = moveOutDate.toISOString().slice(0, 10);
   const rentWaivedYear = noticeDate.getUTCFullYear();
   const rentWaivedMonth = noticeDate.getUTCMonth() + 1;
   const admin = createAdminClient();
@@ -83,9 +80,9 @@ export async function PATCH(
 
   const { data: existingBills, error: billLookupError } = await admin
     .from("bills")
-    .select("id, rent_amount, total_amount")
+    .select("id, status, rent_amount, total_amount")
     .eq("tenant_id", tenantId)
-    .eq("room_id", tenant.room_id)
+    .eq("room_id", roomId)
     .eq("billing_year", rentWaivedYear)
     .eq("billing_month", rentWaivedMonth);
 
@@ -94,7 +91,11 @@ export async function PATCH(
     return NextResponse.json({ error: "บันทึกวันย้ายออกแล้ว แต่ปรับบิลเดิมไม่สำเร็จ" }, { status: 500 });
   }
 
-  for (const bill of existingBills || []) {
+  // Paid bills are closed books: never rewrite their amounts.
+  const adjustable = (existingBills || []).filter((bill) => bill.status !== "paid");
+  const skippedPaidBills = (existingBills || []).length - adjustable.length;
+
+  for (const bill of adjustable) {
     const rentAmount = Number(bill.rent_amount || 0);
     if (rentAmount <= 0) continue;
     const { error } = await admin.from("bills").update({
@@ -113,7 +114,8 @@ export async function PATCH(
     ok: true,
     rentWaivedYear,
     rentWaivedMonth,
-    adjustedBills: existingBills?.length || 0,
+    adjustedBills: adjustable.length,
+    skippedPaidBills,
   });
 }
 

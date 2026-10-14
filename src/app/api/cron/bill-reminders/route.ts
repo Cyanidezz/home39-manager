@@ -1,18 +1,15 @@
+import { timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { publicAppUrl, pushLineText } from "@/lib/line";
+import { bangkokDate } from "@/lib/format";
 
 export const runtime = "nodejs";
 
-function bangkokDate() {
-  const parts = new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Asia/Bangkok",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).formatToParts(new Date());
-  const value = Object.fromEntries(parts.map((part) => [part.type, part.value]));
-  return `${value.year}-${value.month}-${value.day}`;
+function bearerMatches(header: string | null, secret: string) {
+  const expected = Buffer.from(`Bearer ${secret}`);
+  const received = Buffer.from(header ?? "");
+  return received.length === expected.length && timingSafeEqual(received, expected);
 }
 
 function dateDifference(from: string, to: string) {
@@ -21,7 +18,7 @@ function dateDifference(from: string, to: string) {
 
 export async function GET(request: Request) {
   const secret = process.env.CRON_SECRET;
-  if (!secret || request.headers.get("authorization") !== `Bearer ${secret}`) {
+  if (!secret || !bearerMatches(request.headers.get("authorization"), secret)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

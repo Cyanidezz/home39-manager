@@ -37,7 +37,12 @@ export async function PATCH(
     .single();
   if (!visibleBill) return NextResponse.json({ error: "ไม่พบบิล" }, { status: 404 });
 
-  const body = (await request.json()) as Record<string, unknown>;
+  let body: Record<string, unknown>;
+  try {
+    body = (await request.json()) as Record<string, unknown>;
+  } catch {
+    return NextResponse.json({ error: "ข้อมูลไม่ถูกต้อง" }, { status: 400 });
+  }
   const billingYear = numeric(body.billingYear);
   const billingMonth = numeric(body.billingMonth);
   const rentAmount = numeric(body.rentAmount);
@@ -111,7 +116,7 @@ export async function PATCH(
 
   if (items.length > 0) {
     const { error: insertItemsError } = await admin.from("bill_items").insert(
-      items.map((item) => ({ bill_id: billId, item_name: item.name, amount: item.amount }))
+      items.map((item) => ({ bill_id: billId, item_name: item.name, amount: Number(item.amount) }))
     );
     if (insertItemsError) {
       console.error("Insert bill items failed:", insertItemsError);
@@ -159,7 +164,7 @@ export async function DELETE(
     "line_notification_logs",
     "bill_status_logs",
     "bill_items",
-  ];
+  ] as const;
 
   for (const table of dependentTables) {
     const { error } = await admin.from(table).delete().eq("bill_id", billId);

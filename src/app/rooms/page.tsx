@@ -1,31 +1,12 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
-
-const thaiMonths = [
-  "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.",
-  "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค.",
-];
-
-function formatThaiDate(date: string) {
-  const [year, month, day] = date.split("-").map(Number);
-  return `${day} ${thaiMonths[month - 1]} ${year + 543}`;
-}
+import { requireUser } from "@/lib/data/session";
+import { fetchRoomList } from "@/lib/data/lists";
+import { formatThaiDate } from "@/lib/format";
 
 export default async function RoomsPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { supabase } = await requireUser("/");
 
-  if (!user) redirect("/");
-
-  const { data: rooms, error } = await supabase
-    .from("rooms")
-    .select(
-      "id, room_code, monthly_rent, occupant_count, status, tenants(full_name, phone, planned_move_out_date, is_active)"
-    )
-    .order("room_code");
+  const { data: rooms, error } = await fetchRoomList(supabase);
 
   const occupied = (rooms || []).filter((room) => room.status === "occupied").length;
   const vacant = (rooms || []).length - occupied;

@@ -1,39 +1,12 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { requireUser } from "@/lib/data/session";
+import { fetchPaymentSettings } from "@/lib/data/settings";
 import PaymentSettingsForm from "./PaymentSettingsForm";
 
-const defaultSettings = {
-  bank_name: "ธนาคารไทยพาณิชย์",
-  bank_code: "SCB",
-  account_name: "นางสาวพิรญาณ์ จันทร์งาม",
-  account_number: "206-269288-7",
-};
-
 export default async function PaymentSettingsPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { supabase } = await requireUser();
 
-  if (!user) {
-    redirect("/login");
-  }
-
-  const { data, error } = await supabase
-    .from("payment_settings")
-    .select("bank_name, bank_code, account_name, account_number")
-    .eq("id", "default")
-    .maybeSingle();
-
-  const initialSettings = data
-    ? {
-        bank_name: data.bank_name,
-        bank_code: data.bank_code || "",
-        account_name: data.account_name,
-        account_number: data.account_number,
-      }
-    : defaultSettings;
+  const { settings: initialSettings, error } = await fetchPaymentSettings(supabase);
 
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-10">

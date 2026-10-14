@@ -1,6 +1,9 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { createPublicClient } from "@/lib/supabase/public";
 import SlipUploadForm from "./SlipUploadForm";
+import { formatMoney, formatNumber, formatThaiDateShort, thaiMonths } from "@/lib/format";
+import { getBillStatus } from "@/lib/billStatus";
 
 type Props = {
   params: Promise<{ token: string }>;
@@ -42,42 +45,13 @@ type PublicBill = {
   payment_settings: PaymentSettings | null;
 };
 
-const thaiMonths = [
-  "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.",
-  "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค.",
-];
-
-function formatMoney(value: number | string | null) {
-  return Number(value || 0).toLocaleString("th-TH", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
-}
-
-function formatNumber(value: number | string | null) {
-  return Number(value || 0).toLocaleString("th-TH", {
-    maximumFractionDigits: 2,
-  });
-}
-
-function formatThaiDate(date: string | null) {
-  if (!date) return "-";
-  const [year, month, day] = date.split("-");
-  return `${day}/${month}/${Number(year) + 543}`;
-}
-
-function getStatus(status: string) {
-  switch (status) {
-    case "paid": return { text: "ชำระแล้ว", className: "bg-green-100 text-green-700" };
-    case "unpaid": return { text: "ยังไม่ชำระ", className: "bg-red-100 text-red-700" };
-    case "overdue": return { text: "เกินกำหนด", className: "bg-orange-100 text-orange-700" };
-    case "slip_submitted": return { text: "ส่งสลิปแล้ว", className: "bg-blue-100 text-blue-700" };
-    case "verifying": return { text: "กำลังตรวจสอบ", className: "bg-yellow-100 text-yellow-700" };
-    case "rejected": return { text: "สลิปไม่ผ่าน", className: "bg-red-100 text-red-700" };
-    case "draft": return { text: "ฉบับร่าง", className: "bg-slate-100 text-slate-700" };
-    default: return { text: status, className: "bg-slate-100 text-slate-700" };
-  }
-}
+// The URL is a bearer token for one tenant's bill: keep it out of search results
+// and out of Referer headers sent to outbound links.
+export const metadata: Metadata = {
+  title: "บิลค่าเช่า",
+  robots: { index: false, follow: false },
+  referrer: "no-referrer",
+};
 
 export default async function PublicBillPage({ params }: Props) {
   const { token } = await params;
@@ -95,7 +69,7 @@ export default async function PublicBillPage({ params }: Props) {
   }
 
   const bill = data as PublicBill;
-  const status = getStatus(bill.status);
+  const status = getBillStatus(bill.status);
 
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-10">
@@ -118,7 +92,7 @@ export default async function PublicBillPage({ params }: Props) {
             </div>
             <div className="mt-5 rounded-xl bg-slate-50 p-4">
               <p className="font-semibold">{thaiMonths[bill.billing_month - 1]} {bill.billing_year + 543}</p>
-              <p className="mt-1 text-sm text-slate-500">กำหนดชำระ: {formatThaiDate(bill.due_date)}</p>
+              <p className="mt-1 text-sm text-slate-500">กำหนดชำระ: {formatThaiDateShort(bill.due_date)}</p>
             </div>
           </div>
 

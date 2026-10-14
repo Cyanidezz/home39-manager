@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { convertHeicToJpeg } from "@/lib/image";
+import { matchesDeclaredType } from "@/lib/fileSignature";
 
 export const runtime = "nodejs";
 
@@ -14,6 +15,8 @@ const allowedTypes = new Set([
   "application/pdf",
 ]);
 const maxFileSize = 8 * 1024 * 1024;
+// Same statuses the pay page offers the upload form for.
+const uploadableStatuses = ["unpaid", "overdue", "rejected"];
 
 function normalizedType(file: File) {
   const byExtension: Record<string, string> = {
@@ -57,7 +60,12 @@ export async function POST(
     return NextResponse.json({ error: "ลิงก์บิลไม่ถูกต้อง" }, { status: 404 });
   }
 
-  const formData = await request.formData();
+  let formData: FormData;
+  try {
+    formData = await request.formData();
+  } catch {
+    return NextResponse.json({ error: "ข้อมูลที่ส่งมาไม่ถูกต้อง" }, { status: 400 });
+  }
   const slip = formData.get("slip");
 
   if (!(slip instanceof File) || slip.size === 0) {
@@ -92,9 +100,23 @@ export async function POST(
     return NextResponse.json({ error: "บิลนี้ชำระแล้ว" }, { status: 409 });
   }
 
+  if (!uploadableStatuses.includes(bill.status)) {
+    return NextResponse.json(
+      { error: "บิลนี้ยังไม่สามารถส่งสลิปได้ หรือสลิปกำลังอยู่ระหว่างตรวจสอบ" },
+      { status: 409 }
+    );
+  }
+
+  const body = new Uint8Array(await slip.arrayBuffer());
+  if (!matchesDeclaredType(body, slipType)) {
+    return NextResponse.json(
+      { error: "เนื้อหาไฟล์ไม่ตรงกับชนิดไฟล์ กรุณาเลือกไฟล์สลิปใหม่" },
+      { status: 415 }
+    );
+  }
+
   const uploadId = crypto.randomUUID();
   const objectPath = `${bill.id}/${uploadId}.${extensionFor(slip, slipType)}`;
-  const body = new Uint8Array(await slip.arrayBuffer());
   const isHeic = slipType === "image/heic" || slipType === "image/heif";
   const previewPath = isHeic ? `${bill.id}/${uploadId}.preview.jpg` : null;
   let previewBody: Uint8Array | null = null;
@@ -133,7 +155,8 @@ export async function POST(
   }
 
   const submittedAt = new Date().toISOString();
-  const { error: updateError } = await supabase
+  // The status filter keeps a concurrent change (e.g. admin confirming payment) from being overwritten.
+  const { data: updatedRows, error: updateError } = await supabase
     .from("bills")
     .update({
       slip_path: objectPath,
@@ -145,7 +168,19 @@ export async function POST(
       status: "slip_submitted",
       updated_at: submittedAt,
     })
-    .eq("id", bill.id);
+    .eq("id", bill.id)
+    .eq("status", bill.status)
+    .select("id");
+
+  if (!updateError && (updatedRows?.length ?? 0) === 0) {
+    await supabase.storage.from("payment-slips").remove(
+      previewPath ? [objectPath, previewPath] : [objectPath]
+    );
+    return NextResponse.json(
+      { error: "สถานะบิลเพิ่งเปลี่ยน กรุณารีเฟรชหน้านี้แล้วลองอีกครั้ง" },
+      { status: 409 }
+    );
+  }
 
   if (updateError) {
     await supabase.storage.from("payment-slips").remove(

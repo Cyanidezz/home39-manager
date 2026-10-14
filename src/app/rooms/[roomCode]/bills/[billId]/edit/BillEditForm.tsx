@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import DeleteBillButton from "@/components/DeleteBillButton";
+import { thaiMonthNames as months } from "@/lib/format";
 
 type OtherItem = { name: string; amount: string };
 type Props = {
@@ -21,8 +22,6 @@ type Props = {
     items: OtherItem[];
   };
 };
-
-const months = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
 
 export default function BillEditForm({ billId, roomCode, initial }: Props) {
   const router = useRouter();
