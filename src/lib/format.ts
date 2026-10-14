@@ -67,3 +67,13 @@ export function parsePeriod(value: string | undefined) {
   const [year, month] = period.split("-").map(Number);
   return { period, year, month };
 }
+
+/** Adds one calendar month to "YYYY-MM-DD", clamping to the last day (Jan 31 -> Feb 28/29). */
+export function addOneMonth(date: string) {
+  if (!date) return "";
+  const [year, month, day] = date.split("-").map(Number);
+  const lastDay = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
+  return new Date(Date.UTC(year, month, Math.min(day, lastDay)))
+    .toISOString()
+    .slice(0, 10);
+}

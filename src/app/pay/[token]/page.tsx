@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { createPublicClient } from "@/lib/supabase/public";
 import SlipUploadForm from "./SlipUploadForm";
@@ -42,6 +43,14 @@ type PublicBill = {
   paid_at: string | null;
   bill_items: PublicBillItem[];
   payment_settings: PaymentSettings | null;
+};
+
+// The URL is a bearer token for one tenant's bill: keep it out of search results
+// and out of Referer headers sent to outbound links.
+export const metadata: Metadata = {
+  title: "บิลค่าเช่า",
+  robots: { index: false, follow: false },
+  referrer: "no-referrer",
 };
 
 export default async function PublicBillPage({ params }: Props) {

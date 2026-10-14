@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import { addOneMonth } from "@/lib/format";
 
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const datePattern = /^\d{4}-\d{2}-\d{2}$/;
@@ -9,14 +10,6 @@ function parseDate(value: unknown) {
   if (typeof value !== "string" || !datePattern.test(value)) return null;
   const date = new Date(`${value}T00:00:00.000Z`);
   return Number.isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== value ? null : date;
-}
-
-function addOneMonth(date: Date) {
-  const year = date.getUTCFullYear();
-  const month = date.getUTCMonth();
-  const day = date.getUTCDate();
-  const lastDay = new Date(Date.UTC(year, month + 2, 0)).getUTCDate();
-  return new Date(Date.UTC(year, month + 1, Math.min(day, lastDay)));
 }
 
 export async function PATCH(
@@ -62,12 +55,12 @@ export async function PATCH(
   if (!noticeDate || !moveOutDate) {
     return NextResponse.json({ error: "กรุณากรอกวันที่ให้ถูกต้อง" }, { status: 400 });
   }
-  if (moveOutDate < addOneMonth(noticeDate)) {
+  const noticeDateString = noticeDate.toISOString().slice(0, 10);
+  const moveOutDateString = moveOutDate.toISOString().slice(0, 10);
+  if (moveOutDateString < addOneMonth(noticeDateString)) {
     return NextResponse.json({ error: "วันที่ย้ายออกต้องห่างจากวันที่แจ้งอย่างน้อย 1 เดือน" }, { status: 400 });
   }
 
-  const noticeDateString = noticeDate.toISOString().slice(0, 10);
-  const moveOutDateString = moveOutDate.toISOString().slice(0, 10);
   const rentWaivedYear = noticeDate.getUTCFullYear();
   const rentWaivedMonth = noticeDate.getUTCMonth() + 1;
   const admin = createAdminClient();

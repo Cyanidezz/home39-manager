@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { bangkokDate, formatMoney, formatThaiDateShort } from "@/lib/format";
 
 type Expense = {
   id: string;
@@ -30,26 +31,8 @@ const categories = [
   { value: "other", label: "ค่าใช้จ่ายอื่น" },
 ];
 
-function getToday() {
-  const now = new Date();
-  const localDate = new Date(now.getTime() - now.getTimezoneOffset() * 60_000);
-  return localDate.toISOString().slice(0, 10);
-}
-
 function categoryLabel(value: string) {
   return categories.find((category) => category.value === value)?.label || value;
-}
-
-function money(value: number | string) {
-  return Number(value || 0).toLocaleString("th-TH", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
-}
-
-function thaiDate(value: string) {
-  const [year, month, day] = value.split("-").map(Number);
-  return `${day}/${month}/${year + 543}`;
 }
 
 export default function ExpenseManager({
@@ -59,7 +42,7 @@ export default function ExpenseManager({
   const router = useRouter();
   const supabase = createClient();
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [expenseDate, setExpenseDate] = useState(getToday);
+  const [expenseDate, setExpenseDate] = useState(bangkokDate);
   const [period, setPeriod] = useState(selectedPeriod);
   const [category, setCategory] = useState("water");
   const [amount, setAmount] = useState("");
@@ -70,7 +53,7 @@ export default function ExpenseManager({
 
   function resetForm() {
     setEditingId(null);
-    setExpenseDate(getToday());
+    setExpenseDate(bangkokDate());
     setPeriod(selectedPeriod);
     setCategory("water");
     setAmount("");
@@ -138,7 +121,7 @@ export default function ExpenseManager({
 
   async function deleteExpense(expense: Expense) {
     const confirmed = window.confirm(
-      `ยืนยันลบ ${categoryLabel(expense.category)} ${money(expense.amount)} บาท?`
+      `ยืนยันลบ ${categoryLabel(expense.category)} ${formatMoney(expense.amount)} บาท?`
     );
     if (!confirmed) return;
 
@@ -278,7 +261,7 @@ export default function ExpenseManager({
           </div>
           <p className="text-right">
             <span className="block text-sm text-slate-500">รวมรายจ่าย</span>
-            <strong className="text-2xl text-red-700">{money(total)} บาท</strong>
+            <strong className="text-2xl text-red-700">{formatMoney(total)} บาท</strong>
           </p>
         </div>
 
@@ -296,12 +279,12 @@ export default function ExpenseManager({
                 <div>
                   <p className="font-semibold">{categoryLabel(expense.category)}</p>
                   <p className="mt-1 text-sm text-slate-500">
-                    {thaiDate(expense.expense_date)}
+                    {formatThaiDateShort(expense.expense_date)}
                     {expense.note ? ` · ${expense.note}` : ""}
                   </p>
                 </div>
                 <div className="mt-3 flex items-center justify-between gap-3 sm:mt-0">
-                  <strong>{money(expense.amount)} บาท</strong>
+                  <strong>{formatMoney(expense.amount)} บาท</strong>
                   <button
                     type="button"
                     onClick={() => editExpense(expense)}

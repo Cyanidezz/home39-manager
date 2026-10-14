@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { loginErrorMessage } from "@/lib/authErrors";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -25,7 +26,7 @@ export default function LoginPage() {
     });
 
     if (error) {
-      setError(error.message);
+      setError(loginErrorMessage(error.message));
       setLoading(false);
       return;
     }
@@ -46,12 +47,14 @@ export default function LoginPage() {
 
         <form onSubmit={handleLogin} className="space-y-5">
           <div>
-            <label className="mb-2 block text-sm font-medium">
-              Email
+            <label htmlFor="email" className="mb-2 block text-sm font-medium">
+              อีเมล
             </label>
 
             <input
+              id="email"
               type="email"
+              autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -61,12 +64,14 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium">
-              Password
+            <label htmlFor="password" className="mb-2 block text-sm font-medium">
+              รหัสผ่าน
             </label>
 
             <input
+              id="password"
               type="password"
+              autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -76,7 +81,7 @@ export default function LoginPage() {
           </div>
 
           {error && (
-            <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">
+            <div role="alert" className="rounded-lg bg-red-50 p-3 text-sm text-red-600">
               {error}
             </div>
           )}

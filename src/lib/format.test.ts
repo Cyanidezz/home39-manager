@@ -7,6 +7,8 @@ import {
   formatThaiDateShort,
   formatThaiMonth,
   parsePeriod,
+  addOneMonth,
+  bangkokDate,
 } from "./format";
 
 describe("format", () => {
@@ -72,4 +74,26 @@ describe("parsePeriod", () => {
       expect(parsePeriod(value)).toEqual({ period: "2026-10", year: 2026, month: 10 });
     }
   );
+});
+
+describe("addOneMonth", () => {
+  it.each([
+    ["2026-05-10", "2026-06-10"],
+    ["2026-01-31", "2026-02-28"],
+    ["2028-01-31", "2028-02-29"],
+    ["2026-12-15", "2027-01-15"],
+    ["2026-03-31", "2026-04-30"],
+  ])("%s -> %s", (input, expected) => {
+    expect(addOneMonth(input)).toBe(expected);
+  });
+
+  it("returns an empty string for empty input", () => {
+    expect(addOneMonth("")).toBe("");
+  });
+});
+
+describe("bangkokDate", () => {
+  it("returns the Bangkok calendar date", () => {
+    expect(bangkokDate(new Date("2026-09-30T17:00:00Z"))).toBe("2026-10-01");
+  });
 });
