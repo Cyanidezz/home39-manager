@@ -37,26 +37,30 @@ describe("homepageImageExtension", () => {
 describe("googleMapsEmbedUrl", () => {
   const embed = (value: string) => new URL(googleMapsEmbedUrl(value));
 
-  it("pins coordinates with loc: so no place card is requested", () => {
-    const url = embed("https://www.google.com/maps?q=7.0199642,100.4747884");
-    expect(url.searchParams.get("q")).toBe("loc:7.0199642,100.4747884");
+  it("searches by name for the default Home 39 link", () => {
+    const url = embed("https://share.google/X6GXLKehq7lfD7DdZ");
+    expect(url.searchParams.get("q")).toBe("Home 39 Hatyai");
     expect(url.searchParams.get("z")).toBe("17");
     expect(url.searchParams.get("output")).toBe("embed");
   });
 
-  it("reads coordinates from @lat,lng and !3d!4d URLs", () => {
-    expect(embed("https://www.google.com/maps/place/Home+39/@7.02,100.47,17z").searchParams.get("q")).toBe("loc:7.02,100.47");
-    expect(embed("https://www.google.com/maps/place/x/data=!3d7.03!4d100.48").searchParams.get("q")).toBe("loc:7.03,100.48");
+  it("never sends coordinates, which trigger the failing place card", () => {
+    for (const value of [
+      "https://www.google.com/maps?q=7.0199642,100.4747884",
+      "https://www.google.com/maps/place/@7.02,100.47,17z",
+      "https://www.google.com/maps/place/7.02,100.47",
+    ]) {
+      expect(embed(value).searchParams.get("q")).toBe("Home 39 Hatyai");
+    }
   });
 
-  it("uses the place name when no coordinates are present", () => {
-    const url = embed("https://www.google.com/maps/place/Home+39+Hatyai");
-    expect(url.searchParams.get("q")).toBe("Home 39 Hatyai");
-    expect(url.searchParams.get("z")).toBeNull();
+  it("uses the place name from a /maps/place/ link or ?q= text", () => {
+    expect(embed("https://www.google.com/maps/place/Jiranakorn+Stadium/@7.0,100.4,17z").searchParams.get("q")).toBe("Jiranakorn Stadium");
+    expect(embed("https://www.google.com/maps?q=Hat+Yai+Hospital").searchParams.get("q")).toBe("Hat Yai Hospital");
   });
 
-  it("falls back to the default pin for short links and garbage", () => {
-    expect(embed("https://share.google/X6GXLKehq7lfD7DdZ").searchParams.get("q")).toBe("loc:7.0199642,100.4747884");
-    expect(embed("not a url").searchParams.get("q")).toBe("loc:7.0199642,100.4747884");
+  it("falls back for invalid URLs", () => {
+    expect(embed("not a url").searchParams.get("q")).toBe("Home 39 Hatyai");
+    expect(embed("").searchParams.get("q")).toBe("Home 39 Hatyai");
   });
 });
