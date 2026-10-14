@@ -649,6 +649,42 @@ export type Database = {
         }
         Relationships: []
       }
+      slip_upload_attempts: {
+        Row: {
+          bill_id: string
+          created_at: string
+          id: number
+          ip_hash: string
+        }
+        Insert: {
+          bill_id: string
+          created_at?: string
+          id?: never
+          ip_hash: string
+        }
+        Update: {
+          bill_id?: string
+          created_at?: string
+          id?: never
+          ip_hash?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "slip_upload_attempts_bill_id_fkey"
+            columns: ["bill_id"]
+            isOneToOne: false
+            referencedRelation: "bill_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "slip_upload_attempts_bill_id_fkey"
+            columns: ["bill_id"]
+            isOneToOne: false
+            referencedRelation: "bills"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tenants: {
         Row: {
           advance_rent_amount: number | null
@@ -756,6 +792,16 @@ export type Database = {
     }
     Functions: {
       cancel_tenant_move_out: { Args: { p_tenant_id: string }; Returns: Json }
+      check_slip_upload_rate: {
+        Args: {
+          p_bill_id: string
+          p_ip_hash: string
+          p_max_per_bill?: number
+          p_max_per_ip?: number
+          p_window?: string
+        }
+        Returns: boolean
+      }
       claim_line_link_code: {
         Args: { p_code_hash: string; p_line_user_id: string }
         Returns: Json
@@ -805,6 +851,14 @@ export type Database = {
         Returns: string
       }
       get_public_bill: { Args: { p_token: string }; Returns: Json }
+      set_tenant_move_out_notice: {
+        Args: {
+          p_move_out_date: string
+          p_notice_date: string
+          p_tenant_id: string
+        }
+        Returns: Json
+      }
       update_bill_status: {
         Args: { p_bill_id: string; p_new_status: string; p_reason: string }
         Returns: {

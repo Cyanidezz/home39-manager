@@ -41,7 +41,6 @@ export async function PATCH(
   if (!tenant.room_id) {
     return NextResponse.json({ error: "ผู้เช่ายังไม่ได้ผูกกับห้อง" }, { status: 400 });
   }
-  const roomId = tenant.room_id;
 
   let body: Record<string, unknown>;
   try {
@@ -61,62 +60,19 @@ export async function PATCH(
     return NextResponse.json({ error: "วันที่ย้ายออกต้องห่างจากวันที่แจ้งอย่างน้อย 1 เดือน" }, { status: 400 });
   }
 
-  const rentWaivedYear = noticeDate.getUTCFullYear();
-  const rentWaivedMonth = noticeDate.getUTCMonth() + 1;
   const admin = createAdminClient();
+  const { data, error } = await admin.rpc("set_tenant_move_out_notice", {
+    p_tenant_id: tenantId,
+    p_notice_date: noticeDateString,
+    p_move_out_date: moveOutDateString,
+  });
 
-  const { error: updateError } = await admin.from("tenants").update({
-    termination_notice_date: noticeDateString,
-    planned_move_out_date: moveOutDateString,
-    rent_waived_year: rentWaivedYear,
-    rent_waived_month: rentWaivedMonth,
-    updated_at: new Date().toISOString(),
-  }).eq("id", tenantId);
-
-  if (updateError) {
-    console.error("Save move-out notice failed:", updateError);
+  if (error) {
+    console.error("Save move-out notice failed:", error);
     return NextResponse.json({ error: "บันทึกการแจ้งย้ายออกไม่สำเร็จ" }, { status: 500 });
   }
 
-  const { data: existingBills, error: billLookupError } = await admin
-    .from("bills")
-    .select("id, status, rent_amount, total_amount")
-    .eq("tenant_id", tenantId)
-    .eq("room_id", roomId)
-    .eq("billing_year", rentWaivedYear)
-    .eq("billing_month", rentWaivedMonth);
-
-  if (billLookupError) {
-    console.error("Find waived bill failed:", billLookupError);
-    return NextResponse.json({ error: "บันทึกวันย้ายออกแล้ว แต่ปรับบิลเดิมไม่สำเร็จ" }, { status: 500 });
-  }
-
-  // Paid bills are closed books: never rewrite their amounts.
-  const adjustable = (existingBills || []).filter((bill) => bill.status !== "paid");
-  const skippedPaidBills = (existingBills || []).length - adjustable.length;
-
-  for (const bill of adjustable) {
-    const rentAmount = Number(bill.rent_amount || 0);
-    if (rentAmount <= 0) continue;
-    const { error } = await admin.from("bills").update({
-      rent_amount: 0,
-      total_amount: Math.max(0, Number(bill.total_amount || 0) - rentAmount),
-      updated_at: new Date().toISOString(),
-    }).eq("id", bill.id);
-    if (error) {
-      console.error("Apply advance rent to existing bill failed:", error);
-      return NextResponse.json({ error: "บันทึกวันย้ายออกแล้ว แต่ปรับบิลเดิมไม่สำเร็จ" }, { status: 500 });
-    }
-    await admin.from("line_notification_logs").delete().eq("bill_id", bill.id);
-  }
-
-  return NextResponse.json({
-    ok: true,
-    rentWaivedYear,
-    rentWaivedMonth,
-    adjustedBills: adjustable.length,
-    skippedPaidBills,
-  });
+  return NextResponse.json(data);
 }
 
 
