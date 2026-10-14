@@ -23,6 +23,7 @@ type Props = {
   previousMeter: number | null;
   tenantId: string;
   tenantName: string;
+  tenantHasLine: boolean;
   rentWaivedYear: number | null;
   rentWaivedMonth: number | null;
 };
@@ -35,6 +36,7 @@ export default function BillForm({
   previousMeter,
   tenantId,
   tenantName,
+  tenantHasLine,
   rentWaivedYear,
   rentWaivedMonth,
 }: Props) {
@@ -49,6 +51,7 @@ export default function BillForm({
     { name: "", amount: "" },
   ]);
   const [dueDate, setDueDate] = useState("");
+  const [sendLine, setSendLine] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -172,13 +175,24 @@ export default function BillForm({
       return;
     }
 
-    try {
-      await fetch(`/api/line/bills/${newBillId}/send`, { method: "POST" });
-    } catch {
-      // เปิดดูบิลและส่งซ้ำจากหน้ารายละเอียดได้ หาก LINE ยังไม่พร้อม
+    // The bill is already saved; a failed LINE push is reported on the detail page,
+    // where it can be resent with the "send via LINE" button.
+    let lineResult: "sent" | "failed" | null = null;
+    if (tenantHasLine && sendLine) {
+      try {
+        const response = await fetch(`/api/line/bills/${newBillId}/send`, {
+          method: "POST",
+          signal: AbortSignal.timeout(15000),
+        });
+        lineResult = response.ok ? "sent" : "failed";
+      } catch {
+        lineResult = "failed";
+      }
     }
 
-    router.push(`/rooms/${roomCode}/bills/${newBillId}`);
+    router.push(
+      `/rooms/${roomCode}/bills/${newBillId}${lineResult ? `?lineSend=${lineResult}` : ""}`
+    );
     router.refresh();
   }
 
@@ -307,6 +321,27 @@ export default function BillForm({
           </strong>
         </div>
       </div>
+
+      {tenantHasLine ? (
+        <label className="flex items-start gap-3 rounded-xl border border-slate-200 p-4">
+          <input
+            type="checkbox"
+            checked={sendLine}
+            onChange={(e) => setSendLine(e.target.checked)}
+            className="mt-1 h-4 w-4"
+          />
+          <span>
+            <span className="font-medium">ส่งบิลให้ผู้เช่าทาง LINE ทันทีหลังบันทึก</span>
+            <span className="mt-1 block text-sm text-slate-500">
+              ไม่ติ๊กไว้ก็ได้ แล้วตรวจบิลก่อนกดส่งเองจากหน้ารายละเอียดบิล
+            </span>
+          </span>
+        </label>
+      ) : (
+        <p className="rounded-xl bg-slate-50 p-4 text-sm text-slate-500">
+          ผู้เช่ายังไม่ได้ผูก LINE จึงไม่ส่งบิลอัตโนมัติ
+        </p>
+      )}
 
       {error && (
         <div className="rounded-lg bg-red-50 p-4 text-red-600">{error}</div>

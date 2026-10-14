@@ -17,7 +17,7 @@ export async function fetchBillingContext(supabase: Client, roomCode: string) {
     supabase
       .from("tenants")
       .select(
-        "id, full_name, rent_waived_year, rent_waived_month, initial_electricity_meter"
+        "id, full_name, rent_waived_year, rent_waived_month, initial_electricity_meter, line_user_id"
       )
       .eq("room_id", room.id)
       .eq("is_active", true)

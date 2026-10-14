@@ -51,6 +51,7 @@ export default async function NewBillPage({ params }: Props) {
               previousMeter={previousMeter}
               tenantId={tenant.id}
               tenantName={tenant.full_name}
+              tenantHasLine={Boolean(tenant.line_user_id)}
               rentWaivedYear={tenant.rent_waived_year}
               rentWaivedMonth={tenant.rent_waived_month}
             />

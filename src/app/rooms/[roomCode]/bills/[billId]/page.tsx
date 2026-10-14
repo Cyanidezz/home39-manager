@@ -13,10 +13,12 @@ type Props = {
     roomCode: string;
     billId: string;
   }>;
+  searchParams: Promise<{ lineSend?: string }>;
 };
 
-export default async function BillDetailPage({ params }: Props) {
+export default async function BillDetailPage({ params, searchParams }: Props) {
   const { roomCode, billId } = await params;
+  const { lineSend } = await searchParams;
   const { supabase } = await requireUser();
 
   const { data: bill, error } = await supabase
@@ -75,6 +77,17 @@ export default async function BillDetailPage({ params }: Props) {
         >
           ← กลับประวัติบิล
         </Link>
+
+        {lineSend === "sent" && (
+          <p role="status" className="mt-5 rounded-xl bg-green-50 p-4 text-sm text-green-800">
+            ออกบิลและส่งทาง LINE ให้ผู้เช่าแล้ว
+          </p>
+        )}
+        {lineSend === "failed" && (
+          <p role="alert" className="mt-5 rounded-xl bg-amber-50 p-4 text-sm text-amber-900">
+            ออกบิลแล้ว แต่ส่งทาง LINE ไม่สำเร็จ ผู้เช่ายังไม่ได้รับบิล กรุณากด &quot;ส่งบิลทาง LINE&quot; ด้านล่างเพื่อลองใหม่
+          </p>
+        )}
 
         <div className="mt-5 flex items-start justify-between gap-4">
           <div>
