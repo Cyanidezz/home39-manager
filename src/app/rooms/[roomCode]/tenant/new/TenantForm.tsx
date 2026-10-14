@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { nullable } from "@/lib/supabase/rpc";
 
 type Props = {
   roomId: string;
@@ -127,16 +128,16 @@ export default function TenantForm({
           p_tenant_id: tenantId,
           p_room_id: roomId,
           p_full_name: fullName.trim(),
-          p_phone: phone.trim() || null,
+          p_phone: nullable(phone.trim() || null),
           p_move_in_date: moveInDate,
           p_monthly_rent: rent,
           p_advance_rent_amount: advance,
           p_deposit_amount: deposit,
-          p_initial_electricity_meter: meter,
+          p_initial_electricity_meter: nullable(meter),
           p_occupant_count: occupantCount,
-          p_note: note.trim() || null,
-          p_contract_file_path: filePath,
-          p_contract_original_name: contractFile?.name || null,
+          p_note: nullable(note.trim() || null),
+          p_contract_file_path: nullable(filePath),
+          p_contract_original_name: nullable(contractFile?.name || null),
         }
       );
 

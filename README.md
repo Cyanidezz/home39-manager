@@ -19,6 +19,7 @@ npm run dev                  # http://localhost:3000
 | `npm run lint` | ESLint |
 | `npm test` | Unit tests (Vitest) |
 | `npx tsc --noEmit` | Type check |
+| `npm run gen:types` | Regenerate `src/lib/supabase/database.types.ts` from the linked Supabase project (run after every migration) |
 
 CI runs lint, type check, and tests on every pull request.
 

@@ -13,6 +13,7 @@ import {
 } from "@/lib/billing";
 import { thaiMonthNames } from "@/lib/format";
 import OtherItemsEditor from "./_components/OtherItemsEditor";
+import { nullable } from "@/lib/supabase/rpc";
 
 type Props = {
   roomId: string;
@@ -155,7 +156,7 @@ export default function BillForm({
         p_electricity_amount: electricityAmount,
         p_other_amount: other,
         p_total_amount: totalAmount,
-        p_due_date: dueDate || null,
+        p_due_date: nullable(dueDate || null),
         p_items: items,
       }
     );

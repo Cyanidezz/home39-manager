@@ -9,8 +9,8 @@ type Expense = {
   expense_date: string;
   category: string;
   amount: number | string;
-  billing_year: number;
-  billing_month: number;
+  billing_year: number | null;
+  billing_month: number | null;
   note: string | null;
 };
 

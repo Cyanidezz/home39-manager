@@ -111,7 +111,7 @@ export async function PATCH(
 
   if (items.length > 0) {
     const { error: insertItemsError } = await admin.from("bill_items").insert(
-      items.map((item) => ({ bill_id: billId, item_name: item.name, amount: item.amount }))
+      items.map((item) => ({ bill_id: billId, item_name: item.name, amount: Number(item.amount) }))
     );
     if (insertItemsError) {
       console.error("Insert bill items failed:", insertItemsError);
@@ -159,7 +159,7 @@ export async function DELETE(
     "line_notification_logs",
     "bill_status_logs",
     "bill_items",
-  ];
+  ] as const;
 
   for (const table of dependentTables) {
     const { error } = await admin.from(table).delete().eq("bill_id", billId);

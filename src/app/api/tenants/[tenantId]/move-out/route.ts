@@ -45,6 +45,10 @@ export async function PATCH(
     .eq("is_active", true)
     .single();
   if (!tenant) return NextResponse.json({ error: "ไม่พบผู้เช่าปัจจุบัน" }, { status: 404 });
+  if (!tenant.room_id) {
+    return NextResponse.json({ error: "ผู้เช่ายังไม่ได้ผูกกับห้อง" }, { status: 400 });
+  }
+  const roomId = tenant.room_id;
 
   let body: Record<string, unknown>;
   try {
@@ -85,7 +89,7 @@ export async function PATCH(
     .from("bills")
     .select("id, rent_amount, total_amount")
     .eq("tenant_id", tenantId)
-    .eq("room_id", tenant.room_id)
+    .eq("room_id", roomId)
     .eq("billing_year", rentWaivedYear)
     .eq("billing_month", rentWaivedMonth);
 
