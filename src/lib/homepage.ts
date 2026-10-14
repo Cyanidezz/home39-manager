@@ -59,22 +59,47 @@ export function safeHttpUrl(value: string, fallback = "#") {
   }
 }
 
+const coordinatePattern = /^\s*(-?\d{1,3}(?:\.\d+)?)\s*,\s*(-?\d{1,3}(?:\.\d+)?)\s*$/;
+
+/** Pulls "lat,lng" out of a Google Maps URL (?q=, @lat,lng, or !3d..!4d..), if present. */
+function coordinatesFromMapUrl(url: URL) {
+  const query = url.searchParams.get("query") || url.searchParams.get("q") || "";
+  const fromQuery = query.match(coordinatePattern);
+  if (fromQuery) return `${fromQuery[1]},${fromQuery[2]}`;
+
+  const at = decodeURIComponent(url.pathname).match(/@(-?\d{1,3}(?:\.\d+)?),(-?\d{1,3}(?:\.\d+)?)/);
+  if (at) return `${at[1]},${at[2]}`;
+
+  const data = url.pathname.match(/!3d(-?\d{1,3}(?:\.\d+)?)!4d(-?\d{1,3}(?:\.\d+)?)/);
+  if (data) return `${data[1]},${data[2]}`;
+
+  return null;
+}
+
 export function googleMapsEmbedUrl(mapUrl: string) {
-  const defaultQuery = "7.0199642,100.4747884";
-  let query = defaultQuery;
+  const defaultCoordinates = "7.0199642,100.4747884";
+  let coordinates: string | null = defaultCoordinates;
+  let placeName: string | null = null;
 
   try {
     const url = new URL(mapUrl);
-    query = url.searchParams.get("query") || url.searchParams.get("q") || query;
-    if (query === defaultQuery) {
-      const placeSlug = url.pathname.match(/\/maps\/place\/([^/]+)/)?.[1];
-      if (placeSlug) query = decodeURIComponent(placeSlug.replaceAll("+", " "));
+    coordinates = coordinatesFromMapUrl(url);
+    if (!coordinates) {
+      const query = url.searchParams.get("query") || url.searchParams.get("q");
+      const placeSlug = url.pathname.match(/\/maps\/place\/([^/@]+)/)?.[1];
+      placeName =
+        query || (placeSlug ? decodeURIComponent(placeSlug.replaceAll("+", " ")) : null);
+      if (!placeName) coordinates = defaultCoordinates;
     }
   } catch {
-    query = defaultQuery;
+    coordinates = defaultCoordinates;
   }
 
-  return `https://maps.google.com/maps?q=${encodeURIComponent(query)}&output=embed`;
+  // A bare "lat,lng" query makes the embed try to load a place card, which fails
+  // with "Place info couldn't load". The loc: prefix drops a plain pin instead.
+  const query = coordinates ? `loc:${coordinates}` : placeName!;
+  const zoom = coordinates ? "&z=17" : "";
+  return `https://maps.google.com/maps?q=${encodeURIComponent(query)}${zoom}&output=embed`;
 }
 
 export const defaultHomepageSettings: HomepageSettings = {
