@@ -1,10 +1,5 @@
 import { requireUser } from "@/lib/data/session";
-import {
-  defaultHomepageRooms,
-  defaultHomepageSettings,
-  type HomepageRoom,
-  type HomepageSettings,
-} from "@/lib/homepage";
+import { fetchHomepageContent } from "@/lib/data/settings";
 import HomepageManager from "./HomepageManager";
 
 export const dynamic = "force-dynamic";
@@ -12,22 +7,12 @@ export const dynamic = "force-dynamic";
 export default async function HomepageSettingsPage() {
   const { supabase } = await requireUser();
 
-  const [{ data: settings }, { data: rooms }] = await Promise.all([
-    supabase.from("homepage_settings").select("*").eq("id", "default").maybeSingle(),
-    supabase.from("homepage_rooms").select("*").order("room_code"),
-  ]);
-
-  const roomData = defaultHomepageRooms.map(
-    (fallback) =>
-      (rooms as HomepageRoom[] | null)?.find(
-        (room) => room.room_code === fallback.room_code
-      ) || fallback
-  );
+  const { settings, rooms } = await fetchHomepageContent(supabase);
 
   return (
     <HomepageManager
-      initialSettings={(settings as HomepageSettings | null) || defaultHomepageSettings}
-      initialRooms={roomData}
+      initialSettings={settings}
+      initialRooms={rooms}
     />
   );
 }

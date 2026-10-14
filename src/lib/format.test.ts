@@ -6,6 +6,7 @@ import {
   formatThaiDate,
   formatThaiDateShort,
   formatThaiMonth,
+  parsePeriod,
 } from "./format";
 
 describe("format", () => {
@@ -44,4 +45,21 @@ describe("format", () => {
       expect(currentPeriod()).toBe("2026-10");
     });
   });
+});
+
+describe("parsePeriod", () => {
+  afterEach(() => vi.useRealTimers());
+
+  it("accepts a valid YYYY-MM value", () => {
+    expect(parsePeriod("2026-03")).toEqual({ period: "2026-03", year: 2026, month: 3 });
+  });
+
+  it.each(["", undefined, "2026-13", "2026-00", "26-03", "2026-3", "abc"])(
+    "falls back to the current month for %o",
+    (value) => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date("2026-10-13T05:00:00Z"));
+      expect(parsePeriod(value)).toEqual({ period: "2026-10", year: 2026, month: 10 });
+    }
+  );
 });

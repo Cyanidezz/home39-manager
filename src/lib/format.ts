@@ -46,3 +46,12 @@ export const thaiMonthNames = [
   "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
   "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม",
 ];
+
+/** Parses a `?month=YYYY-MM` value, falling back to the current month. */
+export function parsePeriod(value: string | undefined) {
+  const period = /^\d{4}-(0[1-9]|1[0-2])$/.test(value || "")
+    ? value!
+    : currentPeriod();
+  const [year, month] = period.split("-").map(Number);
+  return { period, year, month };
+}

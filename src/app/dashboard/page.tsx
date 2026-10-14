@@ -1,6 +1,6 @@
 import { requireUser } from "@/lib/data/session";
 import SlipNotificationBell from "@/components/SlipNotificationBell";
-import { currentPeriod, formatThaiMonth } from "@/lib/format";
+import { formatThaiMonth, parsePeriod } from "@/lib/format";
 import { summarizeMonth } from "@/lib/dashboard";
 import { fetchMonthData } from "@/lib/data/dashboard";
 import SummaryCards from "./_components/SummaryCards";
@@ -16,10 +16,7 @@ export default async function DashboardPage({ searchParams }: Props) {
   const { supabase } = await requireUser();
 
   const query = await searchParams;
-  const selectedPeriod = /^\d{4}-(0[1-9]|1[0-2])$/.test(query.month || "")
-    ? query.month!
-    : currentPeriod();
-  const [year, month] = selectedPeriod.split("-").map(Number);
+  const { period: selectedPeriod, year, month } = parsePeriod(query.month);
 
   const { rooms, bills, expenses, error: pageError } = await fetchMonthData(
     supabase,
