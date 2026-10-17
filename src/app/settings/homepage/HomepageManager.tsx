@@ -4,7 +4,7 @@ import { ChangeEvent, FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { safeHttpUrl, type HomepageRoom, type HomepageSettings } from "@/lib/homepage";
-import { uploadHomepageImage } from "@/lib/homepageUpload";
+import { uploadHomepageImage, uploadHomepageMedia } from "@/lib/homepageUpload";
 import { clampPercent, clampZoom } from "@/lib/bannerCrop";
 import { MAX_GALLERY_ITEMS, normalizeGalleryItems, type GalleryItem } from "@/lib/gallery";
 import BannerSection from "./_components/BannerSection";
@@ -98,7 +98,11 @@ export default function HomepageManager({ initialSettings, initialRooms }: Props
 
     try {
       const urls = await Promise.all(
-        files.map((file) => uploadImage(file, `rooms/${roomCode.toLowerCase()}`))
+        files.map((file) =>
+          cover
+            ? uploadImage(file, `rooms/${roomCode.toLowerCase()}`)
+            : uploadHomepageMedia(supabase, file, `rooms/${roomCode.toLowerCase()}`)
+        )
       );
       const room = rooms.find((item) => item.room_code === roomCode)!;
       if (cover) {

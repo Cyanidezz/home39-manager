@@ -2,6 +2,7 @@
 
 import type { MouseEvent } from "react";
 import HomepageImage from "@/components/HomepageImage";
+import { isVideoUrl, videoSrc } from "@/lib/media";
 import { useModal } from "@/lib/useModal";
 import type { HomepageSettings } from "@/lib/homepage";
 import type { DisplayRoom } from "./types";
@@ -64,7 +65,16 @@ export default function RoomDialog({ room, settings, onClose }: Props) {
                     key={imageUrl || index}
                     className="flex aspect-[4/3] items-center justify-center rounded-xl border border-brand-100 bg-gradient-to-br from-brand-50 to-sand-100"
                   >
-                    {imageUrl ? (
+                    {imageUrl && isVideoUrl(imageUrl) ? (
+                      <video
+                        src={videoSrc(imageUrl)}
+                        controls
+                        playsInline
+                        preload="metadata"
+                        aria-label={`${room.title} วิดีโอที่ ${index + 1}`}
+                        className="h-full w-full rounded-xl bg-sand-950 object-contain"
+                      />
+                    ) : imageUrl ? (
                       <HomepageImage
                         src={imageUrl}
                         alt={`${room.title} รูปที่ ${index + 1}`}

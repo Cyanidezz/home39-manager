@@ -5,6 +5,7 @@ import type { DragEvent } from "react";
 import HomepageImage from "@/components/HomepageImage";
 import Icon from "@/components/Icon";
 import { moveItem } from "@/lib/list";
+import { isVideoUrl, videoSrc } from "@/lib/media";
 
 type Props = {
   roomCode: string;
@@ -40,7 +41,7 @@ export default function PhotoGallery({ roomCode, urls, onChange }: Props) {
   return (
     <>
       <p className="mt-1 text-xs text-sand-500">
-        ลากรูปเพื่อสลับลำดับ หรือกดปุ่มลูกศรที่รูป ลำดับนี้คือลำดับที่แสดงบนหน้าเว็บ แล้วกด &quot;บันทึกห้อง {roomCode}&quot;
+        ลากรูปหรือวิดีโอเพื่อสลับลำดับ หรือกดปุ่มลูกศร ลำดับนี้คือลำดับที่แสดงบนหน้าเว็บ แล้วกด &quot;บันทึกห้อง {roomCode}&quot;
       </p>
       <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         {urls.map((url, index) => (
@@ -62,18 +63,36 @@ export default function PhotoGallery({ roomCode, urls, onChange }: Props) {
                 : ""
             }`}
           >
-            <HomepageImage
-              src={url}
-              alt={`ห้อง ${roomCode} รูปที่ ${index + 1}`}
-              draggable={false}
-              className="aspect-[4/3] w-full object-cover"
-            />
+            {isVideoUrl(url) ? (
+              <>
+                <video
+                  src={videoSrc(url)}
+                  muted
+                  playsInline
+                  preload="metadata"
+                  aria-label={`ห้อง ${roomCode} วิดีโอที่ ${index + 1}`}
+                  className="pointer-events-none aspect-[4/3] w-full bg-sand-950 object-cover"
+                />
+                <span className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                  <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white/85 text-brand-800 shadow">
+                    <Icon name="play" className="ml-0.5 h-6 w-6" />
+                  </span>
+                </span>
+              </>
+            ) : (
+              <HomepageImage
+                src={url}
+                alt={`ห้อง ${roomCode} รูปที่ ${index + 1}`}
+                draggable={false}
+                className="aspect-[4/3] w-full object-cover"
+              />
+            )}
             <span className="absolute left-2 top-2 flex h-7 min-w-7 items-center justify-center rounded-full bg-sand-950/75 px-2 text-xs font-bold text-white">
               {index + 1}
             </span>
             <button
               type="button"
-              aria-label={`เอารูปที่ ${index + 1} ออก`}
+              aria-label={`เอารายการที่ ${index + 1} ออก`}
               onClick={() => onChange(urls.filter((item) => item !== url))}
               className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-sand-950/75 text-white hover:bg-red-600"
             >

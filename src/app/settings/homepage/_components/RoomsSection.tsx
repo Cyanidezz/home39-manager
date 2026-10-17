@@ -72,10 +72,10 @@ export default function RoomsSection({ rooms, saving, uploading, updateRoom, onS
                 </div>
                 <div className="mt-6">
                   <div className="flex flex-wrap items-center justify-between gap-3">
-                    <p className="text-sm font-semibold">รูปเพิ่มเติม ({room.image_urls.length} รูป)</p>
+                    <p className="text-sm font-semibold">รูปและวิดีโอเพิ่มเติม ({room.image_urls.length} รายการ)</p>
                     <label className="cursor-pointer rounded-lg border border-sand-300 px-4 py-2 text-sm font-semibold text-brand-700 hover:bg-brand-50">
-                      {uploading === `${room.room_code}-gallery` ? "กำลังอัปโหลด..." : "+ เพิ่มรูปภาพ"}
-                      <input type="file" accept="image/*,.heic,.heif" multiple className="sr-only" disabled={Boolean(uploading)} onChange={(event) => onUploadImages(room.room_code, event, false)} />
+                      {uploading === `${room.room_code}-gallery` ? "กำลังอัปโหลด..." : "+ เพิ่มรูป/วิดีโอ"}
+                      <input type="file" accept="image/*,.heic,.heif,video/mp4,.mp4" multiple className="sr-only" disabled={Boolean(uploading)} onChange={(event) => onUploadImages(room.room_code, event, false)} />
                     </label>
                   </div>
                   {room.image_urls.length ? (
@@ -85,7 +85,7 @@ export default function RoomsSection({ rooms, saving, uploading, updateRoom, onS
                       onChange={(image_urls) => updateRoom(room.room_code, { image_urls })}
                     />
                   ) : (
-                    <p className="mt-4 rounded-xl bg-sand-50 px-4 py-6 text-center text-sm text-sand-400">ยังไม่มีรูปเพิ่มเติม</p>
+                    <p className="mt-4 rounded-xl bg-sand-50 px-4 py-6 text-center text-sm text-sand-400">ยังไม่มีรูปหรือวิดีโอเพิ่มเติม</p>
                   )}
                 </div>
               </article>

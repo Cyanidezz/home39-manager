@@ -7,7 +7,7 @@ import {
   parseNearbyPlace,
   safeHttpUrl,
 } from "./homepage";
-import { homepageImageExtension } from "./homepageUpload";
+import { homepageImageExtension, isMp4File } from "./homepageUpload";
 
 describe("safeHttpUrl", () => {
   it("keeps http and https URLs", () => {
@@ -171,5 +171,18 @@ describe("heroHighlights", () => {
 
   it("omits the price when no room has one", () => {
     expect(heroHighlights([{ monthly_price: 0 }], [])).toEqual([]);
+  });
+});
+
+describe("isMp4File", () => {
+  it("accepts mp4 by MIME type, or by extension when the type is empty", () => {
+    expect(isMp4File({ name: "clip.mp4", type: "video/mp4" })).toBe(true);
+    expect(isMp4File({ name: "CLIP.MP4", type: "" })).toBe(true);
+  });
+
+  it("rejects other videos, images and mislabelled files", () => {
+    expect(isMp4File({ name: "clip.mov", type: "video/quicktime" })).toBe(false);
+    expect(isMp4File({ name: "photo.jpg", type: "image/jpeg" })).toBe(false);
+    expect(isMp4File({ name: "clip.mp4", type: "text/html" })).toBe(false);
   });
 });
