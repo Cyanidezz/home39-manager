@@ -72,7 +72,7 @@ export default function HomePage({ rooms, isLoggedIn, settings, homepageRooms }:
       <header className="sticky top-0 z-40 border-b border-sand-200 bg-white/95 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-8">
           <a href="#" className="flex items-center gap-3">
-            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-600 text-xl text-white shadow-md shadow-brand-200">
+            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-300 text-xl text-brand-950 shadow-md shadow-brand-200">
               🏢
             </span>
             <div>
@@ -85,7 +85,7 @@ export default function HomePage({ rooms, isLoggedIn, settings, homepageRooms }:
             <button
               type="button"
               onClick={() => router.push("/dashboard")}
-              className="rounded-lg bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-brand-700"
+              className="rounded-lg bg-brand-300 px-5 py-2.5 text-sm font-semibold text-brand-950 shadow-sm hover:bg-brand-400"
             >
               กลับหน้าจัดการ
             </button>
@@ -96,7 +96,7 @@ export default function HomePage({ rooms, isLoggedIn, settings, homepageRooms }:
                 setError("");
                 setLoginOpen(true);
               }}
-              className="rounded-lg bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-brand-700"
+              className="rounded-lg bg-brand-300 px-5 py-2.5 text-sm font-semibold text-brand-950 shadow-sm hover:bg-brand-400"
             >
               เข้าสู่ระบบ
             </button>

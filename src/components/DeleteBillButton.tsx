@@ -48,7 +48,7 @@ export default function DeleteBillButton({ billId, roomCode, billLabel }: Props)
             type="button"
             aria-label="ปิดหน้าต่างยืนยัน"
             onClick={() => !loading && setOpen(false)}
-            className="absolute inset-0 bg-brand-600/50"
+            className="absolute inset-0 bg-sand-950/40"
           />
           <div role="alertdialog" aria-modal="true" aria-labelledby="delete-bill-title" className="relative z-10 w-full max-w-md rounded-2xl border border-sand-200 bg-white p-6 shadow-2xl">
             <h2 id="delete-bill-title" className="text-xl font-bold text-sand-950">ยืนยันการลบบิล</h2>

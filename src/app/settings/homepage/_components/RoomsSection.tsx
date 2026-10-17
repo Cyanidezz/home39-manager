@@ -42,7 +42,7 @@ export default function RoomsSection({ rooms, saving, uploading, updateRoom, onS
               <article key={room.room_code} className="rounded-2xl border border-sand-200 p-5">
                 <div className="flex items-center justify-between gap-4">
                   <h3 className="text-lg font-bold">ห้อง {room.room_code}</h3>
-                  <button type="button" disabled={saving || Boolean(uploading)} onClick={() => onSaveRoom(room)} className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700 disabled:opacity-50">
+                  <button type="button" disabled={saving || Boolean(uploading)} onClick={() => onSaveRoom(room)} className="rounded-lg bg-brand-300 px-4 py-2 text-sm font-semibold text-brand-950 hover:bg-brand-400 disabled:opacity-50">
                     บันทึกห้อง {room.room_code}
                   </button>
                 </div>

@@ -51,14 +51,14 @@ export default async function RoomPage({ params }: Props) {
             {activeTenant ? (
               <Link
                 href={`/rooms/${room.room_code}/bills/new`}
-                className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700"
+                className="rounded-lg bg-brand-300 px-4 py-2 text-sm font-medium text-brand-950 hover:bg-brand-400"
               >
                 🧾 ออกบิลใหม่
               </Link>
             ) : (
               <Link
                 href={`/rooms/${room.room_code}/tenant/new`}
-                className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700"
+                className="rounded-lg bg-brand-300 px-4 py-2 text-sm font-medium text-brand-950 hover:bg-brand-400"
               >
                 + สร้างผู้เช่าใหม่
               </Link>

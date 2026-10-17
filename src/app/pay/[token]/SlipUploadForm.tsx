@@ -64,7 +64,7 @@ export default function SlipUploadForm({ token }: Props) {
       <button
         type="submit"
         disabled={!file || loading}
-        className="mt-4 w-full rounded-xl bg-brand-600 px-5 py-3 font-semibold text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-50"
+        className="mt-4 w-full rounded-xl bg-brand-300 px-5 py-3 font-semibold text-brand-950 transition hover:bg-brand-400 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {loading ? "กำลังส่งสลิป..." : "ส่งสลิปให้ผู้ดูแลตรวจสอบ"}
       </button>

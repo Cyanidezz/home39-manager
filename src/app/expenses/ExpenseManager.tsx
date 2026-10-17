@@ -243,7 +243,7 @@ export default function ExpenseManager({
             <button
               type="submit"
               disabled={saving}
-              className="flex-1 rounded-xl bg-brand-600 px-4 py-3 font-semibold text-white hover:bg-brand-700 disabled:opacity-50"
+              className="flex-1 rounded-xl bg-brand-300 px-4 py-3 font-semibold text-brand-950 hover:bg-brand-400 disabled:opacity-50"
             >
               {saving ? "กำลังบันทึก..." : editingId ? "บันทึกการแก้ไข" : "เพิ่มรายจ่าย"}
             </button>

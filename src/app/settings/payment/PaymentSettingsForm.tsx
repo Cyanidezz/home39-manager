@@ -125,7 +125,7 @@ export default function PaymentSettingsForm({
       <button
         type="submit"
         disabled={saving}
-        className="w-full rounded-lg bg-brand-600 py-3 font-medium text-white transition hover:bg-brand-700 disabled:opacity-50"
+        className="w-full rounded-lg bg-brand-300 py-3 font-medium text-brand-950 transition hover:bg-brand-400 disabled:opacity-50"
       >
         {saving ? "กำลังบันทึก..." : "บันทึกข้อมูลบัญชี"}
       </button>

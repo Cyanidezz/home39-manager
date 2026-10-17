@@ -30,7 +30,7 @@ export default function ErrorPage({ error, reset }: Props) {
           <button
             type="button"
             onClick={reset}
-            className="rounded-xl bg-brand-600 px-6 py-3 font-semibold text-white hover:bg-brand-700"
+            className="rounded-xl bg-brand-300 px-6 py-3 font-semibold text-brand-950 hover:bg-brand-400"
           >
             ลองอีกครั้ง
           </button>

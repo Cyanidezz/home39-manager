@@ -38,7 +38,7 @@ export default async function BillsHistoryPage({ params }: Props) {
 
           <Link
             href={`/rooms/${room.room_code}/bills/new`}
-            className="rounded-xl bg-brand-600 px-5 py-3 font-semibold text-white hover:bg-brand-700"
+            className="rounded-xl bg-brand-300 px-5 py-3 font-semibold text-brand-950 hover:bg-brand-400"
           >
             + ออกบิลใหม่
           </Link>

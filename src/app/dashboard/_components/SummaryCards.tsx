@@ -57,21 +57,21 @@ export default function SummaryCards({ summary }: { summary: MonthSummary }) {
         </div>
       ))}
 
-      <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-brand-600 to-brand-700 p-4 text-white shadow-lg shadow-brand-200">
-        <div className="absolute -bottom-8 -right-6 h-24 w-24 rounded-full bg-brand-400/30" />
-        <div className="absolute bottom-0 right-0 h-12 w-28 -skew-x-12 bg-brand-500/40" />
-        <p className="relative text-xs font-semibold text-brand-100">
+      <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-brand-100 to-brand-200 p-4 text-brand-950 shadow-sm">
+        <div className="absolute -bottom-8 -right-6 h-24 w-24 rounded-full bg-brand-300/40" />
+        <div className="absolute bottom-0 right-0 h-12 w-28 -skew-x-12 bg-brand-300/50" />
+        <p className="relative text-xs font-semibold text-brand-700">
           {summary.netProfit >= 0 ? "กำไรสุทธิ" : "ขาดทุนสุทธิ"}
         </p>
         <div className="relative mt-3 flex items-center justify-between gap-3">
           <strong className="text-2xl tracking-tight">
             {formatMoney(Math.abs(summary.netProfit))}
           </strong>
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-sand-200 bg-white/20 font-bold">
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-brand-300 bg-white/60 font-bold">
             ฿
           </span>
         </div>
-        <p className="relative mt-2 text-xs text-brand-100">
+        <p className="relative mt-2 text-xs text-brand-700">
           เงินรับจริง − รายจ่ายจริง
         </p>
       </div>

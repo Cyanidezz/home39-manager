@@ -28,7 +28,7 @@ export default function LocationSection({ settings }: Props) {
             href={safeHttpUrl(settings.map_url)}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-5 inline-flex rounded-xl bg-brand-600 px-5 py-3 font-semibold text-white hover:bg-brand-700"
+            className="mt-5 inline-flex rounded-xl bg-brand-300 px-5 py-3 font-semibold text-brand-950 hover:bg-brand-400"
           >
             เปิดเส้นทางใน Google Maps
           </a>

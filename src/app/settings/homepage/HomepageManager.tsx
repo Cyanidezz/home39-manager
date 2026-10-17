@@ -190,7 +190,7 @@ export default function HomepageManager({ initialSettings, initialRooms }: Props
           <LocationSection settings={settings} updateSetting={updateSetting} />
           <ContactSection settings={settings} updateSetting={updateSetting} />
           <div className="flex justify-end">
-            <button type="submit" disabled={saving || Boolean(uploading)} className="rounded-xl bg-brand-600 px-7 py-3 font-semibold text-white shadow-sm hover:bg-brand-700 disabled:opacity-50">
+            <button type="submit" disabled={saving || Boolean(uploading)} className="rounded-xl bg-brand-300 px-7 py-3 font-semibold text-brand-950 shadow-sm hover:bg-brand-400 disabled:opacity-50">
               {saving ? "กำลังบันทึก..." : "บันทึก Banner แผนที่ และข้อมูลติดต่อ"}
             </button>
           </div>

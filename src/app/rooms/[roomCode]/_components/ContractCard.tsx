@@ -39,7 +39,7 @@ export default function ContractCard({ roomCode, contract, contractUrl }: Props)
                 href={contractUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-lg bg-brand-600 px-4 py-2 text-sm text-white"
+                className="rounded-lg bg-brand-300 px-4 py-2 text-sm text-brand-950"
               >
                 👁 ดูสัญญา
               </a>

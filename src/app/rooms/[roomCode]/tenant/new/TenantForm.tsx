@@ -347,7 +347,7 @@ export default function TenantForm({
         <button
           type="submit"
           disabled={loading}
-          className="rounded-lg bg-brand-600 px-6 py-3 font-semibold text-white disabled:opacity-50"
+          className="rounded-lg bg-brand-300 px-6 py-3 font-semibold text-brand-950 disabled:opacity-50"
         >
           {loading ? "กำลังบันทึก..." : "บันทึกและสร้างผู้เช่า"}
         </button>

@@ -83,7 +83,7 @@ export default function LoginDialog({ email, password, loading, error, onEmailCh
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-xl bg-brand-600 py-3 font-semibold text-white hover:bg-brand-700 disabled:opacity-50"
+            className="w-full rounded-xl bg-brand-300 py-3 font-semibold text-brand-950 hover:bg-brand-400 disabled:opacity-50"
           >
             {loading ? "กำลังเข้าสู่ระบบ..." : "เข้าสู่ระบบ"}
           </button>

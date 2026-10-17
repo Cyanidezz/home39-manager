@@ -51,7 +51,7 @@ export default function StatusEditor({
             type="button"
             aria-label="ปิด"
             onClick={() => setOpen(false)}
-            className="absolute inset-0 bg-brand-600/40"
+            className="absolute inset-0 bg-sand-950/40"
           />
 
           <div className="relative z-10 w-full max-w-lg rounded-2xl border border-sand-200 bg-white shadow-2xl">
@@ -132,7 +132,7 @@ export default function StatusEditor({
                 </button>
                 <button
                   type="submit"
-                  className="rounded-xl bg-brand-600 px-5 py-2.5 font-semibold text-white transition hover:bg-brand-700"
+                  className="rounded-xl bg-brand-300 px-5 py-2.5 font-semibold text-brand-950 transition hover:bg-brand-400"
                 >
                   ยืนยันการแก้ไข
                 </button>

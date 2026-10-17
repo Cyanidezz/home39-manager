@@ -53,7 +53,7 @@ export default function SlipViewer({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="rounded-xl bg-brand-700 px-5 py-3 font-semibold text-white hover:bg-brand-800"
+        className="rounded-xl bg-brand-300 px-5 py-3 font-semibold text-brand-950 hover:bg-brand-400"
       >
         เปิดดูสลิป
       </button>
@@ -64,7 +64,7 @@ export default function SlipViewer({
             type="button"
             aria-label="ปิดหน้าต่างดูสลิป"
             onClick={() => setOpen(false)}
-            className="absolute inset-0 bg-brand-600/70"
+            className="absolute inset-0 bg-sand-950/45"
           />
 
           <section
@@ -101,7 +101,7 @@ export default function SlipViewer({
                 <div className="flex h-full flex-col items-center justify-center gap-3 rounded-lg bg-white p-6 text-center text-sand-700">
                   <p className="font-semibold">ไม่สามารถแสดงตัวอย่างภาพนี้ได้</p>
                   <p className="text-sm text-sand-500">ดาวน์โหลดไฟล์ต้นฉบับเพื่อตรวจสอบสลิป</p>
-                  <a href={slipUrl} download={fileName} className="rounded-lg bg-brand-700 px-4 py-2 font-semibold text-white hover:bg-brand-800">
+                  <a href={slipUrl} download={fileName} className="rounded-lg bg-brand-300 px-4 py-2 font-semibold text-brand-950 hover:bg-brand-400">
                     ดาวน์โหลดไฟล์สลิป
                   </a>
                 </div>

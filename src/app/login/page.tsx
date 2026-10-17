@@ -89,7 +89,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-lg bg-brand-600 py-3 font-medium text-white disabled:opacity-50"
+            className="w-full rounded-lg bg-brand-300 py-3 font-medium text-brand-950 disabled:opacity-50"
           >
             {loading ? "กำลังเข้าสู่ระบบ..." : "เข้าสู่ระบบ"}
           </button>

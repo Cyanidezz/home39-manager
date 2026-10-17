@@ -1,40 +1,41 @@
 @import "tailwindcss";
 
 :root {
-  --background: #fbf8f4;
-  --foreground: #2f2823;
+  --background: #fff9f2;
+  --foreground: #3b2d24;
 }
 
 /*
- * Soft, warm "homie" palette. `brand` is the muted clay accent (buttons, links,
- * highlights); `sand` is the warm neutral scale (surfaces, borders, text).
+ * Soft, warm "homie" palette. `brand` is a peach-to-caramel accent (soft peach
+ * buttons with dark brown text, caramel links and icons); `sand` is the warm
+ * neutral scale (surfaces, borders, text).
  * Status colours (green, red, amber, orange) keep Tailwind's defaults so
  * paid / overdue / rejected stay instantly recognisable.
  */
 @theme {
-  --color-brand-50: #fcf7f3;
-  --color-brand-100: #f8ece3;
-  --color-brand-200: #f1d9c8;
-  --color-brand-300: #e6bfa4;
-  --color-brand-400: #d9a07e;
-  --color-brand-500: #c98462;
-  --color-brand-600: #a4644a;
-  --color-brand-700: #8a533b;
-  --color-brand-800: #704431;
-  --color-brand-900: #5b382a;
-  --color-brand-950: #321d15;
+  --color-brand-50: #fffaf4;
+  --color-brand-100: #fef1e3;
+  --color-brand-200: #fbe0c8;
+  --color-brand-300: #f6cba6;
+  --color-brand-400: #eeb084;
+  --color-brand-500: #e2935f;
+  --color-brand-600: #a05d34;
+  --color-brand-700: #8a4f2c;
+  --color-brand-800: #6f3f25;
+  --color-brand-900: #5a3320;
+  --color-brand-950: #35190d;
 
-  --color-sand-50: #fbf8f4;
-  --color-sand-100: #f6f1ea;
-  --color-sand-200: #ede6dc;
-  --color-sand-300: #ddd2c5;
-  --color-sand-400: #b0a396;
-  --color-sand-500: #7a6c60;
-  --color-sand-600: #625649;
-  --color-sand-700: #4d433a;
-  --color-sand-800: #382f28;
-  --color-sand-900: #2f2823;
-  --color-sand-950: #1a1512;
+  --color-sand-50: #fff9f2;
+  --color-sand-100: #fbf3e9;
+  --color-sand-200: #f3e8da;
+  --color-sand-300: #e6d6c3;
+  --color-sand-400: #b9a590;
+  --color-sand-500: #806d5b;
+  --color-sand-600: #66554a;
+  --color-sand-700: #55463a;
+  --color-sand-800: #46382d;
+  --color-sand-900: #3b2d24;
+  --color-sand-950: #1f1712;
 }
 
 @theme inline {
@@ -51,8 +52,8 @@ body {
 }
 
 ::selection {
-  background: #f1d9c8;
-  color: #321d15;
+  background: #fbe0c8;
+  color: #35190d;
 }
 
 button,
@@ -72,14 +73,14 @@ textarea {
 input,
 select,
 textarea {
-  border-color: #ddd2c5;
+  border-color: #e6d6c3;
   background-color: #ffffff;
 }
 
 input:focus,
 select:focus,
 textarea:focus {
-  border-color: #c98462;
-  box-shadow: 0 0 0 3px rgb(201 132 98 / 0.18);
+  border-color: #e2935f;
+  box-shadow: 0 0 0 3px rgb(226 147 95 / 0.2);
   outline: none;
 }
