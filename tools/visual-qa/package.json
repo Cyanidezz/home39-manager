@@ -1,0 +1,13 @@
+{
+  "name": "home39-visual-qa",
+  "private": true,
+  "type": "module",
+  "description": "Screenshots of the real app (public + signed-in pages) against a fake Supabase backend. Not part of the app build.",
+  "scripts": {
+    "mock": "node mock-supabase.mjs",
+    "shots": "node screenshot.mjs"
+  },
+  "dependencies": {
+    "puppeteer-core": "^24.0.0"
+  }
+}
