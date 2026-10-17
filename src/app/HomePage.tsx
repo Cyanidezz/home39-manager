@@ -3,7 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import type { HomepageRoom, HomepageSettings } from "@/lib/homepage";
+import { heroHighlights, type HomepageRoom, type HomepageSettings } from "@/lib/homepage";
 import type { MapDestination } from "@/lib/mapLinks";
 import Hero from "./_components/home/Hero";
 import RoomCards from "./_components/home/RoomCards";
@@ -111,7 +111,7 @@ export default function HomePage({ rooms, isLoggedIn, settings, homepageRooms, n
         </div>
       </header>
 
-      <Hero settings={settings} />
+      <Hero settings={settings} highlights={heroHighlights(displayRooms, settings.nearby_places)} />
       <RoomCards rooms={displayRooms} onSelect={setSelectedRoom} />
       <GallerySection settings={settings} />
       <LocationSection settings={settings} destinations={nearbyDestinations} />

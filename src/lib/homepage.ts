@@ -163,6 +163,40 @@ export function googleMapsDirectionsLink(
   );
 }
 
+const SCHOOL_PATTERN = /โรงเรียน|มหาวิทยาลัย|วิทยาลัย/;
+
+function formatDistance(meters: number) {
+  return meters >= 1000 ? `${Number((meters / 1000).toFixed(1))} กม.` : `${Math.round(meters)} ม.`;
+}
+
+/**
+ * Selling points for the hero, derived from existing settings so they never
+ * need retyping: the lowest advertised room price, and walking distance to the
+ * first nearby school (the short name in parentheses, e.g. "ญ.ว.", if given).
+ */
+export function heroHighlights(
+  rooms: { monthly_price: number | string }[],
+  nearbyPlaces: string[]
+) {
+  const highlights: string[] = [];
+
+  const prices = rooms.map((room) => Number(room.monthly_price)).filter((price) => price > 0);
+  if (prices.length > 0) {
+    highlights.push(`ห้องเริ่มต้น ${Math.min(...prices).toLocaleString("th-TH")} บาท/เดือน`);
+  }
+
+  for (const text of nearbyPlaces) {
+    const place = parseNearbyPlace(text);
+    if (place.meters === null || place.meters > WALKING_LIMIT_METERS) continue;
+    if (!SCHOOL_PATTERN.test(place.label)) continue;
+    const short = place.label.match(/\(([^)]+)\)/)?.[1]?.trim() || place.name;
+    highlights.push(`เดินถึง ${short} ${formatDistance(place.meters)}`);
+    break;
+  }
+
+  return highlights;
+}
+
 export const defaultHomepageSettings: HomepageSettings = {
   id: "default",
   banner_badge: "ห้องพักในเมืองหาดใหญ่",

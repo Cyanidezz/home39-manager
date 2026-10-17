@@ -3,6 +3,7 @@ import {
   googleMapsDirectionsEmbedUrl,
   googleMapsDirectionsLink,
   googleMapsEmbedUrl,
+  heroHighlights,
   parseNearbyPlace,
   safeHttpUrl,
 } from "./homepage";
@@ -142,5 +143,33 @@ describe("directions URLs", () => {
     expect(link.searchParams.get("origin")).toBe("Home 39 Hatyai");
     expect(link.searchParams.get("destination")).toBe("แบงค์ชาติ หาดใหญ่");
     expect(link.searchParams.get("travelmode")).toBe("walking");
+  });
+});
+
+describe("heroHighlights", () => {
+  const rooms = [{ monthly_price: 5000 }, { monthly_price: "4500" }, { monthly_price: 0 }];
+  const nearby = [
+    "แบงค์ชาติ 250 ม.",
+    "โรงเรียนหาดใหญ่วิทยาลัย (ญ.ว.) 400 ม. | https://maps.app.goo.gl/x",
+    "มหาวิทยาลัยสงขลานครินทร์ (มอ.) 4.5 กม.",
+  ];
+
+  it("shows the lowest price and the walking distance to the first school", () => {
+    expect(heroHighlights(rooms, nearby)).toEqual([
+      "ห้องเริ่มต้น 4,500 บาท/เดือน",
+      "เดินถึง ญ.ว. 400 ม.",
+    ]);
+  });
+
+  it("falls back to the place name when there is no abbreviation", () => {
+    expect(heroHighlights([], ["โรงเรียนสาธิต 1.2 กม."])).toEqual(["เดินถึง โรงเรียนสาธิต 1.2 กม."]);
+  });
+
+  it("skips far schools, non-schools and entries without a distance", () => {
+    expect(heroHighlights([], ["มหาวิทยาลัยสงขลานครินทร์ 4.5 กม.", "แบงค์ชาติ 250 ม.", "โรงเรียนหาดใหญ่วิทยาลัย"])).toEqual([]);
+  });
+
+  it("omits the price when no room has one", () => {
+    expect(heroHighlights([{ monthly_price: 0 }], [])).toEqual([]);
   });
 });

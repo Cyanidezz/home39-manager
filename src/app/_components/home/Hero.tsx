@@ -1,8 +1,9 @@
+import Icon from "@/components/Icon";
 import { homepageImageDisplayUrl, type HomepageSettings } from "@/lib/homepage";
 
-type Props = { settings: HomepageSettings };
+type Props = { settings: HomepageSettings; highlights: string[] };
 
-export default function Hero({ settings }: Props) {
+export default function Hero({ settings, highlights }: Props) {
   // With a banner photo the copy stays white (with a shadow) so it reads on any image;
   // without one, a soft peach gradient and dark brown copy keep the page light and warm.
   const hasImage = Boolean(settings.banner_image_url);
@@ -25,6 +26,10 @@ export default function Hero({ settings }: Props) {
             transform: `scale(${settings.banner_image_zoom / 100})`,
           }}
         />
+      )}
+      {hasImage && (
+        // Warm dark scrim from the text side so white copy stays legible on bright photos.
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-brand-950/75 via-brand-950/40 to-transparent sm:via-brand-950/30" />
       )}
       <div className="relative mx-auto grid min-h-[470px] max-w-7xl items-center px-4 py-16 sm:px-8">
         <div>
@@ -50,6 +55,23 @@ export default function Hero({ settings }: Props) {
           >
             {settings.banner_description}
           </p>
+          {highlights.length > 0 && (
+            <ul className="mt-6 flex flex-wrap gap-2">
+              {highlights.map((text, index) => (
+                <li
+                  key={text}
+                  className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold ${
+                    hasImage
+                      ? "border-white/30 bg-white/15 text-white backdrop-blur-sm"
+                      : "border-brand-300 bg-white/70 text-brand-900"
+                  }`}
+                >
+                  <Icon name={index === 0 ? "baht" : "pin"} className="h-4 w-4" />
+                  {text}
+                </li>
+              ))}
+            </ul>
+          )}
           <a
             href="#rooms"
             className="mt-8 inline-flex rounded-xl bg-white px-6 py-3 font-semibold text-brand-700 shadow-lg hover:bg-brand-50"
