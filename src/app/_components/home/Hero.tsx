@@ -21,6 +21,7 @@ export default function Hero({ settings }: Props) {
           style={{
             backgroundImage: `url(${homepageImageDisplayUrl(settings.banner_image_url)})`,
             backgroundPosition: `${settings.banner_image_position_x}% ${settings.banner_image_position_y}%`,
+            transformOrigin: `${settings.banner_image_position_x}% ${settings.banner_image_position_y}%`,
             transform: `scale(${settings.banner_image_zoom / 100})`,
           }}
         />
