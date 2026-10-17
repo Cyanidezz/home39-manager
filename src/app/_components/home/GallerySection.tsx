@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import type { MouseEvent } from "react";
 import HomepageImage from "@/components/HomepageImage";
 import Icon from "@/components/Icon";
-import { displayOrder, type GalleryItem } from "@/lib/gallery";
+import type { GalleryItem } from "@/lib/gallery";
 import { useModal } from "@/lib/useModal";
 import type { HomepageSettings } from "@/lib/homepage";
 
@@ -96,87 +96,56 @@ function Lightbox({
 }
 
 export default function GallerySection({ settings }: Props) {
-  const ordered = displayOrder(settings.gallery_items);
-  const photos = ordered.filter((item) => item.kind === "photo");
-  const plans = ordered.filter((item) => item.kind === "plan");
+  const photos = settings.gallery_items;
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
-  if (ordered.length === 0) return null;
+  if (photos.length === 0) return null;
+
+  const hasHeader = Boolean(settings.gallery_title || settings.gallery_description);
 
   return (
     <section id="gallery" className="border-t border-sand-200 bg-sand-50">
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-8">
-        <div className="text-center">
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-600">
-            Our space
-          </p>
-          <h2 className="mt-2 text-3xl font-bold">{settings.gallery_title}</h2>
-          {settings.gallery_description && (
-            <p className="mx-auto mt-3 max-w-xl text-sand-500">{settings.gallery_description}</p>
-          )}
+        {hasHeader && (
+          <div className="mb-10 text-center">
+            {settings.gallery_title && <h2 className="text-3xl font-bold">{settings.gallery_title}</h2>}
+            {settings.gallery_description && (
+              <p className="mx-auto mt-3 max-w-xl text-sand-500">{settings.gallery_description}</p>
+            )}
+          </div>
+        )}
+
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+          {photos.map((item, index) => {
+            const featured = index === 0 && photos.length > 2;
+            return (
+              <button
+                key={`${item.url}-${index}`}
+                type="button"
+                onClick={() => setOpenIndex(index)}
+                className={`group relative overflow-hidden rounded-2xl border border-sand-200 bg-sand-100 text-left shadow-sm ${
+                  featured ? "col-span-2 row-span-2 aspect-square sm:aspect-auto lg:min-h-[420px]" : "aspect-[4/3]"
+                }`}
+              >
+                <HomepageImage
+                  src={item.url}
+                  alt={item.caption || "ภาพหอพัก"}
+                  className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                />
+                {item.caption && (
+                  <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-sand-950/70 to-transparent px-4 pb-3 pt-10 text-sm font-semibold text-white">
+                    {item.caption}
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
-
-        {photos.length > 0 && (
-          <div className="mt-10 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-            {photos.map((item, index) => {
-              const featured = index === 0 && photos.length > 2;
-              return (
-                <button
-                  key={`${item.url}-${index}`}
-                  type="button"
-                  onClick={() => setOpenIndex(index)}
-                  className={`group relative overflow-hidden rounded-2xl border border-sand-200 bg-sand-100 text-left shadow-sm ${
-                    featured ? "col-span-2 row-span-2 aspect-square sm:aspect-auto lg:min-h-[420px]" : "aspect-[4/3]"
-                  }`}
-                >
-                  <HomepageImage
-                    src={item.url}
-                    alt={item.caption || "ภาพหอพัก"}
-                    className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
-                  />
-                  {item.caption && (
-                    <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-sand-950/70 to-transparent px-4 pb-3 pt-10 text-sm font-semibold text-white">
-                      {item.caption}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        )}
-
-        {plans.length > 0 && (
-          <div className="mt-14">
-            <h3 className="text-center text-xl font-bold">แปลนห้องพัก</h3>
-            <div className="mx-auto mt-6 grid max-w-3xl gap-4 sm:grid-cols-2">
-              {plans.map((item, index) => (
-                <button
-                  key={`${item.url}-${index}`}
-                  type="button"
-                  onClick={() => setOpenIndex(photos.length + index)}
-                  className="group overflow-hidden rounded-2xl border border-sand-200 bg-white p-3 text-left shadow-sm hover:border-brand-300 hover:shadow-md"
-                >
-                  <HomepageImage
-                    src={item.url}
-                    alt={item.caption || "แปลนห้องพัก"}
-                    className="aspect-[3/4] w-full object-contain"
-                  />
-                  {item.caption && (
-                    <span className="mt-2 flex items-center justify-between text-sm font-semibold text-brand-800">
-                      {item.caption}
-                      <span className="text-xs font-medium text-brand-600">แตะเพื่อขยาย</span>
-                    </span>
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
 
       {openIndex !== null && (
         <Lightbox
-          items={ordered}
+          items={photos}
           index={openIndex}
           onChange={setOpenIndex}
           onClose={() => setOpenIndex(null)}

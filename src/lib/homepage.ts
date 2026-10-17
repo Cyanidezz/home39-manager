@@ -187,8 +187,8 @@ export const defaultHomepageSettings: HomepageSettings = {
   line_url: "https://line.me/R/ti/p/%40069jzotj",
   phone_primary: "087-0954441",
   phone_secondary: "089-4644898",
-  gallery_title: "ภาพรวมและส่วนกลาง",
-  gallery_description: "ดูบรรยากาศโดยรวมของหอพัก พื้นที่ส่วนกลาง และแปลนห้องพัก",
+  gallery_title: "",
+  gallery_description: "",
   gallery_items: [],
 };
 
