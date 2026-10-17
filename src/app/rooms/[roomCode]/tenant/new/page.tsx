@@ -24,14 +24,14 @@ export default async function NewTenantPage({ params }: Props) {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 p-8">
+    <main className="min-h-screen bg-sand-50 p-8">
       <div className="mx-auto max-w-2xl">
-        <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+        <div className="rounded-2xl border border-sand-200 bg-white p-8 shadow-sm">
           <h1 className="text-3xl font-bold">
             เพิ่มข้อมูลผู้เช่า
           </h1>
 
-          <p className="mt-2 text-slate-500">
+          <p className="mt-2 text-sand-500">
             ห้อง {room.room_code}
           </p>
 

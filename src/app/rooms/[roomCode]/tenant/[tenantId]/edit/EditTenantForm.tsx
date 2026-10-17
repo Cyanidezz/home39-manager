@@ -156,7 +156,7 @@ export default function EditTenantForm({
         />
       </div>
 
-      <div className="rounded-lg bg-blue-50 p-4">
+      <div className="rounded-lg bg-brand-50 p-4">
         <p>
           ค่าน้ำ{" "}
           <strong>
@@ -179,7 +179,7 @@ export default function EditTenantForm({
         <button
           type="submit"
           disabled={loading}
-          className="rounded-lg bg-blue-600 px-6 py-3 text-white disabled:opacity-50"
+          className="rounded-lg bg-brand-300 px-6 py-3 text-brand-950 disabled:opacity-50"
         >
           {loading ? "กำลังบันทึก..." : "บันทึกการแก้ไข"}
         </button>

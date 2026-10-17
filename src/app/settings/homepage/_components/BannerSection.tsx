@@ -12,10 +12,10 @@ type Props = {
 
 export default function BannerSection({ settings, uploading, updateSetting, onUploadBanner }: Props) {
   return (
-          <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
+          <section className="rounded-2xl border border-sand-200 bg-white p-5 shadow-sm sm:p-7">
             <div className="mb-6">
               <h2 className="text-xl font-bold">Banner</h2>
-              <p className="mt-1 text-sm text-slate-500">ข้อความหลักและรูปภาพส่วนบนของหน้าเว็บ</p>
+              <p className="mt-1 text-sm text-sand-500">ข้อความหลักและรูปภาพส่วนบนของหน้าเว็บ</p>
             </div>
             <div className="grid gap-7 lg:grid-cols-2">
               <div className="space-y-5">
@@ -42,7 +42,7 @@ export default function BannerSection({ settings, uploading, updateSetting, onUp
                   onPositionYChange={(value) => updateSetting("banner_image_position_y", value)}
                   onZoomChange={(value) => updateSetting("banner_image_zoom", value)}
                 />
-                <label className="mt-4 block cursor-pointer rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-center font-semibold text-blue-700 hover:bg-blue-100">
+                <label className="mt-4 block cursor-pointer rounded-xl border border-brand-200 bg-brand-50 px-4 py-3 text-center font-semibold text-brand-700 hover:bg-brand-100">
                   {uploading === "banner" ? "กำลังอัปโหลด..." : "เลือกรูป Banner"}
                   <input type="file" accept="image/*,.heic,.heif" className="sr-only" disabled={Boolean(uploading)} onChange={onUploadBanner} />
                 </label>

@@ -14,11 +14,11 @@ export default function RoomGrid({ rooms, billsByRoom, period }: Props) {
       <div className="mb-4 flex items-end justify-between">
         <div className="flex items-baseline gap-3">
           <h2 className="text-xl font-bold">ห้องพัก</h2>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-sand-500">
             สถานะและบิลของ {formatThaiMonth(period)}
           </p>
         </div>
-        <span className="text-sm font-semibold text-blue-600">ดูห้องทั้งหมด →</span>
+        <span className="text-sm font-semibold text-brand-600">ดูห้องทั้งหมด →</span>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
@@ -31,12 +31,12 @@ export default function RoomGrid({ rooms, billsByRoom, period }: Props) {
             <Link
               key={room.id}
               href={`/rooms/${room.room_code}`}
-              className="group rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-blue-300 hover:shadow-md"
+              className="group rounded-xl border border-sand-200 bg-white p-4 shadow-sm transition hover:border-brand-300 hover:shadow-md"
             >
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <h3 className="text-lg font-bold">ห้อง {room.room_code}</h3>
-                  <p className="mt-1 text-xs text-slate-500">
+                  <p className="mt-1 text-xs text-sand-500">
                     {activeTenant?.full_name || "ยังไม่มีผู้เช่า"}
                   </p>
                 </div>
@@ -45,8 +45,8 @@ export default function RoomGrid({ rooms, billsByRoom, period }: Props) {
                     movingOut
                       ? "bg-amber-50 text-amber-700"
                       : room.status === "occupied"
-                        ? "bg-blue-50 text-blue-700"
-                        : "bg-slate-100 text-slate-600"
+                        ? "bg-brand-50 text-brand-700"
+                        : "bg-sand-100 text-sand-600"
                   }`}
                 >
                   {movingOut
@@ -57,13 +57,13 @@ export default function RoomGrid({ rooms, billsByRoom, period }: Props) {
                 </span>
               </div>
 
-              <div className="mt-4 divide-y divide-slate-100 border-y border-slate-100 text-xs">
+              <div className="mt-4 divide-y divide-sand-100 border-y border-sand-100 text-xs">
                 <div className="flex justify-between py-2">
-                  <span className="text-slate-500">ผู้พัก</span>
+                  <span className="text-sand-500">ผู้พัก</span>
                   <strong>{room.occupant_count} คน</strong>
                 </div>
                 <div className="flex justify-between py-2">
-                  <span className="text-slate-500">บิลเดือนนี้</span>
+                  <span className="text-sand-500">บิลเดือนนี้</span>
                   <strong>
                     {currentBill
                       ? `${formatMoney(currentBill.total_amount)} บาท`
@@ -71,14 +71,14 @@ export default function RoomGrid({ rooms, billsByRoom, period }: Props) {
                   </strong>
                 </div>
                 <div className="flex justify-between py-2">
-                  <span className="text-slate-500">สถานะบิล</span>
+                  <span className="text-sand-500">สถานะบิล</span>
                   <strong
                     className={
                       currentBill?.status === "paid"
                         ? "text-emerald-600"
                         : currentBill
                           ? "text-amber-600"
-                          : "text-slate-400"
+                          : "text-sand-400"
                     }
                   >
                     {currentBill?.status === "paid"
@@ -90,7 +90,7 @@ export default function RoomGrid({ rooms, billsByRoom, period }: Props) {
                 </div>
               </div>
 
-              <div className="mt-3 rounded-lg border border-blue-200 py-2 text-center text-xs font-semibold text-blue-600 transition group-hover:bg-blue-50">
+              <div className="mt-3 rounded-lg border border-brand-200 py-2 text-center text-xs font-semibold text-brand-600 transition group-hover:bg-brand-50">
                 ดูรายละเอียดห้อง　→
               </div>
             </Link>

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import ConfirmSubmitButton from "@/components/ConfirmSubmitButton";
+import Icon from "@/components/Icon";
 
 type Props = {
   slipUrl: string;
@@ -53,7 +54,7 @@ export default function SlipViewer({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="rounded-xl bg-blue-700 px-5 py-3 font-semibold text-white hover:bg-blue-800"
+        className="rounded-xl bg-brand-300 px-5 py-3 font-semibold text-brand-950 hover:bg-brand-400"
       >
         เปิดดูสลิป
       </button>
@@ -64,31 +65,31 @@ export default function SlipViewer({
             type="button"
             aria-label="ปิดหน้าต่างดูสลิป"
             onClick={() => setOpen(false)}
-            className="absolute inset-0 bg-blue-600/70"
+            className="absolute inset-0 bg-sand-950/45"
           />
 
           <section
             role="dialog"
             aria-modal="true"
             aria-labelledby="slip-dialog-title"
-            className="relative z-10 flex h-[92vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl"
+            className="relative z-10 flex h-[92vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-sand-200 bg-white shadow-2xl"
           >
             <header className="flex items-center justify-between gap-4 border-b px-5 py-4">
               <div className="min-w-0">
                 <h2 id="slip-dialog-title" className="text-lg font-bold">ตรวจสอบสลิป</h2>
-                <p className="truncate text-sm text-slate-500">{fileName}</p>
+                <p className="truncate text-sm text-sand-500">{fileName}</p>
               </div>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
                 aria-label="ปิด"
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xl text-slate-500 hover:bg-slate-100 hover:text-blue-700"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xl text-sand-500 hover:bg-sand-100 hover:text-brand-700"
               >
-                ✕
+                <Icon name="close" className="h-5 w-5" />
               </button>
             </header>
 
-            <div className="min-h-0 flex-1 bg-slate-100 p-2 sm:p-4">
+            <div className="min-h-0 flex-1 bg-sand-100 p-2 sm:p-4">
               {contentType.startsWith("image/") && !imagePreviewFailed ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -98,10 +99,10 @@ export default function SlipViewer({
                   className="h-full w-full object-contain"
                 />
               ) : contentType.startsWith("image/") ? (
-                <div className="flex h-full flex-col items-center justify-center gap-3 rounded-lg bg-white p-6 text-center text-slate-700">
+                <div className="flex h-full flex-col items-center justify-center gap-3 rounded-lg bg-white p-6 text-center text-sand-700">
                   <p className="font-semibold">ไม่สามารถแสดงตัวอย่างภาพนี้ได้</p>
-                  <p className="text-sm text-slate-500">ดาวน์โหลดไฟล์ต้นฉบับเพื่อตรวจสอบสลิป</p>
-                  <a href={slipUrl} download={fileName} className="rounded-lg bg-blue-700 px-4 py-2 font-semibold text-white hover:bg-blue-800">
+                  <p className="text-sm text-sand-500">ดาวน์โหลดไฟล์ต้นฉบับเพื่อตรวจสอบสลิป</p>
+                  <a href={slipUrl} download={fileName} className="rounded-lg bg-brand-300 px-4 py-2 font-semibold text-brand-950 hover:bg-brand-400">
                     ดาวน์โหลดไฟล์สลิป
                   </a>
                 </div>
@@ -119,11 +120,11 @@ export default function SlipViewer({
                 href={slipUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm font-medium text-blue-700 hover:underline"
+                className="text-sm font-medium text-brand-700 hover:underline"
               >
                 เปิดไฟล์ในแท็บใหม่
               </a>
-              <a href={slipUrl} download={fileName} className="text-sm font-medium text-blue-700 hover:underline">
+              <a href={slipUrl} download={fileName} className="text-sm font-medium text-brand-700 hover:underline">
                 ดาวน์โหลดไฟล์ต้นฉบับ
               </a>
 

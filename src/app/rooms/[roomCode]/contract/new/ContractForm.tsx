@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import Icon from "@/components/Icon";
 
 type Props = {
   roomId: string;
@@ -151,8 +152,8 @@ export default function ContractForm({
         />
 
         {file && (
-          <p className="mt-2 text-sm text-slate-500">
-            📎 {file.name}
+          <p className="mt-2 text-sm text-sand-500">
+            <Icon name="paperclip" /> {file.name}
           </p>
         )}
       </div>
@@ -179,7 +180,7 @@ export default function ContractForm({
         <button
           type="submit"
           disabled={loading}
-          className="rounded-lg bg-blue-600 px-6 py-3 text-white disabled:opacity-50"
+          className="rounded-lg bg-brand-300 px-6 py-3 text-brand-950 disabled:opacity-50"
         >
           {loading ? "กำลัง Upload..." : "บันทึกสัญญา"}
         </button>

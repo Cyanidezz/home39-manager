@@ -15,7 +15,7 @@ type Props = {
 };
 
 const inputClass =
-  "w-full rounded-xl border px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100";
+  "w-full rounded-xl border px-4 py-3 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100";
 
 export default function LoginDialog({ email, password, loading, error, onEmailChange, onPasswordChange, onSubmit, onClose }: Props) {
   const dialogRef = useModal<HTMLDivElement>(onClose);
@@ -26,7 +26,7 @@ export default function LoginDialog({ email, password, loading, error, onEmailCh
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-sand-950/60 p-4"
       onMouseDown={closeOnBackdrop}
     >
       <div
@@ -35,17 +35,17 @@ export default function LoginDialog({ email, password, loading, error, onEmailCh
         aria-modal="true"
         aria-labelledby="login-dialog-title"
         tabIndex={-1}
-        className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-7 shadow-2xl outline-none"
+        className="w-full max-w-md rounded-2xl border border-sand-200 bg-white p-7 shadow-2xl outline-none"
       >
         <div className="flex items-start justify-between">
           <div>
             <h2 id="login-dialog-title" className="text-2xl font-bold">เข้าสู่ระบบ</h2>
-            <p className="mt-1 text-sm text-slate-500">สำหรับผู้ดูแล Home 39</p>
+            <p className="mt-1 text-sm text-sand-500">สำหรับผู้ดูแล Home 39</p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="flex h-10 w-10 items-center justify-center rounded-full text-2xl text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+            className="flex h-10 w-10 items-center justify-center rounded-full text-2xl text-sand-400 hover:bg-sand-100 hover:text-sand-700"
             aria-label="ปิด"
           >
             ×
@@ -83,7 +83,7 @@ export default function LoginDialog({ email, password, loading, error, onEmailCh
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-xl bg-blue-600 py-3 font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
+            className="w-full rounded-xl bg-brand-300 py-3 font-semibold text-brand-950 hover:bg-brand-400 disabled:opacity-50"
           >
             {loading ? "กำลังเข้าสู่ระบบ..." : "เข้าสู่ระบบ"}
           </button>

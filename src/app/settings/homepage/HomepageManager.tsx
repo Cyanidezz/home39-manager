@@ -9,6 +9,7 @@ import BannerSection from "./_components/BannerSection";
 import LocationSection from "./_components/LocationSection";
 import ContactSection from "./_components/ContactSection";
 import RoomsSection from "./_components/RoomsSection";
+import Icon from "@/components/Icon";
 
 
 type Props = {
@@ -150,20 +151,20 @@ export default function HomepageManager({ initialSettings, initialRooms }: Props
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 px-4 py-8 sm:px-6 lg:px-10">
+    <main className="min-h-screen bg-sand-50 px-4 py-8 sm:px-6 lg:px-10">
       <div className="mx-auto max-w-6xl">
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">จัดการ Homepage</h1>
-            <p className="mt-2 text-slate-500">แก้ไขข้อความ ราคา รูปภาพ แผนที่ และช่องทางติดต่อหน้าแรก</p>
+            <h1 className="text-3xl font-bold text-sand-900">จัดการ Homepage</h1>
+            <p className="mt-2 text-sand-500">แก้ไขข้อความ ราคา รูปภาพ แผนที่ และช่องทางติดต่อหน้าแรก</p>
           </div>
           <a
             href="/"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex justify-center rounded-xl border border-blue-200 bg-white px-5 py-3 font-semibold text-blue-700 hover:bg-blue-50"
+            className="inline-flex justify-center rounded-xl border border-brand-200 bg-white px-5 py-3 font-semibold text-brand-700 hover:bg-brand-50"
           >
-            ดูหน้าเว็บไซต์ ↗
+            ดูหน้าเว็บไซต์ <Icon name="external" />
           </a>
         </div>
 
@@ -190,7 +191,7 @@ export default function HomepageManager({ initialSettings, initialRooms }: Props
           <LocationSection settings={settings} updateSetting={updateSetting} />
           <ContactSection settings={settings} updateSetting={updateSetting} />
           <div className="flex justify-end">
-            <button type="submit" disabled={saving || Boolean(uploading)} className="rounded-xl bg-blue-600 px-7 py-3 font-semibold text-white shadow-sm hover:bg-blue-700 disabled:opacity-50">
+            <button type="submit" disabled={saving || Boolean(uploading)} className="rounded-xl bg-brand-300 px-7 py-3 font-semibold text-brand-950 shadow-sm hover:bg-brand-400 disabled:opacity-50">
               {saving ? "กำลังบันทึก..." : "บันทึก Banner แผนที่ และข้อมูลติดต่อ"}
             </button>
           </div>

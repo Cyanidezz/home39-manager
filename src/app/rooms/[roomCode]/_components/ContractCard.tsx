@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Icon from "@/components/Icon";
 
 export type RoomContract = {
   contract_start: string | null;
@@ -15,14 +16,14 @@ type Props = {
 
 export default function ContractCard({ roomCode, contract, contractUrl }: Props) {
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-      <h2 className="text-xl font-semibold">📄 สัญญาเช่า</h2>
+    <section className="rounded-2xl border border-sand-200 bg-white p-6 shadow-sm">
+      <h2 className="text-xl font-semibold"><Icon name="file" /> สัญญาเช่า</h2>
 
       {contract ? (
         <div className="mt-5">
           <p className="font-medium">{contract.original_file_name || "สัญญาเช่า"}</p>
 
-          <div className="mt-3 space-y-1 text-sm text-slate-600">
+          <div className="mt-3 space-y-1 text-sm text-sand-600">
             <p>เริ่มสัญญา: {contract.contract_start || "-"}</p>
             <p>สิ้นสุดสัญญา: {contract.contract_end || "-"}</p>
             <p>
@@ -39,29 +40,29 @@ export default function ContractCard({ roomCode, contract, contractUrl }: Props)
                 href={contractUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white"
+                className="rounded-lg bg-brand-300 px-4 py-2 text-sm text-brand-950"
               >
-                👁 ดูสัญญา
+                <Icon name="eye" /> ดูสัญญา
               </a>
             )}
 
             <Link
               href={`/rooms/${roomCode}/contract/new`}
-              className="rounded-lg border px-4 py-2 text-sm hover:bg-slate-50"
+              className="rounded-lg border px-4 py-2 text-sm hover:bg-sand-50"
             >
-              ⬆ Upload สัญญาใหม่
+              <Icon name="upload" /> Upload สัญญาใหม่
             </Link>
           </div>
         </div>
       ) : (
         <div className="mt-4">
-          <p className="text-slate-500">ยังไม่มีสัญญาเช่า</p>
+          <p className="text-sand-500">ยังไม่มีสัญญาเช่า</p>
 
           <Link
             href={`/rooms/${roomCode}/contract/new`}
-            className="mt-4 inline-block rounded-lg border px-4 py-2 hover:bg-slate-50"
+            className="mt-4 inline-block rounded-lg border px-4 py-2 hover:bg-sand-50"
           >
-            ⬆ Upload สัญญา
+            <Icon name="upload" /> Upload สัญญา
           </Link>
         </div>
       )}

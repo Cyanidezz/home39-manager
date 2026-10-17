@@ -14,11 +14,11 @@ export default function RoomCards({ rooms, onSelect }: Props) {
   return (
     <section id="rooms" className="mx-auto max-w-7xl px-4 py-16 sm:px-8">
       <div className="text-center">
-        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-600">
+        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-600">
           Our rooms
         </p>
         <h2 className="mt-2 text-3xl font-bold">ห้องพัก Home 39</h2>
-        <p className="mx-auto mt-3 max-w-xl text-slate-500">
+        <p className="mx-auto mt-3 max-w-xl text-sand-500">
           เลือกห้องเพื่อดูรายละเอียด สถานะ และรูปภาพเพิ่มเติม
         </p>
       </div>
@@ -31,9 +31,9 @@ export default function RoomCards({ rooms, onSelect }: Props) {
               key={room.room_code}
               type="button"
               onClick={() => onSelect(room)}
-              className="group overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-sm hover:-translate-y-1 hover:border-blue-300 hover:shadow-xl"
+              className="group overflow-hidden rounded-2xl border border-sand-200 bg-white text-left shadow-sm hover:-translate-y-1 hover:border-brand-300 hover:shadow-xl"
             >
-              <div className="relative flex h-52 items-center justify-center overflow-hidden bg-gradient-to-br from-blue-100 via-slate-100 to-blue-50">
+              <div className="relative flex h-52 items-center justify-center overflow-hidden bg-gradient-to-br from-brand-100 via-sand-100 to-brand-50">
                 {room.cover_image_url ? (
                   <HomepageImage
                     src={room.cover_image_url}
@@ -41,7 +41,7 @@ export default function RoomCards({ rooms, onSelect }: Props) {
                     className="absolute inset-0 h-full w-full object-cover transition duration-300 group-hover:scale-105"
                   />
                 ) : (
-                  <span className="relative rounded-full bg-white/90 px-4 py-2 text-sm font-semibold text-blue-700 shadow">
+                  <span className="relative rounded-full bg-white/90 px-4 py-2 text-sm font-semibold text-brand-700 shadow">
                     รูปห้อง {room.room_code}
                   </span>
                 )}
@@ -52,22 +52,22 @@ export default function RoomCards({ rooms, onSelect }: Props) {
                   <span
                     className={`rounded-full px-3 py-1 text-xs font-semibold ${
                       vacant
-                        ? "bg-blue-50 text-blue-700"
-                        : "bg-slate-100 text-slate-600"
+                        ? "bg-brand-50 text-brand-700"
+                        : "bg-sand-100 text-sand-600"
                     }`}
                   >
                     {vacant ? "ห้องว่าง" : "มีผู้เช่า"}
                   </span>
                 </div>
-                <p className="mt-3 line-clamp-2 text-sm leading-6 text-slate-500">
+                <p className="mt-3 line-clamp-2 text-sm leading-6 text-sand-500">
                   {room.description}
                 </p>
                 {Number(room.monthly_price) > 0 && (
-                  <p className="mt-4 font-semibold text-blue-700">
+                  <p className="mt-4 font-semibold text-brand-700">
                     {money(room.monthly_price)} บาท/เดือน
                   </p>
                 )}
-                <p className="mt-4 border-t border-slate-100 pt-4 text-sm font-semibold text-blue-600">
+                <p className="mt-4 border-t border-sand-100 pt-4 text-sm font-semibold text-brand-600">
                   ดูรายละเอียดและรูปภาพ →
                 </p>
               </div>

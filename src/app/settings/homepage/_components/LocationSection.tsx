@@ -8,7 +8,7 @@ type Props = {
 
 export default function LocationSection({ settings, updateSetting }: Props) {
   return (
-          <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
+          <section className="rounded-2xl border border-sand-200 bg-white p-5 shadow-sm sm:p-7">
             <h2 className="text-xl font-bold">แผนที่และสถานที่ใกล้เคียง</h2>
             <div className="mt-6 grid gap-5 md:grid-cols-2">
               <label className="block text-sm font-semibold">หัวข้อ
@@ -26,7 +26,7 @@ export default function LocationSection({ settings, updateSetting }: Props) {
                   <button
                     type="button"
                     onClick={() => updateSetting("nearby_places", [...settings.nearby_places, ""])}
-                    className="text-sm font-semibold text-blue-700 hover:underline"
+                    className="text-sm font-semibold text-brand-700 hover:underline"
                   >
                     + เพิ่มสถานที่
                   </button>
@@ -56,7 +56,7 @@ export default function LocationSection({ settings, updateSetting }: Props) {
                             settings.nearby_places.filter((_, placeIndex) => placeIndex !== index)
                           )
                         }
-                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-xl text-slate-500 hover:bg-red-50 hover:text-red-600"
+                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-xl text-sand-500 hover:bg-red-50 hover:text-red-600"
                         aria-label={`ลบสถานที่ใกล้เคียง ${index + 1}`}
                       >
                         ×

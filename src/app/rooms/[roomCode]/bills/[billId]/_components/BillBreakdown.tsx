@@ -29,12 +29,12 @@ type Props = {
 
 export default function BillBreakdown({ bill, items }: Props) {
   return (
-    <div className="mt-8 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <div className="mt-8 overflow-hidden rounded-2xl border border-sand-200 bg-white shadow-sm">
       <div className="border-b px-6 py-5">
         <p className="text-xl font-bold">
           {thaiMonths[bill.billing_month - 1]} {bill.billing_year + 543}
         </p>
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="mt-1 text-sm text-sand-500">
           กำหนดชำระ: {formatThaiDateShort(bill.due_date)}
         </p>
       </div>
@@ -50,7 +50,7 @@ export default function BillBreakdown({ bill, items }: Props) {
         <div className="flex justify-between">
           <div>
             <p>ค่าน้ำ</p>
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-sm text-sand-500">
               {bill.occupant_count} คน × {formatNumber(bill.water_rate_per_person)} บาท
             </p>
           </div>
@@ -62,15 +62,15 @@ export default function BillBreakdown({ bill, items }: Props) {
         <h2 className="font-semibold">ค่าไฟฟ้า</h2>
         <div className="mt-4 space-y-3 text-sm">
           <div className="flex justify-between">
-            <span className="text-slate-500">มิเตอร์ครั้งก่อน</span>
+            <span className="text-sand-500">มิเตอร์ครั้งก่อน</span>
             <span>{bill.previous_meter != null ? formatNumber(bill.previous_meter) : "-"}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-slate-500">มิเตอร์ครั้งนี้</span>
+            <span className="text-sand-500">มิเตอร์ครั้งนี้</span>
             <span>{bill.current_meter != null ? formatNumber(bill.current_meter) : "-"}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-slate-500">หน่วยไฟที่ใช้</span>
+            <span className="text-sand-500">หน่วยไฟที่ใช้</span>
             <span>{formatNumber(bill.electricity_units)} หน่วย</span>
           </div>
           <div className="flex justify-between pt-2">
@@ -96,7 +96,7 @@ export default function BillBreakdown({ bill, items }: Props) {
         </div>
       )}
 
-      <div className="bg-slate-50 px-6 py-6">
+      <div className="bg-sand-50 px-6 py-6">
         <div className="flex items-center justify-between">
           <span className="text-lg font-bold">ยอดรวม</span>
           <span className="text-2xl font-bold">{formatMoney(bill.total_amount)} บาท</span>

@@ -1,8 +1,41 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  --background: #fcfaf7;
+  --foreground: #332b25;
+}
+
+/*
+ * Soft, warm "homie" coffee palette. `brand` runs from latte cream to roasted
+ * brown (soft latte buttons with dark brown text, mocha links and icons);
+ * `sand` is the warm neutral scale (surfaces, borders, text).
+ * Status colours (green, red, amber, orange) keep Tailwind's defaults so
+ * paid / overdue / rejected stay instantly recognisable.
+ */
+@theme {
+  --color-brand-50: #fbf7f3;
+  --color-brand-100: #f5ede4;
+  --color-brand-200: #ead9c7;
+  --color-brand-300: #dcc0a3;
+  --color-brand-400: #c9a07c;
+  --color-brand-500: #b2825a;
+  --color-brand-600: #8c6342;
+  --color-brand-700: #744f33;
+  --color-brand-800: #5d3f2a;
+  --color-brand-900: #4a3222;
+  --color-brand-950: #2b1c13;
+
+  --color-sand-50: #fcfaf7;
+  --color-sand-100: #f7f2ec;
+  --color-sand-200: #ede5db;
+  --color-sand-300: #dcd0c2;
+  --color-sand-400: #aa9b8b;
+  --color-sand-500: #7b6c5e;
+  --color-sand-600: #62554a;
+  --color-sand-700: #4f443b;
+  --color-sand-800: #3f362f;
+  --color-sand-900: #332b25;
+  --color-sand-950: #1c1713;
 }
 
 @theme inline {
@@ -19,8 +52,8 @@ body {
 }
 
 ::selection {
-  background: #bfdbfe;
-  color: #172554;
+  background: #ead9c7;
+  color: #2b1c13;
 }
 
 button,
@@ -40,14 +73,14 @@ textarea {
 input,
 select,
 textarea {
-  border-color: #cbd5e1;
+  border-color: #dcd0c2;
   background-color: #ffffff;
 }
 
 input:focus,
 select:focus,
 textarea:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgb(59 130 246 / 0.12);
+  border-color: #b2825a;
+  box-shadow: 0 0 0 3px rgb(178 130 90 / 0.2);
   outline: none;
 }

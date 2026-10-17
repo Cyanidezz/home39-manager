@@ -151,11 +151,11 @@ export default function ExpenseManager({
 
   return (
     <div className="grid gap-6 lg:grid-cols-[380px_1fr]">
-      <section className="h-fit rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="h-fit rounded-2xl border border-sand-200 bg-white p-6 shadow-sm">
         <h2 className="text-xl font-semibold">
           {editingId ? "แก้ไขรายจ่าย" : "เพิ่มรายจ่ายจริง"}
         </h2>
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="mt-1 text-sm text-sand-500">
           ใช้เดือนบัญชีในการคำนวณกำไร/ขาดทุน
         </p>
 
@@ -166,7 +166,7 @@ export default function ExpenseManager({
               type="date"
               value={expenseDate}
               onChange={(event) => setExpenseDate(event.target.value)}
-              className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              className="w-full rounded-xl border border-sand-200 px-4 py-3 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
               required
             />
           </div>
@@ -179,7 +179,7 @@ export default function ExpenseManager({
               type="month"
               value={period}
               onChange={(event) => setPeriod(event.target.value)}
-              className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              className="w-full rounded-xl border border-sand-200 px-4 py-3 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
               required
             />
           </div>
@@ -189,7 +189,7 @@ export default function ExpenseManager({
             <select
               value={category}
               onChange={(event) => setCategory(event.target.value)}
-              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              className="w-full rounded-xl border border-sand-200 bg-white px-4 py-3 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
             >
               {categories.map((item) => (
                 <option key={item.value} value={item.value}>
@@ -207,7 +207,7 @@ export default function ExpenseManager({
               step="0.01"
               value={amount}
               onChange={(event) => setAmount(event.target.value)}
-              className="w-full rounded-xl border border-slate-200 px-4 py-3 text-right outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              className="w-full rounded-xl border border-sand-200 px-4 py-3 text-right outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
               placeholder="0.00"
               required
             />
@@ -218,7 +218,7 @@ export default function ExpenseManager({
             <textarea
               value={note}
               onChange={(event) => setNote(event.target.value)}
-              className="min-h-24 w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              className="min-h-24 w-full rounded-xl border border-sand-200 px-4 py-3 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
               placeholder="เช่น ค่าแรงทำความสะอาดประจำเดือน"
             />
           </div>
@@ -243,7 +243,7 @@ export default function ExpenseManager({
             <button
               type="submit"
               disabled={saving}
-              className="flex-1 rounded-xl bg-blue-600 px-4 py-3 font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
+              className="flex-1 rounded-xl bg-brand-300 px-4 py-3 font-semibold text-brand-950 hover:bg-brand-400 disabled:opacity-50"
             >
               {saving ? "กำลังบันทึก..." : editingId ? "บันทึกการแก้ไข" : "เพิ่มรายจ่าย"}
             </button>
@@ -251,22 +251,22 @@ export default function ExpenseManager({
         </form>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="rounded-2xl border border-sand-200 bg-white p-6 shadow-sm">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <h2 className="text-xl font-semibold">รายการรายจ่ายเดือนนี้</h2>
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-sm text-sand-500">
               ทั้งหมด {initialExpenses.length} รายการ
             </p>
           </div>
           <p className="text-right">
-            <span className="block text-sm text-slate-500">รวมรายจ่าย</span>
+            <span className="block text-sm text-sand-500">รวมรายจ่าย</span>
             <strong className="text-2xl text-red-700">{formatMoney(total)} บาท</strong>
           </p>
         </div>
 
         {initialExpenses.length === 0 ? (
-          <div className="mt-8 rounded-xl bg-slate-50 p-8 text-center text-slate-500">
+          <div className="mt-8 rounded-xl bg-sand-50 p-8 text-center text-sand-500">
             ยังไม่มีรายจ่ายในเดือนนี้
           </div>
         ) : (
@@ -278,7 +278,7 @@ export default function ExpenseManager({
               >
                 <div>
                   <p className="font-semibold">{categoryLabel(expense.category)}</p>
-                  <p className="mt-1 text-sm text-slate-500">
+                  <p className="mt-1 text-sm text-sand-500">
                     {formatThaiDateShort(expense.expense_date)}
                     {expense.note ? ` · ${expense.note}` : ""}
                   </p>
@@ -288,7 +288,7 @@ export default function ExpenseManager({
                   <button
                     type="button"
                     onClick={() => editExpense(expense)}
-                    className="rounded-lg border px-3 py-2 text-sm hover:bg-slate-50"
+                    className="rounded-lg border px-3 py-2 text-sm hover:bg-sand-50"
                   >
                     แก้ไข
                   </button>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Icon from "@/components/Icon";
 
 export type RoomBill = {
   billing_year: number;
@@ -17,22 +18,22 @@ const statusStyles: Record<string, { text: string; className: string }> = {
   paid: { text: "ชำระแล้ว", className: "text-green-600" },
   unpaid: { text: "ยังไม่ชำระ", className: "text-red-600" },
   overdue: { text: "เกินกำหนด", className: "text-orange-600" },
-  slip_submitted: { text: "ส่งสลิปแล้ว", className: "text-blue-600" },
+  slip_submitted: { text: "ส่งสลิปแล้ว", className: "text-brand-600" },
   verifying: { text: "กำลังตรวจสอบ", className: "text-yellow-600" },
   rejected: { text: "สลิปไม่ผ่าน", className: "text-red-600" },
-  draft: { text: "ฉบับร่าง", className: "text-slate-600" },
+  draft: { text: "ฉบับร่าง", className: "text-sand-600" },
 };
 
 function getBillStatusLabel(status: string) {
-  return statusStyles[status] ?? { text: status, className: "text-slate-600" };
+  return statusStyles[status] ?? { text: status, className: "text-sand-600" };
 }
 
 export default function LatestBillCard({ roomCode, bill }: Props) {
   const status = bill ? getBillStatusLabel(bill.status) : null;
 
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-      <h2 className="text-xl font-semibold">⚡ ข้อมูลล่าสุด</h2>
+    <section className="rounded-2xl border border-sand-200 bg-white p-6 shadow-sm">
+      <h2 className="text-xl font-semibold"><Icon name="bolt" /> ข้อมูลล่าสุด</h2>
 
       {bill && status ? (
         <div className="mt-5 space-y-2">
@@ -64,20 +65,20 @@ export default function LatestBillCard({ roomCode, bill }: Props) {
 
           <Link
             href={`/rooms/${roomCode}/bills`}
-            className="mt-5 inline-block rounded-lg border px-4 py-2 text-sm hover:bg-slate-50"
+            className="mt-5 inline-block rounded-lg border px-4 py-2 text-sm hover:bg-sand-50"
           >
-            🧾 ดูประวัติบิลทั้งหมด
+            <Icon name="receipt" /> ดูประวัติบิลทั้งหมด
           </Link>
         </div>
       ) : (
         <div className="mt-4">
-          <p className="text-slate-500">ยังไม่มีประวัติบิล</p>
+          <p className="text-sand-500">ยังไม่มีประวัติบิล</p>
 
           <Link
             href={`/rooms/${roomCode}/bills/new`}
-            className="mt-4 inline-block rounded-lg border px-4 py-2 text-sm hover:bg-slate-50"
+            className="mt-4 inline-block rounded-lg border px-4 py-2 text-sm hover:bg-sand-50"
           >
-            🧾 ออกบิลแรก
+            <Icon name="receipt" /> ออกบิลแรก
           </Link>
         </div>
       )}

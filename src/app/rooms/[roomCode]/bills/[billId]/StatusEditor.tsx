@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Icon from "@/components/Icon";
 
 type Props = {
   billId: string;
@@ -40,7 +41,7 @@ export default function StatusEditor({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="text-xs font-medium text-slate-500 underline decoration-gray-300 underline-offset-4 transition hover:text-slate-900"
+        className="text-xs font-medium text-sand-500 underline decoration-gray-300 underline-offset-4 transition hover:text-sand-900"
       >
         แก้ไขสถานะบิล
       </button>
@@ -51,21 +52,21 @@ export default function StatusEditor({
             type="button"
             aria-label="ปิด"
             onClick={() => setOpen(false)}
-            className="absolute inset-0 bg-blue-600/40"
+            className="absolute inset-0 bg-sand-950/40"
           />
 
-          <div className="relative z-10 w-full max-w-lg rounded-2xl border border-slate-200 bg-white shadow-2xl">
-            <div className="flex items-center justify-between border-b border-slate-200 px-6 py-5">
+          <div className="relative z-10 w-full max-w-lg rounded-2xl border border-sand-200 bg-white shadow-2xl">
+            <div className="flex items-center justify-between border-b border-sand-200 px-6 py-5">
               <div>
-                <h2 className="text-xl font-bold">✏️ แก้ไขสถานะบิล</h2>
-                <p className="mt-1 text-sm text-slate-500">ห้อง {roomCode}</p>
+                <h2 className="text-xl font-bold"><Icon name="pencil" /> แก้ไขสถานะบิล</h2>
+                <p className="mt-1 text-sm text-sand-500">ห้อง {roomCode}</p>
               </div>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="flex h-9 w-9 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-blue-700"
+                className="flex h-9 w-9 items-center justify-center rounded-full text-sand-400 transition hover:bg-sand-100 hover:text-brand-700"
               >
-                ✕
+                <Icon name="close" className="h-5 w-5" />
               </button>
             </div>
 
@@ -74,9 +75,9 @@ export default function StatusEditor({
               <input type="hidden" name="roomCode" value={roomCode} />
 
               <div className="space-y-5 px-6 py-6">
-                <div className="rounded-xl bg-slate-50 px-4 py-3">
-                  <p className="text-sm text-slate-500">สถานะปัจจุบัน</p>
-                  <p className="mt-1 font-semibold text-slate-900">
+                <div className="rounded-xl bg-sand-50 px-4 py-3">
+                  <p className="text-sm text-sand-500">สถานะปัจจุบัน</p>
+                  <p className="mt-1 font-semibold text-sand-900">
                     {getStatusText(currentStatus)}
                   </p>
                 </div>
@@ -84,7 +85,7 @@ export default function StatusEditor({
                 <div>
                   <label
                     htmlFor="newStatus"
-                    className="mb-2 block text-sm font-semibold text-slate-700"
+                    className="mb-2 block text-sm font-semibold text-sand-700"
                   >
                     สถานะใหม่
                   </label>
@@ -92,7 +93,7 @@ export default function StatusEditor({
                     id="newStatus"
                     name="newStatus"
                     defaultValue={availableStatuses[0]?.[0]}
-                    className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 outline-none transition focus:border-black"
+                    className="w-full rounded-xl border border-sand-300 bg-white px-4 py-3 outline-none transition focus:border-black"
                   >
                     {availableStatuses.map(([value, label]) => (
                       <option key={value} value={value}>{label}</option>
@@ -103,7 +104,7 @@ export default function StatusEditor({
                 <div>
                   <label
                     htmlFor="reason"
-                    className="mb-2 block text-sm font-semibold text-slate-700"
+                    className="mb-2 block text-sm font-semibold text-sand-700"
                   >
                     เหตุผลในการแก้ไข
                     <span className="ml-1 text-red-500">*</span>
@@ -114,25 +115,25 @@ export default function StatusEditor({
                     required
                     rows={4}
                     placeholder="เช่น กดบันทึกชำระผิด, ตรวจสอบยอดใหม่, ลูกค้าแจ้งแก้ไข"
-                    className="w-full resize-none rounded-xl border border-slate-300 px-4 py-3 outline-none transition placeholder:text-slate-400 focus:border-black"
+                    className="w-full resize-none rounded-xl border border-sand-300 px-4 py-3 outline-none transition placeholder:text-sand-400 focus:border-black"
                   />
-                  <p className="mt-2 text-xs text-slate-400">
+                  <p className="mt-2 text-xs text-sand-400">
                     เหตุผลนี้จะถูกบันทึกไว้ในประวัติการเปลี่ยนสถานะ
                   </p>
                 </div>
               </div>
 
-              <div className="flex justify-end gap-3 border-t border-slate-200 px-6 py-5">
+              <div className="flex justify-end gap-3 border-t border-sand-200 px-6 py-5">
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
-                  className="rounded-xl border border-slate-300 bg-white px-5 py-2.5 font-medium text-slate-700 transition hover:bg-slate-50"
+                  className="rounded-xl border border-sand-300 bg-white px-5 py-2.5 font-medium text-sand-700 transition hover:bg-sand-50"
                 >
                   ยกเลิก
                 </button>
                 <button
                   type="submit"
-                  className="rounded-xl bg-blue-600 px-5 py-2.5 font-semibold text-white transition hover:bg-blue-700"
+                  className="rounded-xl bg-brand-300 px-5 py-2.5 font-semibold text-brand-950 transition hover:bg-brand-400"
                 >
                   ยืนยันการแก้ไข
                 </button>

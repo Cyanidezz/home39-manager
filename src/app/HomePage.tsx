@@ -11,6 +11,7 @@ import ContactSection from "./_components/home/ContactSection";
 import LoginDialog from "./_components/home/LoginDialog";
 import RoomDialog from "./_components/home/RoomDialog";
 import type { DisplayRoom, Room } from "./_components/home/types";
+import Icon from "@/components/Icon";
 
 type Props = {
   rooms: Room[];
@@ -68,16 +69,16 @@ export default function HomePage({ rooms, isLoggedIn, settings, homepageRooms }:
   }
 
   return (
-    <main className="min-h-screen bg-slate-50">
-      <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
+    <main className="min-h-screen bg-sand-50">
+      <header className="sticky top-0 z-40 border-b border-sand-200 bg-white/95 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-8">
           <a href="#" className="flex items-center gap-3">
-            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-600 text-xl text-white shadow-md shadow-blue-200">
-              🏢
+            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-300 text-xl text-brand-950 shadow-md shadow-brand-200">
+              <Icon name="building" className="h-6 w-6" />
             </span>
             <div>
               <p className="text-lg font-bold leading-tight">Home 39</p>
-              <p className="text-xs text-slate-500">Hatyai</p>
+              <p className="text-xs text-sand-500">Hatyai</p>
             </div>
           </a>
 
@@ -85,7 +86,7 @@ export default function HomePage({ rooms, isLoggedIn, settings, homepageRooms }:
             <button
               type="button"
               onClick={() => router.push("/dashboard")}
-              className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700"
+              className="rounded-lg bg-brand-300 px-5 py-2.5 text-sm font-semibold text-brand-950 shadow-sm hover:bg-brand-400"
             >
               กลับหน้าจัดการ
             </button>
@@ -96,7 +97,7 @@ export default function HomePage({ rooms, isLoggedIn, settings, homepageRooms }:
                 setError("");
                 setLoginOpen(true);
               }}
-              className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700"
+              className="rounded-lg bg-brand-300 px-5 py-2.5 text-sm font-semibold text-brand-950 shadow-sm hover:bg-brand-400"
             >
               เข้าสู่ระบบ
             </button>
@@ -109,8 +110,8 @@ export default function HomePage({ rooms, isLoggedIn, settings, homepageRooms }:
       <LocationSection settings={settings} />
       <ContactSection settings={settings} />
 
-      <footer className="border-t border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-6 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+      <footer className="border-t border-sand-200 bg-white">
+        <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-6 text-sm text-sand-500 sm:flex-row sm:items-center sm:justify-between sm:px-8">
           <p>© Home 39 - Hatyai</p>
           <p>ห้องพักสะดวกสบายในเมืองหาดใหญ่</p>
         </div>
