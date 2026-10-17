@@ -18,7 +18,7 @@ export default async function EditBillPage({ params }: Props) {
       water_rate_per_person, previous_meter, current_meter,
       electricity_rate, due_date,
       rooms (room_code),
-      bill_items (id, item_name, amount, created_at)
+      bill_items (id, item_name, amount, created_at, position)
     `)
     .eq("id", billId)
     .single();
@@ -27,7 +27,11 @@ export default async function EditBillPage({ params }: Props) {
   if (error || !bill || room?.room_code !== roomCode) notFound();
 
   const items = [...(bill.bill_items || [])]
-    .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+    .sort(
+      (a, b) =>
+        a.position - b.position ||
+        new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+    )
     .map((item) => ({ name: item.item_name, amount: String(item.amount) }));
 
   return (

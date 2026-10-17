@@ -176,43 +176,84 @@ describe("2. ออกบิลรายเดือน (create_bill_with_items 
     });
   });
 
-  describe("ช่องโหว่ที่พบ", () => {
-    // BUG (Medium): p_other_amount is trusted; nothing checks it equals sum(p_items). The trigger totals bills
-    // from other_amount, so the bill can show items worth 500 while the total includes 0 (or a different sum).
-    it.fails("BUG: other_amount ต้องเท่ากับผลรวม bill_items (หรือถูกปฏิเสธ)", async () => {
-      const id = await addBill(db, roomId, tenantId, {
-        year: 2026, month: 9, prev: 100, curr: 100, other: 0, items: [{ item_name: "ค่าซ่อม", amount: 500 }],
-      });
-      const bill = await getBill(db, id);
-      const items = await one<{ s: string }>(db, "select sum(amount)::text s from bill_items where bill_id=$1", [id]);
-      expect(Number(bill.other_amount)).toBe(Number(items.s));
+  describe("ตรวจตัวเลขที่เว็บส่งมา (create_bill_with_items)", () => {
+    it("other_amount ต้องเท่ากับผลรวม bill_items ไม่งั้นปฏิเสธและไม่มีบิลค้างในฐานข้อมูล", async () => {
+      const err = await errorOf(() =>
+        addBill(db, roomId, tenantId, { year: 2026, month: 9, prev: 100, curr: 100, other: 0, items: [{ item_name: "ค่าซ่อม", amount: 500 }] })
+      );
+      expect(err).toMatch(/Other amount does not match the sum of the bill items/);
+      expect(await rows(db, "select 1 from bills")).toHaveLength(0);
+      expect(await rows(db, "select 1 from bill_items")).toHaveLength(0);
+      // matching amounts are accepted
+      expect(await addBill(db, roomId, tenantId, { year: 2026, month: 9, prev: 100, curr: 100, items: [{ item_name: "ค่าซ่อม", amount: 500 }] })).toBeTruthy();
     });
 
-    // BUG (Medium): previous_meter is client-supplied. The DB accepts a previous meter that does not continue
-    // from the room's last billed current_meter (gap or overlap), silently under/over-billing electricity.
-    it.fails("BUG: previous_meter ต้องต่อจาก current_meter ของบิลล่าสุดของห้อง", async () => {
+    it("previous_meter ต้องต่อจาก current_meter ของบิลล่าสุดของผู้เช่า (ช่องว่าง/ซ้อนทับถูกปฏิเสธ)", async () => {
       await addBill(db, roomId, tenantId, { year: 2026, month: 1, prev: 100, curr: 200 });
-      const err = await errorOf(() => addBill(db, roomId, tenantId, { year: 2026, month: 2, prev: 150, curr: 210 }));
-      expect(err).not.toBeNull();
+      for (const prev of [150, 250]) {
+        expect(await errorOf(() => addBill(db, roomId, tenantId, { year: 2026, month: 2, prev, curr: prev + 60 }))).toMatch(/Previous meter does not continue/);
+      }
+      expect(await addBill(db, roomId, tenantId, { year: 2026, month: 2, prev: 200, curr: 260 })).toBeTruthy();
     });
 
-    // BUG (Low): same for the first bill: previous_meter lower than the tenant's initial meter is accepted, so the
-    // new tenant is charged for electricity used before moving in.
-    it.fails("BUG: บิลแรกต้องไม่ใช้มิเตอร์ก่อนหน้าต่ำกว่า initial_electricity_meter ของผู้เช่า", async () => {
-      const err = await errorOf(() => addBill(db, roomId, tenantId, { year: 2026, month: 1, prev: 50, curr: 120 }));
-      expect(err).not.toBeNull();
+    it("บิลแรกต้องเริ่มจากมิเตอร์ตอนเข้าอยู่ของผู้เช่า (initial_electricity_meter)", async () => {
+      expect(await errorOf(() => addBill(db, roomId, tenantId, { year: 2026, month: 1, prev: 50, curr: 120 }))).toMatch(/Previous meter does not continue from the last reading \(expected 100\)/);
+      expect(await addBill(db, roomId, tenantId, { year: 2026, month: 1, prev: 100, curr: 120 })).toBeTruthy();
     });
 
+    it("ผู้เช่าคนใหม่เริ่มจากมิเตอร์ของตัวเอง ไม่ใช่บิลสุดท้ายของคนเก่า", async () => {
+      await addBill(db, roomId, tenantId, { year: 2026, month: 1, prev: 100, curr: 130 });
+      await db.query("select complete_tenant_move_out($1,'2026-01-31')", [tenantId]);
+      const next = await addTenant(db, roomId, { moveIn: "2026-02-01", meter: 135 });
+      expect(await errorOf(() => addBill(db, roomId, next, { year: 2026, month: 2, prev: 130, curr: 150 }))).toMatch(/expected 135/);
+      expect(await addBill(db, roomId, next, { year: 2026, month: 2, prev: 135, curr: 150 })).toBeTruthy();
+    });
+
+    it("ไม่มีมิเตอร์ตอนเข้าอยู่: ใช้ค่าล่าสุดของห้อง; ไม่มีข้อมูลเลย: รับค่าที่ส่งมา", async () => {
+      await db.query("select complete_tenant_move_out($1,'2026-01-01')", [tenantId]);
+      const bare = await addTenant(db, roomId, { moveIn: "2026-01-01", meter: null });
+      expect(await addBill(db, roomId, bare, { year: 2026, month: 1, prev: 777, curr: 800 })).toBeTruthy();
+      await db.query("select complete_tenant_move_out($1,'2026-01-31')", [bare]);
+      const second = await addTenant(db, roomId, { moveIn: "2026-02-01", meter: null });
+      expect(await errorOf(() => addBill(db, roomId, second, { year: 2026, month: 2, prev: 700, curr: 710 }))).toMatch(/expected 800/);
+      expect(await addBill(db, roomId, second, { year: 2026, month: 2, prev: 800, curr: 810 })).toBeTruthy();
+    });
+
+    it("ย้อนออกบิลเดือนที่เก่ากว่าบิลล่าสุด (back-fill) ไม่ถูกบังคับเรื่องมิเตอร์ต่อเนื่อง", async () => {
+      await addBill(db, roomId, tenantId, { year: 2026, month: 1, prev: 100, curr: 200 });
+      await addBill(db, roomId, tenantId, { year: 2026, month: 3, prev: 200, curr: 250 });
+      expect(await addBill(db, roomId, tenantId, { year: 2026, month: 2, prev: 200, curr: 230 })).toBeTruthy();
+    });
+
+    it("ปีต้องอยู่ในช่วง 2000-2200 และเดือนที่ออกบิลต้องไม่ก่อนเดือนที่ผู้เช่าเข้าอยู่", async () => {
+      expect(await errorOf(() => addBill(db, roomId, tenantId, { year: 1900, month: 1, prev: 100, curr: 110 }))).toMatch(/Invalid billing year/);
+      expect(await errorOf(() => addBill(db, roomId, tenantId, { year: 2300, month: 1, prev: 100, curr: 110 }))).toMatch(/Invalid billing year/);
+      // tenant moved in 2026-01-01 (default in these tests)
+      expect(await errorOf(() => addBill(db, roomId, tenantId, { year: 2025, month: 12, prev: 100, curr: 110 }))).toMatch(/before the tenant move-in date/);
+    });
+
+    it("เดือนเดียวกับวันเข้าพัก (เข้ากลางเดือน) ออกบิลได้", async () => {
+      const room2 = await addRoom(db, "B");
+      const mid = await addTenant(db, room2, { moveIn: "2026-03-20", meter: 10 });
+      expect(await addBill(db, room2, mid, { year: 2026, month: 3, prev: 10, curr: 20 })).toBeTruthy();
+    });
+
+    it("รายการค่าใช้จ่ายอื่นเก็บลำดับตามที่พิมพ์ (position 0,1,2)", async () => {
+      const id = await addBill(db, roomId, tenantId, {
+        year: 2026, month: 1, prev: 100, curr: 100,
+        items: [{ item_name: "ค", amount: 30 }, { item_name: "ก", amount: 10 }, { item_name: "ข", amount: 20 }],
+      });
+      expect(await rows(db, "select item_name, position from bill_items where bill_id=$1 order by position", [id])).toEqual([
+        { item_name: "ค", position: 0 }, { item_name: "ก", position: 1 }, { item_name: "ข", position: 2 },
+      ]);
+    });
+  });
+
+  describe("ช่องโหว่ที่ยังไม่ได้แก้", () => {
     // BUG (Low): rent is client-supplied too; a bill with rent that differs from rooms.monthly_rent (and is not
     // the waived month) is accepted. Waiver (tenants.rent_waived_*) is applied only in BillForm.tsx, never in SQL.
     it.fails("BUG: rent_amount ต้องเป็น monthly_rent หรือ 0 เมื่อเป็นเดือนที่ยกเว้น", async () => {
       const err = await errorOf(() => addBill(db, roomId, tenantId, { year: 2026, month: 1, prev: 100, curr: 110, rent: 1 }));
-      expect(err).not.toBeNull();
-    });
-
-    // BUG (Low): billing_year has no range check and the period can precede the tenant's move-in date.
-    it.fails("BUG: ไม่ควรออกบิลเดือนก่อนวันเข้าพัก/ปีที่เป็นไปไม่ได้", async () => {
-      const err = await errorOf(() => addBill(db, roomId, tenantId, { year: 1900, month: 1, prev: 100, curr: 110 }));
       expect(err).not.toBeNull();
     });
 

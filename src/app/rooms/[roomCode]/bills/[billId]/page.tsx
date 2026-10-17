@@ -37,7 +37,8 @@ export default async function BillDetailPage({ params, searchParams }: Props) {
         id,
         item_name,
         amount,
-        created_at
+        created_at,
+        position
       )
     `)
     .eq("id", billId)
@@ -67,6 +68,7 @@ export default async function BillDetailPage({ params, searchParams }: Props) {
 
   const billItems = [...(bill.bill_items || [])].sort(
     (a, b) =>
+      a.position - b.position ||
       new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
   );
 

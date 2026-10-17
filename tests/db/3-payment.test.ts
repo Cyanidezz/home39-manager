@@ -38,12 +38,10 @@ describe("3a. หน้าจ่ายเงิน (get_public_bill)", () => {
       electricity_units: 20, electricity_amount: 140, other_amount: 250, total_amount: 5690, due_date: "2026-02-10",
       status: "unpaid", paid_at: null, payment_settings: null,
     });
-    // BUG (Low): get_public_bill orders items by (created_at, id). Items of one bill are inserted in one
-    // transaction (identical created_at), so the tie is broken by the random UUID: the tenant sees the items in an
-    // arbitrary order, not the order the owner typed them (and it can differ between bills). Compare as a set here.
-    const items = (bill.bill_items as { item_name: string; amount: number }[]).map((i) => [i.item_name, i.amount]);
-    expect(items).toHaveLength(2);
-    expect(items).toEqual(expect.arrayContaining([["ค่าส่วนกลาง", 200], ["ค่าปรับ", 50]]));
+    // Items keep the order the owner typed them (bill_items.position), not a random-UUID tie-break.
+    expect((bill.bill_items as { item_name: string; amount: number }[]).map((i) => [i.item_name, i.amount])).toEqual([
+      ["ค่าส่วนกลาง", 200], ["ค่าปรับ", 50],
+    ]);
   });
 
   it("แนบ payment_settings เมื่อมีการตั้งค่าบัญชี และไม่รั่ว updated_at/id", async () => {

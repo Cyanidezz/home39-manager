@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   electricityUnitsUsed,
   hasInvalidOtherItem,
+  billCreationError,
   isValidOtherItem,
   pickPreviousMeter,
 } from "./billing";
@@ -76,5 +77,22 @@ describe("pickPreviousMeter", () => {
   it("treats 0 as a real reading and returns null when nothing is known", () => {
     expect(pickPreviousMeter({ tenantLatest: 0, tenantInitial: 50, roomLatest: 70 })).toBe(0);
     expect(pickPreviousMeter({ tenantLatest: null, tenantInitial: null, roomLatest: null })).toBeNull();
+  });
+});
+
+describe("billCreationError", () => {
+  const context = { roomCode: "A", month: 3, year: 2026 };
+
+  it("translates the known database errors", () => {
+    expect(billCreationError("A bill for this room and billing period already exists", context)).toBe("ห้อง A มีบิล 3/2026 อยู่แล้ว");
+    expect(billCreationError("Previous meter does not continue from the last reading (expected 135.00)", context)).toContain("ควรเป็น 135");
+    expect(billCreationError("Other amount does not match the sum of the bill items", context)).toContain("ไม่ตรงกับรายการ");
+    expect(billCreationError("Billing period is before the tenant move-in date", context)).toContain("ก่อนวันที่ผู้เช่าเข้าอยู่");
+    expect(billCreationError("Invalid billing year", context)).toBe("ปีที่เลือกไม่ถูกต้อง");
+    expect(billCreationError("Current meter cannot be less than previous meter", context)).toContain("ไม่น้อยกว่า");
+  });
+
+  it("passes unknown messages through", () => {
+    expect(billCreationError("something else", context)).toBe("something else");
   });
 });

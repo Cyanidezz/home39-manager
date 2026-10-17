@@ -21,6 +21,7 @@ export type Database = {
           created_at: string
           id: string
           item_name: string
+          position: number
         }
         Insert: {
           amount?: number
@@ -28,6 +29,7 @@ export type Database = {
           created_at?: string
           id?: string
           item_name: string
+          position?: number
         }
         Update: {
           amount?: number
@@ -35,6 +37,7 @@ export type Database = {
           created_at?: string
           id?: string
           item_name?: string
+          position?: number
         }
         Relationships: [
           {

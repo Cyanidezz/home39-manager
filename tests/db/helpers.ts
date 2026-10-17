@@ -24,6 +24,7 @@ const supabaseStubs = `
  * objects the file is skipped. Add a migration here when it adds tables or functions the tests use.
  */
 const pendingMigrations = [
+  { file: "20261017200000_billing_integrity.sql", marker: "public.tenants_one_active_per_room" },
   { file: "20261018090000_move_out_settlement.sql", marker: "public.move_out_settlements" },
 ].map(({ file, marker }) => ({
   marker,

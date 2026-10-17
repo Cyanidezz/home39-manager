@@ -121,15 +121,14 @@ describe("1. เริ่มสัญญาเช่า (create_tenant_with_room
     expect(await errorOf(() => db.query("update rooms set occupant_count=-1 where id=$1", [roomId]))).toMatch(/rooms_occupant_count_check/);
   });
 
-  // BUG (Medium): the DB only blocks a second active tenant inside create_tenant_with_room. Nothing at table
-  // level (e.g. a partial unique index on tenants(room_id) where is_active) stops two active tenants in the
-  // same room via a direct insert/update, so any other code path could break the "one active tenant per room" rule.
-  it.fails("BUG: ตารางต้องกันผู้เช่า active สองคนในห้องเดียวกันเองด้วย unique index (ไม่พึ่งแค่ฟังก์ชัน)", async () => {
+  it("ตารางกันผู้เช่า active สองคนในห้องเดียวกันเอง (unique index tenants_one_active_per_room) แม้ insert ตรง ๆ", async () => {
     await addTenant(db, roomId);
     const err = await errorOf(() =>
       db.query("insert into tenants (room_id, full_name, is_active) values ($1,'คนที่สอง',true)", [roomId])
     );
-    expect(err).not.toBeNull();
+    expect(err).toMatch(/tenants_one_active_per_room|duplicate key/i);
+    // an inactive tenant in the same room (history) is fine
+    await db.query("insert into tenants (room_id, full_name, is_active) values ($1,'คนเก่า',false)", [roomId]);
   });
 
   it("ผู้เช่าที่ย้ายออกแล้วไม่นับเป็น active: ห้องเดิมสร้างผู้เช่าใหม่ได้ (ดูไฟล์ 4 สำหรับ flow เต็ม)", async () => {
