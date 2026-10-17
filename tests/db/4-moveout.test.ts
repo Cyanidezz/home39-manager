@@ -163,15 +163,22 @@ describe("4b. ยกเลิกการแจ้งย้ายออก (canc
     expect((await getBill(db, mar)).rent_amount).toBe("5000.00");
   });
 
-  // BUG (Medium): cancel_tenant_move_out restores rent on EVERY bill of the waived month whose rent is 0, including
-  // bills already PAID. set_tenant_move_out_notice deliberately never touches paid bills, so a tenant who paid the
-  // waived (cheaper) bill gets a paid bill whose total silently jumps back up by a month's rent.
-  it.fails("BUG: ยกเลิกการแจ้งย้ายออกต้องไม่แก้ยอดบิลที่จ่ายแล้ว", async () => {
+  it("ยกเลิกการแจ้งย้ายออกไม่แก้ยอดบิลที่จ่ายแล้ว แต่รายงานจำนวนที่ข้ามไว้ (skippedPaidBills)", async () => {
     const mar = await bill(3, 100, 130);
     await notice("2026-03-10", "2026-04-15");
     await setStatus(mar, "paid");
-    await cancel();
+    const result = await cancel();
+    expect(result).toMatchObject({ ok: true, adjustedBills: 0, skippedPaidBills: 1 });
     expect(await getBill(db, mar)).toMatchObject({ rent_amount: "0.00", total_amount: "510.00", status: "paid" });
+    expect(await getTenant(db, tenantId)).toMatchObject({ termination_notice_date: null, rent_waived_month: null });
+    expect((await getRoom(db, roomId)).status).toBe("occupied");
+  });
+
+  it("ยกเลิกการแจ้งย้ายออก: บิลที่ยังไม่จ่ายถูกคืนค่าเช่า และ skippedPaidBills เป็น 0", async () => {
+    const mar = await bill(3, 100, 130);
+    await notice("2026-03-10", "2026-04-15");
+    expect(await cancel()).toMatchObject({ adjustedBills: 1, skippedPaidBills: 0 });
+    expect((await getBill(db, mar)).total_amount).toBe("5510.00");
   });
 
   it("ล้างประวัติแจ้งเตือน LINE ของบิลที่คืนค่าเช่า", async () => {

@@ -85,6 +85,7 @@ export default function EndTenancyButton({
       });
       const result = (await response.json().catch(() => ({}))) as {
         error?: string;
+        skippedPaidBills?: number;
       };
 
       if (!response.ok) {
@@ -92,6 +93,12 @@ export default function EndTenancyButton({
         return;
       }
 
+      // Paid bills keep the amount the tenant actually paid; the owner decides about the difference.
+      setNotice(
+        result.skippedPaidBills
+          ? `บิลที่ชำระแล้ว ${result.skippedPaidBills} ใบ (เดือนที่เคยใช้ค่าเช่าล่วงหน้า) ไม่ถูกปรับยอดกลับ หากต้องเก็บค่าเช่าส่วนที่ขาด กรุณาออกบิลเพิ่มเอง`
+          : ""
+      );
       setNoticeDate("");
       setMoveOutDate("");
       router.refresh();

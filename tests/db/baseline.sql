@@ -377,6 +377,7 @@ declare
   v_rent_waived_month integer;
   v_monthly_rent numeric;
   v_adjusted_bills integer := 0;
+  v_skipped_paid integer := 0;
 begin
   select room_id, rent_waived_year, rent_waived_month
   into v_room_id, v_rent_waived_year, v_rent_waived_month
@@ -406,6 +407,7 @@ begin
         and billing_year = v_rent_waived_year
         and billing_month = v_rent_waived_month
         and rent_amount = 0
+        and status <> 'paid'
       returning id
     ),
     cleared_notifications as (
@@ -417,6 +419,16 @@ begin
     select count(*)::integer
     into v_adjusted_bills
     from restored_bills;
+
+    select count(*)::integer
+    into v_skipped_paid
+    from public.bills
+    where tenant_id = p_tenant_id
+      and room_id = v_room_id
+      and billing_year = v_rent_waived_year
+      and billing_month = v_rent_waived_month
+      and rent_amount = 0
+      and status = 'paid';
   end if;
 
   update public.tenants
@@ -435,7 +447,8 @@ begin
   return jsonb_build_object(
     'ok', true,
     'roomId', v_room_id,
-    'adjustedBills', v_adjusted_bills
+    'adjustedBills', v_adjusted_bills,
+    'skippedPaidBills', v_skipped_paid
   );
 end;
 $function$;
