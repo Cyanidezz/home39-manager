@@ -1,5 +1,7 @@
 import Link from "next/link";
 import Icon from "@/components/Icon";
+import { formatMoney, formatThaiDate } from "@/lib/format";
+import { EmptyNote, InfoCard, InfoRows, primaryButton, secondaryButton } from "./InfoCard";
 
 export type RoomContract = {
   contract_start: string | null;
@@ -15,57 +17,53 @@ type Props = {
 };
 
 export default function ContractCard({ roomCode, contract, contractUrl }: Props) {
-  return (
-    <section className="rounded-2xl border border-sand-200 bg-white p-6 shadow-sm">
-      <h2 className="text-xl font-semibold"><Icon name="file" /> สัญญาเช่า</h2>
+  const icon = <Icon name="file" className="h-5 w-5" />;
+  const uploadHref = `/rooms/${roomCode}/contract/new`;
 
-      {contract ? (
-        <div className="mt-5">
-          <p className="font-medium">{contract.original_file_name || "สัญญาเช่า"}</p>
-
-          <div className="mt-3 space-y-1 text-sm text-sand-600">
-            <p>เริ่มสัญญา: {contract.contract_start || "-"}</p>
-            <p>สิ้นสุดสัญญา: {contract.contract_end || "-"}</p>
-            <p>
-              เงินประกัน:{" "}
-              {contract.deposit_amount != null
-                ? `${Number(contract.deposit_amount).toLocaleString()} บาท`
-                : "-"}
-            </p>
-          </div>
-
-          <div className="mt-5 flex flex-wrap gap-3">
-            {contractUrl && (
-              <a
-                href={contractUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-lg bg-brand-300 px-4 py-2 text-sm text-brand-950"
-              >
-                <Icon name="eye" /> ดูสัญญา
-              </a>
-            )}
-
-            <Link
-              href={`/rooms/${roomCode}/contract/new`}
-              className="rounded-lg border px-4 py-2 text-sm hover:bg-sand-50"
-            >
-              <Icon name="upload" /> Upload สัญญาใหม่
-            </Link>
-          </div>
-        </div>
-      ) : (
-        <div className="mt-4">
-          <p className="text-sand-500">ยังไม่มีสัญญาเช่า</p>
-
-          <Link
-            href={`/rooms/${roomCode}/contract/new`}
-            className="mt-4 inline-block rounded-lg border px-4 py-2 hover:bg-sand-50"
-          >
-            <Icon name="upload" /> Upload สัญญา
+  if (!contract) {
+    return (
+      <InfoCard
+        icon={icon}
+        title="สัญญาเช่า"
+        footer={
+          <Link href={uploadHref} className={secondaryButton}>
+            <Icon name="upload" className="h-4 w-4" /> Upload สัญญา
           </Link>
-        </div>
-      )}
-    </section>
+        }
+      >
+        <EmptyNote>ยังไม่มีสัญญาเช่า</EmptyNote>
+      </InfoCard>
+    );
+  }
+
+  return (
+    <InfoCard
+      icon={icon}
+      title="สัญญาเช่า"
+      footer={
+        <>
+          {contractUrl && (
+            <a href={contractUrl} target="_blank" rel="noopener noreferrer" className={primaryButton}>
+              <Icon name="eye" className="h-4 w-4" /> ดูสัญญา
+            </a>
+          )}
+          <Link href={uploadHref} className={secondaryButton}>
+            <Icon name="upload" className="h-4 w-4" /> Upload สัญญาใหม่
+          </Link>
+        </>
+      }
+    >
+      <p className="mb-3 truncate text-base font-semibold">{contract.original_file_name || "สัญญาเช่า"}</p>
+      <InfoRows
+        rows={[
+          { label: "เริ่มสัญญา", value: formatThaiDate(contract.contract_start) },
+          { label: "สิ้นสุดสัญญา", value: formatThaiDate(contract.contract_end) },
+          {
+            label: "เงินประกัน",
+            value: contract.deposit_amount != null ? `${formatMoney(contract.deposit_amount)} บาท` : "-",
+          },
+        ]}
+      />
+    </InfoCard>
   );
 }

@@ -140,6 +140,9 @@ const server = http.createServer((req, res) => {
     }
     if (path === "/auth/v1/logout") return send(204);
     if (path === "/auth/v1/settings") return send(200, { disable_signup: true, external: { email: true } });
+    if (path.startsWith("/storage/v1/object/sign/")) {
+      return send(200, { signedURL: `${path.replace("/storage/v1", "")}?token=mock` });
+    }
     if (path.startsWith("/storage/v1/")) return send(400, { error: "mock storage", message: "not available in the visual-QA mock" });
     if (path.startsWith("/rest/v1/rpc/")) {
       const name = path.split("/").pop();

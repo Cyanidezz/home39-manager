@@ -68,15 +68,20 @@ export default async function RoomPage({ params }: Props) {
         }
       />
       <div className="mx-auto max-w-5xl px-4 py-6 sm:px-8">
-        <div className="grid gap-6 md:grid-cols-2">
-          <RoomInfoCard room={room} />
-          <TenantCard roomCode={room.room_code} tenants={tenants} />
-          <ContractCard
-            roomCode={room.room_code}
-            contract={latestContract}
-            contractUrl={contractUrl}
-          />
-          <LatestBillCard roomCode={room.room_code} bill={latestBill} />
+        {/* Two independent stacks (no stretched rows), in reading order on mobile: room, tenant, contract, latest bill. */}
+        <div className="grid gap-6 md:grid-cols-2 md:items-start">
+          <div className="flex flex-col gap-6">
+            <RoomInfoCard room={room} />
+            <TenantCard roomCode={room.room_code} tenants={tenants} />
+          </div>
+          <div className="flex flex-col gap-6">
+            <ContractCard
+              roomCode={room.room_code}
+              contract={latestContract}
+              contractUrl={contractUrl}
+            />
+            <LatestBillCard roomCode={room.room_code} bill={latestBill} />
+          </div>
         </div>
       </div>
     </main>
