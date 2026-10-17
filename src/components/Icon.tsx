@@ -93,6 +93,8 @@ const icons = {
       <path d="M3 9h18M9 9v11" />
     </>
   ),
+  chevronLeft: <path d="m15 5-7 7 7 7" />,
+  chevronRight: <path d="m9 5 7 7-7 7" />,
   menu: <path d="M4 7h16M4 12h16M4 17h16" />,
   pin: (
     <>
