@@ -43,6 +43,9 @@ export default function HomePage({ rooms, isLoggedIn, settings, homepageRooms }:
       description: "สอบถามรายละเอียดเพิ่มเติม",
       monthly_price: room.monthly_rent,
       cover_image_url: null,
+      cover_image_position_x: 50,
+      cover_image_position_y: 50,
+      cover_image_zoom: 100,
       image_urls: [],
     };
     return { ...room, ...content };

@@ -27,6 +27,9 @@ export type HomepageRoom = {
   description: string;
   monthly_price: number | string;
   cover_image_url: string | null;
+  cover_image_position_x: number;
+  cover_image_position_y: number;
+  cover_image_zoom: number;
   image_urls: string[];
 };
 
@@ -125,6 +128,9 @@ export const defaultHomepageRooms: HomepageRoom[] = ["A", "B", "C"].map(
     description: roomDescriptions[roomCode],
     monthly_price: roomCode === "A" ? 5000 : 4500,
     cover_image_url: null,
+    cover_image_position_x: 50,
+    cover_image_position_y: 50,
+    cover_image_zoom: 100,
     image_urls: [],
   })
 );

@@ -301,7 +301,10 @@ export type Database = {
       }
       homepage_rooms: {
         Row: {
+          cover_image_position_x: number
+          cover_image_position_y: number
           cover_image_url: string | null
+          cover_image_zoom: number
           description: string
           image_urls: string[]
           monthly_price: number
@@ -310,7 +313,10 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          cover_image_position_x?: number
+          cover_image_position_y?: number
           cover_image_url?: string | null
+          cover_image_zoom?: number
           description: string
           image_urls?: string[]
           monthly_price?: number
@@ -319,7 +325,10 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          cover_image_position_x?: number
+          cover_image_position_y?: number
           cover_image_url?: string | null
+          cover_image_zoom?: number
           description?: string
           image_urls?: string[]
           monthly_price?: number

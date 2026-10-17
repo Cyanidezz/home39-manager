@@ -1,5 +1,5 @@
 import type { ChangeEvent } from "react";
-import HomepageImage from "@/components/HomepageImage";
+import ImageCropEditor, { coverFrames } from "./ImageCropEditor";
 import PhotoGallery from "./PhotoGallery";
 import type { HomepageRoom } from "@/lib/homepage";
 import { inputClass } from "./styles";
@@ -12,24 +12,6 @@ type Props = {
   onSaveRoom: (room: HomepageRoom) => void;
   onUploadImages: (roomCode: string, event: ChangeEvent<HTMLInputElement>, cover: boolean) => void;
 };
-
-function ImagePreview({ src, alt }: { src: string | null; alt: string }) {
-  if (!src) {
-    return (
-      <div className="flex aspect-[16/9] items-center justify-center rounded-xl border border-dashed border-sand-300 bg-sand-50 text-sm text-sand-400">
-        ยังไม่มีรูปภาพ
-      </div>
-    );
-  }
-
-  return (
-    <HomepageImage
-      src={src}
-      alt={alt}
-      className="aspect-[16/9] w-full rounded-xl border border-sand-200 object-cover"
-    />
-  );
-}
 
 export default function RoomsSection({ rooms, saving, uploading, updateRoom, onSaveRoom, onUploadImages }: Props) {
   return (
@@ -71,7 +53,17 @@ export default function RoomsSection({ rooms, saving, uploading, updateRoom, onS
                     </label>
                   </div>
                   <div>
-                    <ImagePreview src={room.cover_image_url} alt={`รูปหน้าปกห้อง ${room.room_code}`} />
+                    <ImageCropEditor
+                      src={room.cover_image_url}
+                      alt={`ตัวอย่างรูปหน้าปกห้อง ${room.room_code}`}
+                      frames={coverFrames}
+                      positionX={room.cover_image_position_x ?? 50}
+                      positionY={room.cover_image_position_y ?? 50}
+                      zoom={room.cover_image_zoom ?? 100}
+                      onPositionXChange={(value) => updateRoom(room.room_code, { cover_image_position_x: value })}
+                      onPositionYChange={(value) => updateRoom(room.room_code, { cover_image_position_y: value })}
+                      onZoomChange={(value) => updateRoom(room.room_code, { cover_image_zoom: value })}
+                    />
                     <label className="mt-3 block cursor-pointer rounded-lg border border-brand-200 bg-brand-50 px-4 py-2.5 text-center text-sm font-semibold text-brand-700 hover:bg-brand-100">
                       {uploading === `${room.room_code}-cover` ? "กำลังอัปโหลด..." : "เลือกรูปหน้าปก"}
                       <input type="file" accept="image/*,.heic,.heif" className="sr-only" disabled={Boolean(uploading)} onChange={(event) => onUploadImages(room.room_code, event, true)} />

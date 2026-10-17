@@ -14,6 +14,10 @@ import {
 
 type Props = {
   src: string | null;
+  /** Alt text for the preview image. */
+  alt?: string;
+  /** Preview frame shapes; a toggle is shown only when there are several. */
+  frames?: Record<string, Frame>;
   positionX: number;
   positionY: number;
   zoom: number;
@@ -22,12 +26,17 @@ type Props = {
   onZoomChange: (value: number) => void;
 };
 
-type View = "desktop" | "mobile";
+type Frame = { label: string; className: string };
 
 // Approximate shapes of the real hero: wide on desktop, tall on a phone.
-const frames: Record<View, { label: string; className: string }> = {
+export const bannerFrames: Record<string, Frame> = {
   desktop: { label: "คอมพิวเตอร์", className: "aspect-[8/3] w-full" },
   mobile: { label: "มือถือ", className: "mx-auto aspect-[5/6] w-full max-w-[260px]" },
+};
+
+// The room card cover: full card width, 208px tall (about 9:5).
+export const coverFrames: Record<string, Frame> = {
+  card: { label: "การ์ดห้อง", className: "aspect-[9/5] w-full" },
 };
 
 type DragStart = {
@@ -39,8 +48,10 @@ type DragStart = {
   frameHeight: number;
 };
 
-export default function BannerCropEditor({
+export default function ImageCropEditor({
   src,
+  alt = "ตัวอย่างตำแหน่งรูป",
+  frames = bannerFrames,
   positionX,
   positionY,
   zoom,
@@ -48,7 +59,9 @@ export default function BannerCropEditor({
   onPositionYChange,
   onZoomChange,
 }: Props) {
-  const [view, setView] = useState<View>("desktop");
+  const keys = Object.keys(frames);
+  const [view, setView] = useState(keys[0]);
+  const activeView = frames[view] ? view : keys[0];
   const [dragging, setDragging] = useState(false);
   const frameRef = useRef<HTMLDivElement>(null);
   const naturalSize = useRef<{ width: number; height: number } | null>(null);
@@ -141,21 +154,25 @@ export default function BannerCropEditor({
   return (
     <div>
       <div className="mb-3 flex items-center justify-between gap-3">
+        {keys.length > 1 ? (
         <div role="group" aria-label="มุมมองตัวอย่าง" className="inline-flex rounded-lg border border-sand-200 p-0.5">
-          {(Object.keys(frames) as View[]).map((key) => (
+          {keys.map((key) => (
             <button
               key={key}
               type="button"
               onClick={() => setView(key)}
-              aria-pressed={view === key}
+              aria-pressed={activeView === key}
               className={`rounded-md px-3 py-1.5 text-sm font-semibold ${
-                view === key ? "bg-brand-200 text-brand-900" : "text-sand-500 hover:text-brand-700"
+                activeView === key ? "bg-brand-200 text-brand-900" : "text-sand-500 hover:text-brand-700"
               }`}
             >
               {frames[key].label}
             </button>
           ))}
         </div>
+        ) : (
+          <span />
+        )}
         <button
           type="button"
           onClick={reset}
@@ -169,7 +186,7 @@ export default function BannerCropEditor({
       <div
         ref={frameRef}
         role="application"
-        aria-label="ตัวอย่าง Banner ลากเพื่อเลื่อนรูป หรือใช้ปุ่มลูกศร"
+        aria-label="ตัวอย่างรูป ลากเพื่อเลื่อนรูป หรือใช้ปุ่มลูกศร"
         tabIndex={src ? 0 : -1}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
@@ -177,14 +194,14 @@ export default function BannerCropEditor({
         onPointerCancel={endDrag}
         onKeyDown={onKeyDown}
         className={`relative touch-none select-none overflow-hidden rounded-xl border border-sand-200 bg-sand-100 outline-none focus-visible:ring-2 focus-visible:ring-brand-400 ${
-          frames[view].className
+          frames[activeView].className
         } ${src ? (dragging ? "cursor-grabbing" : "cursor-grab") : ""}`}
       >
         {src ? (
           <>
             <HomepageImage
               src={src}
-              alt="ตัวอย่างตำแหน่งรูป Banner"
+              alt={alt}
               draggable={false}
               onLoad={(event) => {
                 const image = event.currentTarget;
@@ -224,12 +241,12 @@ export default function BannerCropEditor({
             value={zoom}
             onChange={(event) => onZoomChange(clampZoom(Number(event.target.value)))}
             className="mt-2 w-full accent-brand-600"
-            aria-label="ซูมรูป Banner"
+            aria-label="ซูมรูป"
           />
         </label>
         <p className="mt-2 text-xs text-sand-500">
           ลากรูปในกรอบเพื่อเลือกส่วนที่จะแสดง (หรือกดลูกศรบนแป้นพิมพ์ แล้วใช้ Shift เพื่อเลื่อนเร็วขึ้น)
-          ตำแหน่งเดียวกันใช้ทั้งคอมพิวเตอร์และมือถือ สลับมุมมองเพื่อตรวจทั้งสองแบบ
+          {keys.length > 1 && " ตำแหน่งเดียวกันใช้ทุกมุมมอง สลับมุมมองเพื่อตรวจทั้งสองแบบ"}
         </p>
       </div>
     </div>
