@@ -34,3 +34,18 @@ export function electricityUnitsUsed(
   if (!Number.isFinite(current)) return 0;
   return Math.max(0, current - previousMeter);
 }
+
+/**
+ * Previous meter reading for a tenant's next bill: their own latest bill, else the reading
+ * recorded when they moved in, else (nothing recorded) the room's last reading from whoever lived there before.
+ */
+export function pickPreviousMeter(readings: {
+  tenantLatest: number | string | null | undefined;
+  tenantInitial: number | string | null | undefined;
+  roomLatest: number | string | null | undefined;
+}) {
+  for (const value of [readings.tenantLatest, readings.tenantInitial, readings.roomLatest]) {
+    if (value !== null && value !== undefined && value !== "") return Number(value);
+  }
+  return null;
+}

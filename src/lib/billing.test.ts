@@ -3,6 +3,7 @@ import {
   electricityUnitsUsed,
   hasInvalidOtherItem,
   isValidOtherItem,
+  pickPreviousMeter,
 } from "./billing";
 
 describe("isValidOtherItem", () => {
@@ -56,5 +57,24 @@ describe("electricityUnitsUsed", () => {
 
   it("never goes negative", () => {
     expect(electricityUnitsUsed(100, "90")).toBe(0);
+  });
+});
+
+describe("pickPreviousMeter", () => {
+  it("prefers the tenant's own latest bill", () => {
+    expect(pickPreviousMeter({ tenantLatest: "250.5", tenantInitial: 100, roomLatest: 90 })).toBe(250.5);
+  });
+
+  it("a new tenant starts from their own move-in reading, not the previous tenant's last bill", () => {
+    expect(pickPreviousMeter({ tenantLatest: null, tenantInitial: 135, roomLatest: 130 })).toBe(135);
+  });
+
+  it("uses the room's last reading only when no move-in reading was recorded", () => {
+    expect(pickPreviousMeter({ tenantLatest: undefined, tenantInitial: null, roomLatest: 130 })).toBe(130);
+  });
+
+  it("treats 0 as a real reading and returns null when nothing is known", () => {
+    expect(pickPreviousMeter({ tenantLatest: 0, tenantInitial: 50, roomLatest: 70 })).toBe(0);
+    expect(pickPreviousMeter({ tenantLatest: null, tenantInitial: null, roomLatest: null })).toBeNull();
   });
 });

@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/supabase/database.types";
+import { pickPreviousMeter } from "@/lib/billing";
 
 type Client = SupabaseClient<Database>;
 
@@ -13,25 +14,34 @@ export async function fetchBillingContext(supabase: Client, roomCode: string) {
 
   if (!room) return null;
 
-  const [tenantResult, latestBillResult, periodsResult] = await Promise.all([
-    supabase
-      .from("tenants")
-      .select(
-        "id, full_name, rent_waived_year, rent_waived_month, initial_electricity_meter, line_user_id"
-      )
-      .eq("room_id", room.id)
-      .eq("is_active", true)
-      .maybeSingle(),
-    // Latest metered bill gives the previous meter reading for the next one.
-    supabase
+  const { data: tenant } = await supabase
+    .from("tenants")
+    .select(
+      "id, full_name, rent_waived_year, rent_waived_month, initial_electricity_meter, line_user_id"
+    )
+    .eq("room_id", room.id)
+    .eq("is_active", true)
+    .maybeSingle();
+
+  // Latest metered bill, newest first. Scoped to the current tenant first: a new tenant's
+  // starting reading is their own move-in reading, not the previous tenant's last bill.
+  const latestMeteredBill = (tenantId?: string) => {
+    let query = supabase
       .from("bills")
       .select("billing_year, billing_month, current_meter")
       .eq("room_id", room.id)
-      .not("current_meter", "is", null)
+      .not("current_meter", "is", null);
+    if (tenantId) query = query.eq("tenant_id", tenantId);
+    return query
       .order("billing_year", { ascending: false })
       .order("billing_month", { ascending: false })
       .limit(1)
-      .maybeSingle(),
+      .maybeSingle();
+  };
+
+  const [tenantLatestResult, roomLatestResult, periodsResult] = await Promise.all([
+    tenant ? latestMeteredBill(tenant.id) : Promise.resolve({ data: null }),
+    latestMeteredBill(),
     // Periods that already have a bill ("YYYY-MM"), so the form can warn before submitting.
     supabase.from("bills").select("billing_year, billing_month").eq("room_id", room.id),
   ]);
@@ -39,15 +49,11 @@ export async function fetchBillingContext(supabase: Client, roomCode: string) {
   const existingPeriods = (periodsResult.data ?? []).map(
     (bill) => `${bill.billing_year}-${String(bill.billing_month).padStart(2, "0")}`
   );
-  const tenant = tenantResult.data;
-  const latestMeter = latestBillResult.data?.current_meter;
-  const initialMeter = tenant?.initial_electricity_meter;
-  const previousMeter =
-    latestMeter != null
-      ? Number(latestMeter)
-      : initialMeter != null
-        ? Number(initialMeter)
-        : null;
+  const previousMeter = pickPreviousMeter({
+    tenantLatest: tenantLatestResult.data?.current_meter,
+    tenantInitial: tenant?.initial_electricity_meter,
+    roomLatest: roomLatestResult.data?.current_meter,
+  });
 
   return { room, tenant, previousMeter, existingPeriods };
 }
