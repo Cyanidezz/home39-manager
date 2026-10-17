@@ -26,7 +26,7 @@ export default function GalleryEditor({ settings, uploading, updateSetting, onUp
   return (
     <section className="rounded-2xl border border-sand-200 bg-white p-5 shadow-sm sm:p-7">
       <div className="mb-6">
-        <h2 className="text-xl font-bold">ภาพรวมและส่วนกลาง</h2>
+        <h2 className="text-xl font-bold">รูปบรรยากาศหอพัก</h2>
         <p className="mt-1 text-sm text-sand-500">
           รูปบรรยากาศหอพักและพื้นที่ส่วนกลาง แสดงต่อจากรายการห้องพักบนหน้าแรก
           (ถ้าไม่มีรูปเลย ส่วนนี้จะไม่แสดง) หัวข้อและรายละเอียดเว้นว่างได้ ถ้าไม่ต้องการแสดงข้อความ
