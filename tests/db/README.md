@@ -12,11 +12,15 @@ the production `public` schema. Nothing touches Supabase when the tests run.
 | `3-payment.test.ts` | public bill page, slip submission steps, upload rate limit, status changes |
 | `4-moveout.test.ts` | move-out notice, rent waiver, cancel, complete |
 | `5-lifecycle.test.ts` | re-letting a room, mid-month changeover, one test that walks the whole lifecycle |
+| `6-clear-room.test.ts` | the hand-run script that clears one room's test data (`supabase/scripts/clear-room-data.sql`) |
+| `7-settlement.test.ts` | deposit settlement after move-out: deductions, refund, closing, reopening |
 
 Run: `npx vitest run tests/db` (about 6 s; `npm test` includes it).
 
 Known bugs are kept as `it.fails("BUG: ...")` with a `// BUG (severity)` comment: the suite stays green, and the
 test starts failing the day the bug is fixed, which is the cue to turn it into a normal test.
+
+Migrations newer than `baseline.sql` are applied by `helpers.ts` (`pendingMigrations`) until the baseline is regenerated.
 
 ## Keeping the baseline current
 After a migration is applied to the project, regenerate the snapshot (read-only catalog queries through the linked

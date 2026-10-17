@@ -12,7 +12,23 @@ const supabaseStubs = `
   create function auth.uid() returns uuid language sql stable as $$
     select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid
   $$;
+  create schema storage;
+  create table storage.buckets (id text primary key, name text, public boolean, file_size_limit bigint, allowed_mime_types text[]);
+  create table storage.objects (id uuid default gen_random_uuid() primary key, bucket_id text, name text);
+  alter table storage.objects enable row level security;
 `;
+
+/**
+ * Migrations newer than baseline.sql. The baseline is regenerated from the project after a migration has been applied
+ * there (see README), so until then the test database applies the migration itself; once the baseline contains the
+ * objects the file is skipped. Add a migration here when it adds tables or functions the tests use.
+ */
+const pendingMigrations = [
+  { file: "20261018090000_move_out_settlement.sql", marker: "public.move_out_settlements" },
+].map(({ file, marker }) => ({
+  marker,
+  sql: readFileSync(new URL(`../../supabase/migrations/${file}`, import.meta.url), "utf8"),
+}));
 
 let shared: PGlite | undefined;
 
@@ -26,6 +42,10 @@ export async function createDatabase() {
     shared = new PGlite();
     await shared.exec(supabaseStubs);
     await shared.exec(baseline);
+    for (const { marker, sql } of pendingMigrations) {
+      const present = await shared.query<{ found: string | null }>("select to_regclass($1) as found", [marker]);
+      if (!present.rows[0].found) await shared.exec(sql);
+    }
   }
   const tables = await shared.query<{ tablename: string }>("select tablename from pg_tables where schemaname = 'public'");
   await shared.exec(

@@ -21,6 +21,7 @@ const rooms = [
   { id: uuid(11), room_code: "A", monthly_rent: 4500, occupant_count: 1, status: "occupied", note: null },
   { id: uuid(12), room_code: "B", monthly_rent: 5000, occupant_count: 1, status: "occupied", note: null },
   { id: uuid(13), room_code: "C", monthly_rent: 4500, occupant_count: 0, status: "vacant", note: null },
+  { id: uuid(14), room_code: "D", monthly_rent: 4800, occupant_count: 0, status: "vacant", note: null },
 ];
 
 const tenants = [
@@ -37,6 +38,21 @@ const tenants = [
     termination_notice_date: day(year, month, 1), planned_move_out_date: day(year, month + 1 > 12 ? 12 : month + 1, 28),
     advance_rent_amount: 5000, deposit_amount: 10000, initial_electricity_meter: 340,
     rent_waived_year: year, rent_waived_month: month, line_user_id: "U-mock-line",
+  },
+  // Moved out, deposit settlement not started (room C) and saved but not yet transferred (room D).
+  {
+    id: uuid(23), room_id: rooms[2].id, full_name: "ตัวอย่าง ผู้เช่าเดิม C", phone: "081-000-0003",
+    move_in_date: day(year - 1, 2, 1), move_out_date: day(year, month, 1), is_active: false, note: null,
+    termination_notice_date: day(year, month - 1 < 1 ? 1 : month - 1, 1), planned_move_out_date: day(year, month, 1),
+    advance_rent_amount: 4500, deposit_amount: 9000, initial_electricity_meter: 60,
+    rent_waived_year: year, rent_waived_month: month - 1 < 1 ? 1 : month - 1, line_user_id: null,
+  },
+  {
+    id: uuid(24), room_id: rooms[3].id, full_name: "ตัวอย่าง ผู้เช่าเดิม D", phone: "081-000-0004",
+    move_in_date: day(year - 1, 5, 1), move_out_date: day(year, month, 2), is_active: false, note: null,
+    termination_notice_date: null, planned_move_out_date: null,
+    advance_rent_amount: 4800, deposit_amount: 9600, initial_electricity_meter: 200,
+    rent_waived_year: null, rent_waived_month: null, line_user_id: null,
   },
 ];
 
@@ -65,6 +81,9 @@ const bills = [
   bill(2, rooms[0], tenants[0], year, month, "slip_submitted", 168, 205, { other: 100 }),
   bill(3, rooms[1], tenants[1], prev.year, prev.month, "paid", 340, 402),
   bill(4, rooms[1], tenants[1], year, month, "unpaid", 402, 455),
+  bill(5, rooms[2], tenants[2], prev.year, prev.month, "paid", 60, 98),
+  bill(6, rooms[2], tenants[2], year, month, "unpaid", 98, 131),
+  bill(7, rooms[3], tenants[3], prev.year, prev.month, "paid", 200, 238),
 ];
 
 const billItems = [
@@ -96,7 +115,16 @@ const homepageRooms = rooms.map((room) => ({
   cover_image_zoom: 100, image_urls: [], updated_at: "2026-01-01T00:00:00Z",
 }));
 
+const settlements = [{
+  id: uuid(701), tenant_id: tenants[3].id, room_id: rooms[3].id, deposit_amount: 9600, final_electricity_meter: 262,
+  electricity_amount: 168, water_amount: 150, items: [{ name: "ผนังมีรอย ทาสีใหม่", amount: 1500 }, { name: "ทำความสะอาด", amount: 500 }],
+  items_amount: 2000, outstanding_bills_amount: 0, total_deductions: 2318, refund_amount: 7282,
+  note: "ตรวจห้องวันย้ายออก ผนังด้านเตียงมีรอย", status: "open", refunded_on: null, refund_reference: null, refund_slip_path: null,
+  closed_at: null, created_at: `${day(year, month, 2)}T08:00:00Z`, updated_at: `${day(year, month, 2)}T08:00:00Z`,
+}];
+
 export const tables = {
+  move_out_settlements: settlements,
   rooms, tenants, bills, bill_items: billItems, expenses,
   contracts: [{
     id: uuid(601), room_id: rooms[1].id, tenant_id: tenants[1].id, contract_start: day(year - 1, 8, 15), contract_end: null,
