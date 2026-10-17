@@ -1,6 +1,6 @@
 import type { ChangeEvent } from "react";
 import type { HomepageSettings } from "@/lib/homepage";
-import BannerCropEditor from "./BannerCropEditor";
+import ImageCropEditor from "./ImageCropEditor";
 import { inputClass } from "./styles";
 
 type Props = {
@@ -33,7 +33,8 @@ export default function BannerSection({ settings, uploading, updateSetting, onUp
                 </label>
               </div>
               <div>
-                <BannerCropEditor
+                <ImageCropEditor
+                  alt="ตัวอย่างตำแหน่งรูป Banner"
                   src={settings.banner_image_url}
                   positionX={settings.banner_image_position_x}
                   positionY={settings.banner_image_position_y}

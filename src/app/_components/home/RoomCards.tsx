@@ -5,6 +5,18 @@ function money(value: number | string) {
   return Number(value || 0).toLocaleString("th-TH");
 }
 
+// Rows saved before the crop columns existed come back without them.
+function coverCropStyle(room: DisplayRoom) {
+  const x = room.cover_image_position_x ?? 50;
+  const y = room.cover_image_position_y ?? 50;
+  const zoom = room.cover_image_zoom ?? 100;
+  return {
+    objectPosition: `${x}% ${y}%`,
+    transformOrigin: `${x}% ${y}%`,
+    transform: `scale(${zoom / 100})`,
+  };
+}
+
 type Props = {
   rooms: DisplayRoom[];
   onSelect: (room: DisplayRoom) => void;
@@ -35,11 +47,14 @@ export default function RoomCards({ rooms, onSelect }: Props) {
             >
               <div className="relative flex h-52 items-center justify-center overflow-hidden bg-gradient-to-br from-brand-100 via-sand-100 to-brand-50">
                 {room.cover_image_url ? (
-                  <HomepageImage
-                    src={room.cover_image_url}
-                    alt={room.title}
-                    className="absolute inset-0 h-full w-full object-cover transition duration-300 group-hover:scale-105"
-                  />
+                  <div className="absolute inset-0 transition duration-300 group-hover:scale-105">
+                    <HomepageImage
+                      src={room.cover_image_url}
+                      alt={room.title}
+                      className="h-full w-full object-cover"
+                      style={coverCropStyle(room)}
+                    />
+                  </div>
                 ) : (
                   <span className="relative rounded-full bg-white/90 px-4 py-2 text-sm font-semibold text-brand-700 shadow">
                     รูปห้อง {room.room_code}

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { safeHttpUrl, type HomepageRoom, type HomepageSettings } from "@/lib/homepage";
 import { uploadHomepageImage } from "@/lib/homepageUpload";
+import { clampPercent, clampZoom } from "@/lib/bannerCrop";
 import BannerSection from "./_components/BannerSection";
 import LocationSection from "./_components/LocationSection";
 import ContactSection from "./_components/ContactSection";
@@ -79,7 +80,12 @@ export default function HomepageManager({ initialSettings, initialRooms }: Props
       );
       const room = rooms.find((item) => item.room_code === roomCode)!;
       if (cover) {
-        updateRoom(roomCode, { cover_image_url: urls[0] });
+        updateRoom(roomCode, {
+          cover_image_url: urls[0],
+          cover_image_position_x: 50,
+          cover_image_position_y: 50,
+          cover_image_zoom: 100,
+        });
       } else {
         updateRoom(roomCode, { image_urls: [...room.image_urls, ...urls] });
       }
@@ -138,6 +144,9 @@ export default function HomepageManager({ initialSettings, initialRooms }: Props
     const { error } = await supabase.from("homepage_rooms").upsert({
       ...room,
       monthly_price: monthlyPrice,
+      cover_image_position_x: clampPercent(room.cover_image_position_x ?? 50),
+      cover_image_position_y: clampPercent(room.cover_image_position_y ?? 50),
+      cover_image_zoom: clampZoom(room.cover_image_zoom ?? 100),
       updated_at: new Date().toISOString(),
     });
     setSaving(false);
