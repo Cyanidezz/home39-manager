@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import {
   ELECTRICITY_RATE,
   WATER_RATE,
+  billCreationError,
   electricityUnitsUsed,
   hasInvalidOtherItem,
   isValidOtherItem,
@@ -189,11 +190,7 @@ export default function BillForm({
 
     if (rpcError || !newBillId) {
       const message = rpcError?.message || "ไม่สามารถสร้างบิลได้";
-      setError(
-        message.includes("already exists")
-          ? `ห้อง ${roomCode} มีบิล ${billingMonth}/${billingYear} อยู่แล้ว`
-          : message
-      );
+      setError(billCreationError(message, { roomCode, month: billingMonth, year: billingYear }));
       setLoading(false);
       return;
     }

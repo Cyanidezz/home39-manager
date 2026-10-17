@@ -7,7 +7,8 @@ create table public."bill_items" (
   "bill_id" uuid not null,
   "item_name" text not null,
   "amount" numeric default 0 not null,
-  "created_at" timestamptz default now() not null
+  "created_at" timestamptz default now() not null,
+  "position" integer default 0 not null
 );
 
 create table public."bill_status_logs" (
@@ -285,6 +286,7 @@ CREATE INDEX slip_upload_attempts_bill_created_idx ON public.slip_upload_attempt
 CREATE INDEX slip_upload_attempts_ip_created_idx ON public.slip_upload_attempts USING btree (ip_hash, created_at DESC);
 CREATE INDEX idx_tenants_room_id ON public.tenants USING btree (room_id);
 CREATE UNIQUE INDEX tenants_line_user_id_unique ON public.tenants USING btree (line_user_id) WHERE (line_user_id IS NOT NULL);
+CREATE UNIQUE INDEX tenants_one_active_per_room ON public.tenants USING btree (room_id) WHERE (is_active AND (room_id IS NOT NULL));
 
 create view public."bill_summary" as  SELECT b.id,
     r.room_code,
@@ -622,9 +624,19 @@ declare
   v_item jsonb;
   v_item_name text;
   v_item_amount numeric;
+  v_position integer := 0;
+  v_items_total numeric := 0;
+  v_move_in date;
+  v_latest_year integer;
+  v_latest_month integer;
+  v_expected_meter numeric;
 begin
   if (select auth.uid()) is null then
     raise exception 'Authentication required';
+  end if;
+
+  if p_billing_year < 2000 or p_billing_year > 2200 then
+    raise exception 'Invalid billing year';
   end if;
 
   if p_billing_month < 1 or p_billing_month > 12 then
@@ -655,6 +667,41 @@ begin
       and t.is_active = true
   ) then
     raise exception 'Active tenant does not belong to this room';
+  end if;
+
+  -- A bill cannot cover a month before the tenant moved in.
+  select t.move_in_date into v_move_in from public.tenants t where t.id = p_tenant_id;
+  if v_move_in is not null
+     and make_date(p_billing_year, p_billing_month, 1) < date_trunc('month', v_move_in)::date then
+    raise exception 'Billing period is before the tenant move-in date';
+  end if;
+
+  -- The previous meter must continue from the last reading, using the same rule as the bill form:
+  -- the tenant's latest bill, else the reading recorded at move-in, else the room's last reading.
+  -- Back-filling a period that is not newer than the tenant's latest bill is not checked.
+  select b.billing_year, b.billing_month, b.current_meter
+    into v_latest_year, v_latest_month, v_expected_meter
+  from public.bills b
+  where b.tenant_id = p_tenant_id and b.current_meter is not null
+  order by b.billing_year desc, b.billing_month desc
+  limit 1;
+
+  if v_latest_year is null
+     or (p_billing_year, p_billing_month) > (v_latest_year, v_latest_month) then
+    if v_expected_meter is null then
+      select t.initial_electricity_meter into v_expected_meter
+      from public.tenants t where t.id = p_tenant_id;
+    end if;
+    if v_expected_meter is null then
+      select b.current_meter into v_expected_meter
+      from public.bills b
+      where b.room_id = p_room_id and b.current_meter is not null
+      order by b.billing_year desc, b.billing_month desc
+      limit 1;
+    end if;
+    if v_expected_meter is not null and p_previous_meter <> v_expected_meter then
+      raise exception 'Previous meter does not continue from the last reading (expected %)', v_expected_meter;
+    end if;
   end if;
 
   insert into public.bills (
@@ -711,9 +758,17 @@ begin
       raise exception 'Invalid bill item';
     end if;
 
-    insert into public.bill_items (bill_id, item_name, amount)
-    values (v_bill_id, v_item_name, v_item_amount);
+    insert into public.bill_items (bill_id, item_name, amount, position)
+    values (v_bill_id, v_item_name, v_item_amount, v_position);
+
+    v_position := v_position + 1;
+    v_items_total := v_items_total + v_item_amount;
   end loop;
+
+  -- The client sends both the items and their total; they must agree (the bill is rolled back otherwise).
+  if abs(v_items_total - p_other_amount) > 0.004 then
+    raise exception 'Other amount does not match the sum of the bill items';
+  end if;
 
   return v_bill_id;
 exception
@@ -824,7 +879,7 @@ AS $function$
           jsonb_build_object(
             'item_name', bi.item_name,
             'amount', bi.amount
-          ) order by bi.created_at, bi.id
+          ) order by bi.position, bi.created_at, bi.id
         )
         from public.bill_items bi
         where bi.bill_id = b.id

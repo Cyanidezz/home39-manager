@@ -116,7 +116,7 @@ export async function PATCH(
 
   if (items.length > 0) {
     const { error: insertItemsError } = await admin.from("bill_items").insert(
-      items.map((item) => ({ bill_id: billId, item_name: item.name, amount: Number(item.amount) }))
+      items.map((item, index) => ({ bill_id: billId, item_name: item.name, amount: Number(item.amount), position: index }))
     );
     if (insertItemsError) {
       console.error("Insert bill items failed:", insertItemsError);

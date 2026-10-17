@@ -36,7 +36,7 @@ describe("5a. ห้องกลับมาให้เช่าใหม่ห
     await setStatus(bill, "paid", "รับเงินสด");
     await complete(first, "2026-03-31");
 
-    const second = await addTenant(db, roomId, { name: "คนที่สอง", moveIn: "2026-04-01", contractPath: "contracts/2.pdf", contractName: "2.pdf" });
+    const second = await addTenant(db, roomId, { name: "คนที่สอง", moveIn: "2026-04-01", meter: 130, contractPath: "contracts/2.pdf", contractName: "2.pdf" });
     await addBill(db, roomId, second, { year: 2026, month: 4, prev: 130, curr: 140 });
 
     expect((await rows(db, "select 1 from bills where tenant_id=$1", [first])).length).toBe(1);

@@ -28,12 +28,19 @@ const settlement = () =>
        from move_out_settlements where tenant_id=$1`,
     [tenantId]
   );
-const bill = (month: number, curr: number) => addBill(db, roomId, tenantId, { year: 2026, month, prev: curr - 30, curr, rent: 5000, occupants: 2 });
+// Each bill continues from the previous reading (create_bill_with_items rejects a previous meter that does not).
+let lastMeter = 100;
+const bill = async (month: number, curr: number) => {
+  const id = await addBill(db, roomId, tenantId, { year: 2026, month, prev: lastMeter, curr, rent: 5000, occupants: 2 });
+  lastMeter = curr;
+  return id;
+};
 
 beforeEach(async () => {
   db = await createDatabase();
   roomId = await addRoom(db, "A", { monthlyRent: 5000 });
   tenantId = await addTenant(db, roomId, { moveIn: "2026-01-01", rent: 5000, advance: 5000, deposit: 10000, meter: 100, occupants: 2 });
+  lastMeter = 100;
   await signIn(db);
 });
 
