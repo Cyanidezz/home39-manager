@@ -1,41 +1,41 @@
 @import "tailwindcss";
 
 :root {
-  --background: #fff9f2;
-  --foreground: #3b2d24;
+  --background: #fcfaf7;
+  --foreground: #332b25;
 }
 
 /*
- * Soft, warm "homie" palette. `brand` is a peach-to-caramel accent (soft peach
- * buttons with dark brown text, caramel links and icons); `sand` is the warm
- * neutral scale (surfaces, borders, text).
+ * Soft, warm "homie" coffee palette. `brand` runs from latte cream to roasted
+ * brown (soft latte buttons with dark brown text, mocha links and icons);
+ * `sand` is the warm neutral scale (surfaces, borders, text).
  * Status colours (green, red, amber, orange) keep Tailwind's defaults so
  * paid / overdue / rejected stay instantly recognisable.
  */
 @theme {
-  --color-brand-50: #fffaf4;
-  --color-brand-100: #fef1e3;
-  --color-brand-200: #fbe0c8;
-  --color-brand-300: #f6cba6;
-  --color-brand-400: #eeb084;
-  --color-brand-500: #e2935f;
-  --color-brand-600: #a05d34;
-  --color-brand-700: #8a4f2c;
-  --color-brand-800: #6f3f25;
-  --color-brand-900: #5a3320;
-  --color-brand-950: #35190d;
+  --color-brand-50: #fbf7f3;
+  --color-brand-100: #f5ede4;
+  --color-brand-200: #ead9c7;
+  --color-brand-300: #dcc0a3;
+  --color-brand-400: #c9a07c;
+  --color-brand-500: #b2825a;
+  --color-brand-600: #8c6342;
+  --color-brand-700: #744f33;
+  --color-brand-800: #5d3f2a;
+  --color-brand-900: #4a3222;
+  --color-brand-950: #2b1c13;
 
-  --color-sand-50: #fff9f2;
-  --color-sand-100: #fbf3e9;
-  --color-sand-200: #f3e8da;
-  --color-sand-300: #e6d6c3;
-  --color-sand-400: #b9a590;
-  --color-sand-500: #806d5b;
-  --color-sand-600: #66554a;
-  --color-sand-700: #55463a;
-  --color-sand-800: #46382d;
-  --color-sand-900: #3b2d24;
-  --color-sand-950: #1f1712;
+  --color-sand-50: #fcfaf7;
+  --color-sand-100: #f7f2ec;
+  --color-sand-200: #ede5db;
+  --color-sand-300: #dcd0c2;
+  --color-sand-400: #aa9b8b;
+  --color-sand-500: #7b6c5e;
+  --color-sand-600: #62554a;
+  --color-sand-700: #4f443b;
+  --color-sand-800: #3f362f;
+  --color-sand-900: #332b25;
+  --color-sand-950: #1c1713;
 }
 
 @theme inline {
@@ -52,8 +52,8 @@ body {
 }
 
 ::selection {
-  background: #fbe0c8;
-  color: #35190d;
+  background: #ead9c7;
+  color: #2b1c13;
 }
 
 button,
@@ -73,14 +73,14 @@ textarea {
 input,
 select,
 textarea {
-  border-color: #e6d6c3;
+  border-color: #dcd0c2;
   background-color: #ffffff;
 }
 
 input:focus,
 select:focus,
 textarea:focus {
-  border-color: #e2935f;
-  box-shadow: 0 0 0 3px rgb(226 147 95 / 0.2);
+  border-color: #b2825a;
+  box-shadow: 0 0 0 3px rgb(178 130 90 / 0.2);
   outline: none;
 }

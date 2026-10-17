@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/data/session";
 import { fetchBillingContext } from "@/lib/data/roomPages";
 import BillForm from "./BillForm";
+import Icon from "@/components/Icon";
 
 type Props = {
   params: Promise<{
@@ -24,7 +25,7 @@ export default async function NewBillPage({ params }: Props) {
       <div className="mx-auto max-w-2xl">
         <div className="rounded-2xl border border-sand-200 bg-white p-8 shadow-sm">
           <h1 className="text-3xl font-bold">
-            🧾 ออกบิลใหม่ - ห้อง {room.room_code}
+            <Icon name="receipt" /> ออกบิลใหม่ - ห้อง {room.room_code}
           </h1>
 
           {/* <p className="mt-1 font-semibold">

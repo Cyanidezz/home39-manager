@@ -14,6 +14,7 @@ import {
 import { thaiMonthNames } from "@/lib/format";
 import OtherItemsEditor from "./_components/OtherItemsEditor";
 import { nullable } from "@/lib/supabase/rpc";
+import Icon from "@/components/Icon";
 
 type Props = {
   roomId: string;
@@ -353,7 +354,7 @@ export default function BillForm({
           disabled={loading}
           className="rounded-lg bg-brand-300 px-6 py-3 text-brand-950 disabled:opacity-50"
         >
-          {loading ? "กำลังบันทึก..." : "🧾 บันทึกและออกบิล"}
+          {loading ? "กำลังบันทึก..." : <><Icon name="receipt" /> บันทึกและออกบิล</>}
         </button>
         <button
           type="button"

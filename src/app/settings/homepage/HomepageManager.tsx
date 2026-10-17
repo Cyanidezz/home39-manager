@@ -9,6 +9,7 @@ import BannerSection from "./_components/BannerSection";
 import LocationSection from "./_components/LocationSection";
 import ContactSection from "./_components/ContactSection";
 import RoomsSection from "./_components/RoomsSection";
+import Icon from "@/components/Icon";
 
 
 type Props = {
@@ -163,7 +164,7 @@ export default function HomepageManager({ initialSettings, initialRooms }: Props
             rel="noopener noreferrer"
             className="inline-flex justify-center rounded-xl border border-brand-200 bg-white px-5 py-3 font-semibold text-brand-700 hover:bg-brand-50"
           >
-            ดูหน้าเว็บไซต์ ↗
+            ดูหน้าเว็บไซต์ <Icon name="external" />
           </a>
         </div>
 

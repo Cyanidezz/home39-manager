@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { nullable } from "@/lib/supabase/rpc";
+import Icon from "@/components/Icon";
 
 type Props = {
   roomId: string;
@@ -324,7 +325,7 @@ export default function TenantForm({
             ไม่บังคับ • PDF ขนาดไม่เกิน 10 MB • เพิ่มภายหลังได้
           </p>
           {contractFile && (
-            <p className="mt-2 text-sm font-medium text-sand-700">📎 {contractFile.name}</p>
+            <p className="mt-2 text-sm font-medium text-sand-700"><Icon name="paperclip" /> {contractFile.name}</p>
           )}
         </div>
 

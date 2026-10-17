@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import Icon from "@/components/Icon";
 
 type Props = {
   roomId: string;
@@ -152,7 +153,7 @@ export default function ContractForm({
 
         {file && (
           <p className="mt-2 text-sm text-sand-500">
-            📎 {file.name}
+            <Icon name="paperclip" /> {file.name}
           </p>
         )}
       </div>

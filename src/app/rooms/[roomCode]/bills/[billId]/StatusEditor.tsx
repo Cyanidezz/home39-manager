@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Icon from "@/components/Icon";
 
 type Props = {
   billId: string;
@@ -57,7 +58,7 @@ export default function StatusEditor({
           <div className="relative z-10 w-full max-w-lg rounded-2xl border border-sand-200 bg-white shadow-2xl">
             <div className="flex items-center justify-between border-b border-sand-200 px-6 py-5">
               <div>
-                <h2 className="text-xl font-bold">✏️ แก้ไขสถานะบิล</h2>
+                <h2 className="text-xl font-bold"><Icon name="pencil" /> แก้ไขสถานะบิล</h2>
                 <p className="mt-1 text-sm text-sand-500">ห้อง {roomCode}</p>
               </div>
               <button
@@ -65,7 +66,7 @@ export default function StatusEditor({
                 onClick={() => setOpen(false)}
                 className="flex h-9 w-9 items-center justify-center rounded-full text-sand-400 transition hover:bg-sand-100 hover:text-brand-700"
               >
-                ✕
+                <Icon name="close" className="h-5 w-5" />
               </button>
             </div>
 

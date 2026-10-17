@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireUser } from "@/lib/data/session";
 import { fetchRoomList } from "@/lib/data/lists";
 import { formatThaiDate } from "@/lib/format";
+import Icon from "@/components/Icon";
 
 export default async function RoomsPage() {
   const { supabase } = await requireUser("/");
@@ -53,7 +54,7 @@ export default async function RoomsPage() {
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-center gap-3">
                     <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-xl">
-                      🏠
+                      <Icon name="home" className="h-6 w-6 text-brand-600" />
                     </span>
                     <div>
                       <h2 className="text-2xl font-bold">ห้อง {room.room_code}</h2>

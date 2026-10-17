@@ -1,4 +1,5 @@
 import { googleMapsEmbedUrl, safeHttpUrl, type HomepageSettings } from "@/lib/homepage";
+import Icon from "@/components/Icon";
 
 type Props = { settings: HomepageSettings };
 
@@ -37,7 +38,7 @@ export default function LocationSection({ settings }: Props) {
             <ul className="mt-4 grid gap-3 sm:grid-cols-2">
               {settings.nearby_places.map((place, index) => (
                 <li key={`${place}-${index}`} className="flex items-center gap-3 rounded-lg border border-sand-200 bg-sand-50 px-4 py-3">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-100">📍</span>
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-100"><Icon name="pin" className="h-5 w-5 text-brand-600" /></span>
                   <span className="font-medium">{place}</span>
                 </li>
               ))}

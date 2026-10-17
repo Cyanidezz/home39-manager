@@ -4,6 +4,7 @@ import { createPublicClient } from "@/lib/supabase/public";
 import SlipUploadForm from "./SlipUploadForm";
 import { formatMoney, formatNumber, formatThaiDateShort, thaiMonths } from "@/lib/format";
 import { getBillStatus } from "@/lib/billStatus";
+import Icon from "@/components/Icon";
 
 type Props = {
   params: Promise<{ token: string }>;
@@ -75,7 +76,7 @@ export default async function PublicBillPage({ params }: Props) {
     <main className="min-h-screen bg-sand-50 px-4 py-10">
       <div className="mx-auto max-w-xl">
         <div className="mb-6 text-center">
-          <h1 className="text-3xl font-bold">🏠 Home39</h1>
+          <h1 className="text-3xl font-bold"><Icon name="home" /> Home39</h1>
           <p className="mt-1 text-sand-500">ใบแจ้งค่าใช้จ่าย</p>
         </div>
 

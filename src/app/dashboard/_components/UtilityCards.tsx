@@ -1,18 +1,19 @@
 import { formatMoney } from "@/lib/format";
 import type { MonthSummary } from "@/lib/dashboard";
+import Icon from "@/components/Icon";
 
 export default function UtilityCards({ summary }: { summary: MonthSummary }) {
   const utilities = [
     {
       title: "วิเคราะห์ค่าน้ำ",
       subtitle: "เปรียบเทียบยอดเรียกเก็บกับต้นทุนจริง",
-      icon: "💧",
+      icon: <Icon name="droplet" className="h-6 w-6 text-brand-600" />,
       ...summary.water,
     },
     {
       title: "วิเคราะห์ค่าไฟ",
       subtitle: `ผู้เช่าใช้รวม ${summary.electricity.units.toLocaleString("th-TH")} หน่วย`,
-      icon: "💡",
+      icon: <Icon name="bolt" className="h-6 w-6 text-brand-600" />,
       ...summary.electricity,
     },
   ];

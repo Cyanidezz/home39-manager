@@ -5,6 +5,7 @@ import HomepageImage from "@/components/HomepageImage";
 import { useModal } from "@/lib/useModal";
 import type { HomepageSettings } from "@/lib/homepage";
 import type { DisplayRoom } from "./types";
+import Icon from "@/components/Icon";
 
 function money(value: number | string) {
   return Number(value || 0).toLocaleString("th-TH");
@@ -71,7 +72,7 @@ export default function RoomDialog({ room, settings, onClose }: Props) {
                       />
                     ) : (
                       <div className="text-center">
-                        <span className="text-4xl">🛏️</span>
+                        <Icon name="bed" className="mx-auto h-10 w-10 text-brand-500" />
                         <p className="mt-3 text-sm font-semibold text-brand-700">
                           รูปห้อง {room.room_code}
                         </p>

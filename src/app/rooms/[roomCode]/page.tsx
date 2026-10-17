@@ -7,6 +7,7 @@ import RoomInfoCard from "./_components/RoomInfoCard";
 import TenantCard from "./_components/TenantCard";
 import ContractCard from "./_components/ContractCard";
 import LatestBillCard from "./_components/LatestBillCard";
+import Icon from "@/components/Icon";
 
 type Props = {
   params: Promise<{
@@ -53,7 +54,7 @@ export default async function RoomPage({ params }: Props) {
                 href={`/rooms/${room.room_code}/bills/new`}
                 className="rounded-lg bg-brand-300 px-4 py-2 text-sm font-medium text-brand-950 hover:bg-brand-400"
               >
-                🧾 ออกบิลใหม่
+                <Icon name="receipt" /> ออกบิลใหม่
               </Link>
             ) : (
               <Link

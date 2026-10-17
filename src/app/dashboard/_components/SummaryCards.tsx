@@ -1,5 +1,6 @@
 import { formatMoney } from "@/lib/format";
 import type { MonthSummary } from "@/lib/dashboard";
+import Icon from "@/components/Icon";
 
 export default function SummaryCards({ summary }: { summary: MonthSummary }) {
   const cards = [
@@ -7,7 +8,7 @@ export default function SummaryCards({ summary }: { summary: MonthSummary }) {
       label: "ยอดเรียกเก็บ",
       value: summary.totalIssued,
       detail: `${summary.issuedBills.length} บิล`,
-      icon: "▤",
+      icon: <Icon name="receipt" className="h-[18px] w-[18px]" />,
       valueClass: "text-sand-900",
       iconClass: "bg-brand-50 text-brand-600",
     },
@@ -15,7 +16,7 @@ export default function SummaryCards({ summary }: { summary: MonthSummary }) {
       label: "รับเงินจริง",
       value: summary.totalReceived,
       detail: `${summary.paidBills.length} บิลชำระแล้ว`,
-      icon: "▣",
+      icon: <Icon name="wallet" className="h-[18px] w-[18px]" />,
       valueClass: "text-emerald-600",
       iconClass: "bg-emerald-50 text-emerald-600",
     },
@@ -23,7 +24,7 @@ export default function SummaryCards({ summary }: { summary: MonthSummary }) {
       label: "ยอดค้างชำระ",
       value: summary.totalOutstanding,
       detail: `${summary.outstandingBills.length} บิลค้าง`,
-      icon: "!",
+      icon: <Icon name="alert" className="h-[18px] w-[18px]" />,
       valueClass: "text-amber-600",
       iconClass: "bg-amber-50 text-amber-600",
     },
@@ -31,7 +32,7 @@ export default function SummaryCards({ summary }: { summary: MonthSummary }) {
       label: "รายจ่ายจริง",
       value: summary.totalExpenses,
       detail: `${summary.expenseCount} รายการ`,
-      icon: "฿",
+      icon: <Icon name="baht" className="h-[18px] w-[18px]" />,
       valueClass: "text-red-600",
       iconClass: "bg-red-50 text-red-600",
     },
@@ -68,7 +69,7 @@ export default function SummaryCards({ summary }: { summary: MonthSummary }) {
             {formatMoney(Math.abs(summary.netProfit))}
           </strong>
           <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-brand-300 bg-white/60 font-bold">
-            ฿
+            <Icon name="baht" className="h-[18px] w-[18px]" />
           </span>
         </div>
         <p className="relative mt-2 text-xs text-brand-700">

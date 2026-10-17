@@ -1,4 +1,5 @@
 import type { OtherItem } from "@/lib/billing";
+import Icon from "@/components/Icon";
 
 type Props = {
   items: OtherItem[];
@@ -46,7 +47,7 @@ export default function OtherItemsEditor({ items, total, onAdd, onChange, onRemo
                 className="rounded-lg border px-3 text-sand-500 hover:bg-red-50 hover:text-red-600"
                 title="ลบรายการ"
               >
-                ✕
+                <Icon name="close" className="h-4 w-4" />
               </button>
             </div>
           ))}

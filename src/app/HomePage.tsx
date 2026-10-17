@@ -11,6 +11,7 @@ import ContactSection from "./_components/home/ContactSection";
 import LoginDialog from "./_components/home/LoginDialog";
 import RoomDialog from "./_components/home/RoomDialog";
 import type { DisplayRoom, Room } from "./_components/home/types";
+import Icon from "@/components/Icon";
 
 type Props = {
   rooms: Room[];
@@ -73,7 +74,7 @@ export default function HomePage({ rooms, isLoggedIn, settings, homepageRooms }:
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-8">
           <a href="#" className="flex items-center gap-3">
             <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-300 text-xl text-brand-950 shadow-md shadow-brand-200">
-              🏢
+              <Icon name="building" className="h-6 w-6" />
             </span>
             <div>
               <p className="text-lg font-bold leading-tight">Home 39</p>

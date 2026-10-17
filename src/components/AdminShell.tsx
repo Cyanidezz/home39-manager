@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { ReactNode, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import Icon from "@/components/Icon";
 
 type Props = {
   children: ReactNode;
@@ -15,25 +16,25 @@ const navigation = [
   {
     label: "Dashboard",
     href: "/dashboard",
-    icon: "▦",
+    icon: <Icon name="grid" className="h-4 w-4" />,
     active: (path: string) => path === "/dashboard",
   },
   {
     label: "ห้องพัก",
     href: "/rooms",
-    icon: "⌂",
+    icon: <Icon name="home" className="h-4 w-4" />,
     active: (path: string) => path.startsWith("/rooms"),
   },
   {
     label: "บันทึกรายจ่าย",
     href: "/expenses",
-    icon: "฿",
+    icon: <Icon name="baht" className="h-4 w-4" />,
     active: (path: string) => path.startsWith("/expenses"),
   },
   {
     label: "บัญชีโอนเงิน",
     href: "/settings/payment",
-    icon: "⚙",
+    icon: <Icon name="sliders" className="h-4 w-4" />,
     active: (path: string) => path.startsWith("/settings/payment"),
   },
 ];
@@ -68,7 +69,7 @@ export default function AdminShell({ children }: Props) {
           className="flex items-center gap-3"
         >
           <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-300 text-lg text-brand-950 shadow-md shadow-brand-200">
-            🏢
+            <Icon name="building" className="h-5 w-5" />
           </span>
           <div>
             <p className="font-bold leading-tight text-brand-950">Home39 Manager</p>
@@ -122,7 +123,7 @@ export default function AdminShell({ children }: Props) {
               pathname.startsWith("/settings/homepage") ? "bg-brand-100" : "bg-white/60"
             }`}
           >
-            ▤
+            <Icon name="layout" className="h-4 w-4" />
           </span>
           จัดการ Homepage
         </Link>
@@ -132,7 +133,7 @@ export default function AdminShell({ children }: Props) {
           className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-brand-800 hover:bg-white/70 hover:text-brand-950"
         >
           <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/60">
-            ↗
+            <Icon name="external" className="h-4 w-4" />
           </span>
           ดูหน้าเว็บไซต์
         </Link>
@@ -143,7 +144,7 @@ export default function AdminShell({ children }: Props) {
           className="mt-1 flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-red-700 hover:bg-red-100 hover:text-red-800 disabled:opacity-50"
         >
           <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-100">
-            ⇥
+            <Icon name="logout" className="h-4 w-4" />
           </span>
           {signingOut ? "กำลังออกจากระบบ..." : "ออกจากระบบ"}
         </button>
@@ -161,7 +162,7 @@ export default function AdminShell({ children }: Props) {
         <div className="sticky top-0 z-40 flex items-center justify-between border-b border-sand-200 bg-white px-4 py-3 lg:hidden">
           <Link href="/dashboard" className="flex items-center gap-2 font-bold">
             <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-300 text-brand-950">
-              🏢
+              <Icon name="building" className="h-5 w-5" />
             </span>
             Home39 Manager
           </Link>
@@ -171,7 +172,7 @@ export default function AdminShell({ children }: Props) {
             className="flex h-10 w-10 items-center justify-center rounded-lg border border-sand-200 text-xl text-sand-700"
             aria-label="เปิดเมนู"
           >
-            ☰
+            <Icon name="menu" className="h-5 w-5" />
           </button>
         </div>
 

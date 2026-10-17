@@ -7,6 +7,7 @@ import SlipSection from "./_components/SlipSection";
 import { updateBillStatus } from "./actions";
 import SendBillLineButton from "@/components/SendBillLineButton";
 import { getBillStatus } from "@/lib/billStatus";
+import Icon from "@/components/Icon";
 
 type Props = {
   params: Promise<{
@@ -91,7 +92,7 @@ export default async function BillDetailPage({ params, searchParams }: Props) {
 
         <div className="mt-5 flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold">🧾 รายละเอียดบิล</h1>
+            <h1 className="text-3xl font-bold"><Icon name="receipt" /> รายละเอียดบิล</h1>
             <p className="mt-2 text-sand-500">ห้อง {bill.rooms.room_code}</p>
             <p className="text-sand-500">
               ผู้เช่า:{" "}
@@ -143,7 +144,7 @@ export default async function BillDetailPage({ params, searchParams }: Props) {
             prefetch={false}
             className="rounded-xl border border-sand-300 bg-white px-5 py-3 font-medium text-sand-700 hover:bg-sand-50"
           >
-            👁 ดูบิลสำหรับผู้เช่า
+            <Icon name="eye" /> ดูบิลสำหรับผู้เช่า
           </Link>
 
         </div>

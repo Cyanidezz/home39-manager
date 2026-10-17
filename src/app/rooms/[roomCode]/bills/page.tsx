@@ -4,6 +4,7 @@ import { requireUser } from "@/lib/data/session";
 import { fetchBillHistory } from "@/lib/data/roomPages";
 import { formatMoney, formatThaiDateShort, thaiMonths } from "@/lib/format";
 import { getBillStatus } from "@/lib/billStatus";
+import Icon from "@/components/Icon";
 
 type Props = {
   params: Promise<{
@@ -32,7 +33,7 @@ export default async function BillsHistoryPage({ params }: Props) {
 
         <div className="mt-5 flex items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold">🧾 ประวัติบิล</h1>
+            <h1 className="text-3xl font-bold"><Icon name="receipt" /> ประวัติบิล</h1>
             <p className="mt-2 text-sand-500">ห้อง {room.room_code}</p>
           </div>
 

@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/data/session";
 import { fetchContractContext } from "@/lib/data/roomPages";
 import ContractForm from "./ContractForm";
+import Icon from "@/components/Icon";
 
 type Props = {
   params: Promise<{
@@ -40,7 +41,7 @@ export default async function NewContractPage({ params }: Props) {
       <div className="mx-auto max-w-2xl">
         <div className="rounded-2xl border border-sand-200 bg-white p-8 shadow-sm">
           <h1 className="text-3xl font-bold">
-            📄 เพิ่มสัญญาเช่า
+            <Icon name="file" /> เพิ่มสัญญาเช่า
           </h1>
 
           <p className="mt-2 text-sand-500">

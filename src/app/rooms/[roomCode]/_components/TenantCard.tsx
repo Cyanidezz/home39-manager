@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { formatThaiDate, formatThaiMonth } from "@/lib/format";
+import Icon from "@/components/Icon";
 
 export type RoomTenant = {
   id: string;
@@ -25,7 +26,7 @@ function baht(value: number | string | null) {
 export default function TenantCard({ roomCode, tenants }: Props) {
   return (
     <section className="rounded-2xl border border-sand-200 bg-white p-6 shadow-sm">
-      <h2 className="text-xl font-semibold">👤 ผู้เช่า</h2>
+      <h2 className="text-xl font-semibold"><Icon name="user" /> ผู้เช่า</h2>
 
       <div className="mt-5">
         {tenants.length > 0 ? (
@@ -56,7 +57,7 @@ export default function TenantCard({ roomCode, tenants }: Props) {
                 href={`/rooms/${roomCode}/tenant/${tenant.id}/edit`}
                 className="mt-4 inline-block rounded-lg border px-4 py-2 text-sm hover:bg-sand-50"
               >
-                ✏️ แก้ไขข้อมูลผู้เช่า
+                <Icon name="pencil" /> แก้ไขข้อมูลผู้เช่า
               </Link>
 
               {tenant.planned_move_out_date && (

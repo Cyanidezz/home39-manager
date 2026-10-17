@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import ConfirmSubmitButton from "@/components/ConfirmSubmitButton";
+import Icon from "@/components/Icon";
 
 type Props = {
   slipUrl: string;
@@ -84,7 +85,7 @@ export default function SlipViewer({
                 aria-label="ปิด"
                 className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xl text-sand-500 hover:bg-sand-100 hover:text-brand-700"
               >
-                ✕
+                <Icon name="close" className="h-5 w-5" />
               </button>
             </header>
 

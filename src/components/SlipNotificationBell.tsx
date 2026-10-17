@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import Icon from "@/components/Icon";
 
 type RelatedRoom = { room_code: string } | { room_code: string }[] | null;
 type RelatedTenant = { full_name: string } | { full_name: string }[] | null;
@@ -174,7 +175,7 @@ export default function SlipNotificationBell() {
             ) : notifications.length === 0 ? (
               <div className="px-4 py-8 text-center">
                 <span className="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
-                  ✓
+                  <Icon name="check" className="h-5 w-5" />
                 </span>
                 <p className="mt-3 text-sm font-medium text-sand-700">
                   ตรวจสอบสลิปครบแล้ว
@@ -194,7 +195,7 @@ export default function SlipNotificationBell() {
                     className="flex gap-3 border-b border-sand-100 px-4 py-3.5 transition last:border-b-0 hover:bg-brand-50"
                   >
                     <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-100 text-brand-700">
-                      ▤
+                      <Icon name="receipt" className="h-5 w-5" />
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="flex items-center justify-between gap-3">
