@@ -53,6 +53,24 @@ Conventions:
 - Dates are stored as `YYYY-MM-DD` and displayed in the Buddhist era via `src/lib/format.ts`.
 - Water (150 baht/person) and electricity (7 baht/unit) rates live in `src/lib/billing.ts`.
 
+## Move-out and deposit settlement
+
+A tenancy starts with a deposit (two months' rent by default) and one month's rent in advance. The tenant gives a month's
+notice: the rent of the notice month is waived (the advance rent covers it). After the tenant has moved out, the room page
+shows "สรุปเงินมัดจำผู้เช่าเดิม" and `/rooms/<code>/settlement/<tenantId>` does the settlement:
+
+- electricity from the last billed meter to the move-out reading (7 baht/unit) and water (150 baht/person), both editable;
+- damage and other deductions, one row each;
+- unpaid issued bills are taken from the deposit and marked paid when the settlement is closed;
+- refund = deposit - deductions (negative = the tenant still owes); closing records the transfer date, reference and slip
+  (private `refund-slips` bucket).
+
+The logic lives in `save_move_out_settlement` / `close_move_out_settlement` / `reopen_move_out_settlement`
+(migration `20261018090000_move_out_settlement.sql`, tested in `tests/db/7-settlement.test.ts`). Apply the migration to the
+Supabase project before deploying the app.
+
+`supabase/scripts/clear-room-data.sql` clears one room's test data by hand (preview first, then delete in one transaction).
+
 ## Production setup
 
 Required environment variables:

@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/supabase/database.types";
+import { fetchLastMovedOutTenant } from "@/lib/data/settlement";
 
 type Client = SupabaseClient<Database>;
 
@@ -50,9 +51,14 @@ export async function fetchRoomOverview(supabase: Client, roomCode: string) {
     contractUrl = data?.signedUrl ?? null;
   }
 
+  const tenants = tenantsResult.data ?? [];
+  // A room with nobody in it: the tenant who just left may still have a deposit to settle.
+  const lastMovedOut = tenants.length === 0 ? await fetchLastMovedOutTenant(supabase, room.id) : null;
+
   return {
     room,
-    tenants: tenantsResult.data ?? [],
+    lastMovedOut,
+    tenants,
     bills: billsResult.data ?? [],
     latestContract,
     contractUrl,

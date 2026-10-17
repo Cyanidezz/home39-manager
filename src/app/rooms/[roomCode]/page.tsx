@@ -7,6 +7,7 @@ import RoomInfoCard from "./_components/RoomInfoCard";
 import TenantCard from "./_components/TenantCard";
 import ContractCard from "./_components/ContractCard";
 import LatestBillCard from "./_components/LatestBillCard";
+import SettlementCard from "./_components/SettlementCard";
 import Icon from "@/components/Icon";
 import PageHeader from "@/components/PageHeader";
 
@@ -24,7 +25,7 @@ export default async function RoomPage({ params }: Props) {
   const overview = await fetchRoomOverview(supabase, roomCode);
   if (!overview) notFound();
 
-  const { room, tenants, bills, latestContract, contractUrl } = overview;
+  const { room, tenants, bills, latestContract, contractUrl, lastMovedOut } = overview;
   const activeTenant = tenants[0];
   const latestBill = bills[0];
 
@@ -73,6 +74,13 @@ export default async function RoomPage({ params }: Props) {
           <div className="flex flex-col gap-6">
             <RoomInfoCard room={room} />
             <TenantCard roomCode={room.room_code} tenants={tenants} />
+            {lastMovedOut && (
+              <SettlementCard
+                roomCode={room.room_code}
+                tenant={lastMovedOut.tenant}
+                settlement={lastMovedOut.settlement}
+              />
+            )}
           </div>
           <div className="flex flex-col gap-6">
             <ContractCard

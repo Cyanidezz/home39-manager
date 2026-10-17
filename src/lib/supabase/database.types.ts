@@ -523,6 +523,90 @@ export type Database = {
         }
         Relationships: []
       }
+      move_out_settlements: {
+        Row: {
+          closed_at: string | null
+          created_at: string
+          deposit_amount: number
+          electricity_amount: number
+          final_electricity_meter: number | null
+          id: string
+          items: Json
+          items_amount: number
+          note: string | null
+          outstanding_bills_amount: number
+          refund_amount: number
+          refund_reference: string | null
+          refund_slip_path: string | null
+          refunded_on: string | null
+          room_id: string | null
+          status: string
+          tenant_id: string
+          total_deductions: number
+          updated_at: string
+          water_amount: number
+        }
+        Insert: {
+          closed_at?: string | null
+          created_at?: string
+          deposit_amount: number
+          electricity_amount?: number
+          final_electricity_meter?: number | null
+          id?: string
+          items?: Json
+          items_amount?: number
+          note?: string | null
+          outstanding_bills_amount?: number
+          refund_amount: number
+          refund_reference?: string | null
+          refund_slip_path?: string | null
+          refunded_on?: string | null
+          room_id?: string | null
+          status?: string
+          tenant_id: string
+          total_deductions: number
+          updated_at?: string
+          water_amount?: number
+        }
+        Update: {
+          closed_at?: string | null
+          created_at?: string
+          deposit_amount?: number
+          electricity_amount?: number
+          final_electricity_meter?: number | null
+          id?: string
+          items?: Json
+          items_amount?: number
+          note?: string | null
+          outstanding_bills_amount?: number
+          refund_amount?: number
+          refund_reference?: string | null
+          refund_slip_path?: string | null
+          refunded_on?: string | null
+          room_id?: string | null
+          status?: string
+          tenant_id?: string
+          total_deductions?: number
+          updated_at?: string
+          water_amount?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "move_out_settlements_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "move_out_settlements_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: true
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payments: {
         Row: {
           amount: number | null
@@ -824,6 +908,16 @@ export type Database = {
         Args: { p_code_hash: string; p_line_user_id: string }
         Returns: Json
       }
+      close_move_out_settlement: {
+        Args: {
+          p_expected_refund: number
+          p_refunded_on: string
+          p_reference: string
+          p_slip_path: string
+          p_tenant_id: string
+        }
+        Returns: Json
+      }
       complete_tenant_move_out: {
         Args: { p_move_out_date: string; p_tenant_id: string }
         Returns: Json
@@ -869,6 +963,21 @@ export type Database = {
         Returns: string
       }
       get_public_bill: { Args: { p_token: string }; Returns: Json }
+      reopen_move_out_settlement: {
+        Args: { p_tenant_id: string }
+        Returns: Json
+      }
+      save_move_out_settlement: {
+        Args: {
+          p_electricity_amount: number
+          p_final_electricity_meter: number
+          p_items: Json
+          p_note: string
+          p_tenant_id: string
+          p_water_amount: number
+        }
+        Returns: Json
+      }
       set_tenant_move_out_notice: {
         Args: {
           p_move_out_date: string
@@ -876,6 +985,10 @@ export type Database = {
           p_tenant_id: string
         }
         Returns: Json
+      }
+      tenant_outstanding_bills: {
+        Args: { p_tenant_id: string }
+        Returns: number
       }
       update_bill_status: {
         Args: { p_bill_id: string; p_new_status: string; p_reason: string }

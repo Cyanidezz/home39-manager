@@ -128,7 +128,8 @@ export default function EndTenancyButton({
       }
 
       setCompleteOpen(false);
-      router.push(`/rooms/${result.roomCode}`);
+      // The room is checked and the deposit settled next.
+      router.push(`/rooms/${result.roomCode}/settlement/${tenantId}`);
       router.refresh();
     } catch {
       setError("เชื่อมต่อระบบไม่สำเร็จ กรุณาลองใหม่");
