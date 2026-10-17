@@ -74,22 +74,46 @@ describe("googleMapsEmbedUrl", () => {
 describe("parseNearbyPlace", () => {
   it("strips the abbreviation and reads metres", () => {
     expect(parseNearbyPlace("โรงเรียนหาดใหญ่วิทยาลัย (ญ.ว.) 200 ม.")).toEqual({
+      label: "โรงเรียนหาดใหญ่วิทยาลัย (ญ.ว.) 200 ม.",
       name: "โรงเรียนหาดใหญ่วิทยาลัย",
       meters: 200,
+      target: null,
     });
   });
 
   it("reads kilometres as metres", () => {
-    expect(parseNearbyPlace("มหาวิทยาลัยสงขลานครินทร์ 4.5 กม.")).toEqual({
+    expect(parseNearbyPlace("มหาวิทยาลัยสงขลานครินทร์ 4.5 กม.")).toMatchObject({
       name: "มหาวิทยาลัยสงขลานครินทร์",
       meters: 4500,
     });
-    expect(parseNearbyPlace("Airport 12 km")).toEqual({ name: "Airport", meters: 12000 });
+    expect(parseNearbyPlace("Airport 12 km")).toMatchObject({ name: "Airport", meters: 12000 });
   });
 
   it("keeps text without a distance", () => {
-    expect(parseNearbyPlace("แบงค์ชาติ")).toEqual({ name: "แบงค์ชาติ", meters: null });
-    expect(parseNearbyPlace("  ")).toEqual({ name: "", meters: null });
+    expect(parseNearbyPlace("แบงค์ชาติ")).toMatchObject({ name: "แบงค์ชาติ", meters: null, target: null });
+    expect(parseNearbyPlace("  ")).toMatchObject({ name: "", meters: null });
+  });
+
+  it("splits an optional route target after |", () => {
+    expect(
+      parseNearbyPlace("โรงเรียนหาดใหญ่วิทยาลัย (ญ.ว.) 400 ม. | https://maps.app.goo.gl/sk15sFQJ3GmwTghs5")
+    ).toEqual({
+      label: "โรงเรียนหาดใหญ่วิทยาลัย (ญ.ว.) 400 ม.",
+      name: "โรงเรียนหาดใหญ่วิทยาลัย",
+      meters: 400,
+      target: "https://maps.app.goo.gl/sk15sFQJ3GmwTghs5",
+    });
+    expect(parseNearbyPlace("ประตู 2 300 ม. | 7.017359,100.476131").target).toBe("7.017359,100.476131");
+  });
+});
+
+describe("directions to coordinates", () => {
+  it("routes to an exact point", () => {
+    const url = new URL(googleMapsDirectionsEmbedUrl({ coordinates: "7.017359,100.476131" }, 400));
+    expect(url.searchParams.get("daddr")).toBe("7.017359,100.476131");
+    expect(url.searchParams.get("dirflg")).toBe("w");
+    const link = new URL(googleMapsDirectionsLink({ coordinates: "7.017359,100.476131" }, 400));
+    expect(link.searchParams.get("destination")).toBe("7.017359,100.476131");
   });
 });
 

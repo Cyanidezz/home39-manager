@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import type { HomepageRoom, HomepageSettings } from "@/lib/homepage";
+import type { MapDestination } from "@/lib/mapLinks";
 import Hero from "./_components/home/Hero";
 import RoomCards from "./_components/home/RoomCards";
 import LocationSection from "./_components/home/LocationSection";
@@ -18,9 +19,10 @@ type Props = {
   isLoggedIn: boolean;
   settings: HomepageSettings;
   homepageRooms: HomepageRoom[];
+  nearbyDestinations: Record<string, MapDestination>;
 };
 
-export default function HomePage({ rooms, isLoggedIn, settings, homepageRooms }: Props) {
+export default function HomePage({ rooms, isLoggedIn, settings, homepageRooms, nearbyDestinations }: Props) {
   const router = useRouter();
   const supabase = createClient();
   const [loginOpen, setLoginOpen] = useState(false);
@@ -110,7 +112,7 @@ export default function HomePage({ rooms, isLoggedIn, settings, homepageRooms }:
 
       <Hero settings={settings} />
       <RoomCards rooms={displayRooms} onSelect={setSelectedRoom} />
-      <LocationSection settings={settings} />
+      <LocationSection settings={settings} destinations={nearbyDestinations} />
       <ContactSection settings={settings} />
 
       <footer className="border-t border-sand-200 bg-white">

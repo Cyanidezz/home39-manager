@@ -1,3 +1,5 @@
+import type { MapDestination } from "./mapLinks";
+
 export type HomepageSettings = {
   id: string;
   banner_badge: string;
@@ -92,51 +94,68 @@ export function googleMapsEmbedUrl(mapUrl: string) {
 const WALKING_LIMIT_METERS = 1500;
 
 /**
- * Splits an admin-written nearby place like "โรงเรียนหาดใหญ่วิทยาลัย (ญ.ว.) 200 ม."
- * into a searchable name and a distance in metres (null when none is written).
+ * Splits an admin-written nearby place such as
+ * "โรงเรียนหาดใหญ่วิทยาลัย (ญ.ว.) 400 ม. | https://maps.app.goo.gl/xyz" into:
+ * - label: what the card shows (text before "|")
+ * - name: a searchable name (no distance, no parenthetical abbreviation)
+ * - meters: distance in metres, or null
+ * - target: optional text after "|" (Google Maps link or "lat,lng") that pins the route destination
  */
 export function parseNearbyPlace(text: string) {
-  const trimmed = text.trim();
-  const distance = trimmed.match(/(\d+(?:[.,]\d+)?)\s*(กม\.?|ม\.?|km|m)\s*$/i);
+  const [labelPart, ...targetParts] = text.split("|");
+  const label = labelPart.trim();
+  const target = targetParts.join("|").trim() || null;
+
+  const distance = label.match(/(\d+(?:[.,]\d+)?)\s*(กม\.?|ม\.?|km|m)\s*$/i);
   let meters: number | null = null;
-  let rest = trimmed;
+  let rest = label;
 
   if (distance) {
     const value = parseFloat(distance[1].replace(",", "."));
     const unit = distance[2].toLowerCase();
     meters = unit.startsWith("กม") || unit === "km" ? value * 1000 : value;
-    rest = trimmed.slice(0, distance.index).trim();
+    rest = label.slice(0, distance.index).trim();
   }
 
   const name = rest.replace(/\s*\([^)]*\)/g, "").trim();
-  return { name: name || trimmed, meters };
+  return { label, name: name || label, meters, target };
 }
 
-function routeEndpoints(destinationName: string) {
-  // Name searches only: coordinates make the embed request a place card that fails.
-  const destination = destinationName.includes("หาดใหญ่")
-    ? destinationName
-    : `${destinationName} หาดใหญ่`;
-  return { origin: defaultMapQuery, destination };
+function routeEndpoints(destination: MapDestination) {
+  // Directions use coordinates or a name, never a bare place query in the
+  // embed (coordinate place queries trigger the failing "Place info" card).
+  const to =
+    "coordinates" in destination
+      ? destination.coordinates
+      : destination.name.includes("หาดใหญ่")
+        ? destination.name
+        : `${destination.name} หาดใหญ่`;
+  return { origin: defaultMapQuery, destination: to };
 }
 
 /** Keyless Google Maps embed showing the route from Home 39 to a nearby place. */
-export function googleMapsDirectionsEmbedUrl(destinationName: string, meters: number | null) {
-  const { origin, destination } = routeEndpoints(destinationName);
+export function googleMapsDirectionsEmbedUrl(
+  destination: MapDestination | string,
+  meters: number | null
+) {
+  const end = routeEndpoints(typeof destination === "string" ? { name: destination } : destination);
   const walking = meters !== null && meters <= WALKING_LIMIT_METERS;
   return (
-    `https://maps.google.com/maps?saddr=${encodeURIComponent(origin)}` +
-    `&daddr=${encodeURIComponent(destination)}${walking ? "&dirflg=w" : ""}&output=embed`
+    `https://maps.google.com/maps?saddr=${encodeURIComponent(end.origin)}` +
+    `&daddr=${encodeURIComponent(end.destination)}${walking ? "&dirflg=w" : ""}&output=embed`
   );
 }
 
 /** Link that opens the same route in the Google Maps site/app. */
-export function googleMapsDirectionsLink(destinationName: string, meters: number | null) {
-  const { origin, destination } = routeEndpoints(destinationName);
+export function googleMapsDirectionsLink(
+  destination: MapDestination | string,
+  meters: number | null
+) {
+  const end = routeEndpoints(typeof destination === "string" ? { name: destination } : destination);
   const walking = meters !== null && meters <= WALKING_LIMIT_METERS;
   return (
-    `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origin)}` +
-    `&destination=${encodeURIComponent(destination)}&travelmode=${walking ? "walking" : "driving"}`
+    `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(end.origin)}` +
+    `&destination=${encodeURIComponent(end.destination)}&travelmode=${walking ? "walking" : "driving"}`
   );
 }
 

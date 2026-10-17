@@ -9,21 +9,30 @@ import {
   safeHttpUrl,
   type HomepageSettings,
 } from "@/lib/homepage";
+import type { MapDestination } from "@/lib/mapLinks";
 import Icon from "@/components/Icon";
 
-type Props = { settings: HomepageSettings };
+type Props = {
+  settings: HomepageSettings;
+  /** Pinned route destinations from "| link" suffixes, keyed by the raw target text. */
+  destinations: Record<string, MapDestination>;
+};
 
-export default function LocationSection({ settings }: Props) {
+export default function LocationSection({ settings, destinations }: Props) {
   const [selected, setSelected] = useState<number | null>(null);
 
-  const places = settings.nearby_places.map((text) => ({ text, ...parseNearbyPlace(text) }));
+  const places = settings.nearby_places.map((text) => {
+    const place = parseNearbyPlace(text);
+    const pinned = place.target ? destinations[place.target] : undefined;
+    return { ...place, destination: pinned ?? { name: place.name } };
+  });
   const route = selected !== null ? places[selected] : undefined;
 
   const mapSrc = route
-    ? googleMapsDirectionsEmbedUrl(route.name, route.meters)
+    ? googleMapsDirectionsEmbedUrl(route.destination, route.meters)
     : googleMapsEmbedUrl(settings.map_url);
   const mapsLink = route
-    ? googleMapsDirectionsLink(route.name, route.meters)
+    ? googleMapsDirectionsLink(route.destination, route.meters)
     : safeHttpUrl(settings.map_url);
 
   return (
@@ -81,7 +90,7 @@ export default function LocationSection({ settings }: Props) {
               {places.map((place, index) => {
                 const active = selected === index;
                 return (
-                  <li key={`${place.text}-${index}`}>
+                  <li key={`${place.label}-${index}`}>
                     <button
                       type="button"
                       onClick={() => setSelected(active ? null : index)}
@@ -95,7 +104,7 @@ export default function LocationSection({ settings }: Props) {
                       <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-100">
                         <Icon name="pin" className="h-5 w-5 text-brand-600" />
                       </span>
-                      <span className="font-medium">{place.text}</span>
+                      <span className="font-medium">{place.label}</span>
                     </button>
                   </li>
                 );
