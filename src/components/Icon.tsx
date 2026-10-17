@@ -95,6 +95,7 @@ const icons = {
   ),
   chevronLeft: <path d="m15 5-7 7 7 7" />,
   chevronRight: <path d="m9 5 7 7-7 7" />,
+  play: <path d="M8 5v14l11-7z" />,
   menu: <path d="M4 7h16M4 12h16M4 17h16" />,
   pin: (
     <>
