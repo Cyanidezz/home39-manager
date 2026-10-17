@@ -28,14 +28,14 @@ export default function GalleryEditor({ settings, uploading, updateSetting, onUp
       <div className="mb-6">
         <h2 className="text-xl font-bold">ภาพรวมและส่วนกลาง</h2>
         <p className="mt-1 text-sm text-sand-500">
-          รูปบรรยากาศหอพัก ห้องครัว/ห้องนั่งเล่นส่วนกลาง ทางเข้า และแปลนห้อง แสดงเป็นส่วนหนึ่งของหน้าแรก
-          ต่อจากรายการห้องพัก (ถ้าไม่มีรูปเลย ส่วนนี้จะไม่แสดง)
+          รูปบรรยากาศหอพักและพื้นที่ส่วนกลาง แสดงต่อจากรายการห้องพักบนหน้าแรก
+          (ถ้าไม่มีรูปเลย ส่วนนี้จะไม่แสดง) หัวข้อและรายละเอียดเว้นว่างได้ ถ้าไม่ต้องการแสดงข้อความ
         </p>
       </div>
 
       <div className="grid gap-5 md:grid-cols-2">
         <label className="block text-sm font-semibold">หัวข้อ
-          <input className={inputClass} value={settings.gallery_title} onChange={(e) => updateSetting("gallery_title", e.target.value)} required />
+          <input className={inputClass} value={settings.gallery_title} onChange={(e) => updateSetting("gallery_title", e.target.value)} />
         </label>
         <label className="block text-sm font-semibold">รายละเอียด
           <input className={inputClass} value={settings.gallery_description} onChange={(e) => updateSetting("gallery_description", e.target.value)} />
@@ -50,8 +50,7 @@ export default function GalleryEditor({ settings, uploading, updateSetting, onUp
         </label>
       </div>
       <p className="mt-1 text-xs text-sand-500">
-        รูปแรกของหมวด &quot;รูปถ่าย&quot; จะแสดงเป็นภาพใหญ่ เลือกหมวด &quot;แปลน&quot; สำหรับแผนผังห้อง (แสดงเต็มภาพ ไม่ถูกตัด)
-        ใช้ลูกศรเพื่อเรียงลำดับ แล้วกดบันทึกด้านล่าง
+        รูปแรกจะแสดงเป็นภาพใหญ่ (เมื่อมีตั้งแต่ 3 รูปขึ้นไป) ใช้ลูกศรเพื่อเรียงลำดับ แล้วกดบันทึกด้านล่าง
       </p>
 
       {items.length === 0 ? (
@@ -63,9 +62,9 @@ export default function GalleryEditor({ settings, uploading, updateSetting, onUp
               <HomepageImage
                 src={item.url}
                 alt={item.caption || `รูปที่ ${index + 1}`}
-                className={`h-24 w-full shrink-0 rounded-lg bg-sand-100 sm:w-36 ${item.kind === "plan" ? "object-contain" : "object-cover"}`}
+                className="h-24 w-full shrink-0 rounded-lg bg-sand-100 object-cover sm:w-36"
               />
-              <div className="grid flex-1 gap-3 sm:grid-cols-[1fr_9rem]">
+              <div className="flex-1">
                 <input
                   className="w-full rounded-xl border border-sand-300 bg-white px-3 py-2 text-sm"
                   value={item.caption}
@@ -74,15 +73,6 @@ export default function GalleryEditor({ settings, uploading, updateSetting, onUp
                   aria-label={`คำบรรยายรูปที่ ${index + 1}`}
                   onChange={(e) => updateItem(index, { caption: e.target.value })}
                 />
-                <select
-                  className="w-full rounded-xl border border-sand-300 bg-white px-3 py-2 text-sm"
-                  value={item.kind}
-                  aria-label={`หมวดของรูปที่ ${index + 1}`}
-                  onChange={(e) => updateItem(index, { kind: e.target.value === "plan" ? "plan" : "photo" })}
-                >
-                  <option value="photo">รูปถ่าย</option>
-                  <option value="plan">แปลน</option>
-                </select>
               </div>
               <div className="flex gap-2">
                 <button type="button" className={iconButton} disabled={index === 0} aria-label={`เลื่อนรูปที่ ${index + 1} ขึ้น`} onClick={() => setItems(moveItem(items, index, index - 1))}>

@@ -2,23 +2,29 @@ import { describe, expect, it } from "vitest";
 import {
   MAX_CAPTION_LENGTH,
   MAX_GALLERY_ITEMS,
-  displayOrder,
   normalizeGalleryItems,
 } from "./gallery";
 
 describe("normalizeGalleryItems", () => {
-  it("keeps valid items and defaults kind to photo", () => {
+  it("keeps valid items", () => {
+    expect(
+      normalizeGalleryItems([
+        { url: "https://x.test/a.jpg", caption: "ห้องครัว" },
+        { url: "http://x.test/b.jpg" },
+      ])
+    ).toEqual([
+      { url: "https://x.test/a.jpg", caption: "ห้องครัว" },
+      { url: "http://x.test/b.jpg", caption: "" },
+    ]);
+  });
+
+  it("ignores legacy floor-plan entries", () => {
     expect(
       normalizeGalleryItems([
         { url: "https://x.test/a.jpg", caption: "ห้องครัว", kind: "photo" },
         { url: "https://x.test/p.png", caption: "แปลนชั้น 1", kind: "plan" },
-        { url: "http://x.test/b.jpg" },
       ])
-    ).toEqual([
-      { url: "https://x.test/a.jpg", caption: "ห้องครัว", kind: "photo" },
-      { url: "https://x.test/p.png", caption: "แปลนชั้น 1", kind: "plan" },
-      { url: "http://x.test/b.jpg", caption: "", kind: "photo" },
-    ]);
+    ).toEqual([{ url: "https://x.test/a.jpg", caption: "ห้องครัว" }]);
   });
 
   it("drops malformed entries and non-http URLs", () => {
@@ -46,17 +52,5 @@ describe("normalizeGalleryItems", () => {
     expect(normalizeGalleryItems([{ url: "https://x.test/a.jpg", caption: long }])[0].caption).toHaveLength(MAX_CAPTION_LENGTH);
     const many = Array.from({ length: MAX_GALLERY_ITEMS + 5 }, (_, i) => ({ url: `https://x.test/${i}.jpg` }));
     expect(normalizeGalleryItems(many)).toHaveLength(MAX_GALLERY_ITEMS);
-  });
-});
-
-describe("displayOrder", () => {
-  it("puts photos before plans without reordering within a kind", () => {
-    const items = [
-      { url: "u1", caption: "", kind: "plan" as const },
-      { url: "u2", caption: "", kind: "photo" as const },
-      { url: "u3", caption: "", kind: "plan" as const },
-      { url: "u4", caption: "", kind: "photo" as const },
-    ];
-    expect(displayOrder(items).map((item) => item.url)).toEqual(["u2", "u4", "u1", "u3"]);
   });
 });

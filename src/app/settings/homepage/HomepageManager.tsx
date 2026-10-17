@@ -72,7 +72,7 @@ export default function HomepageManager({ initialSettings, initialRooms }: Props
     setMessage(null);
     try {
       const urls = await Promise.all(files.map((file) => uploadImage(file, "gallery")));
-      const added: GalleryItem[] = urls.map((url) => ({ url, caption: "", kind: "photo" }));
+      const added: GalleryItem[] = urls.map((url) => ({ url, caption: "" }));
       setSettings((current) => ({
         ...current,
         gallery_items: [...current.gallery_items, ...added].slice(0, MAX_GALLERY_ITEMS),
