@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/supabase/database.types";
+import { normalizeGalleryItems } from "@/lib/gallery";
 import {
   defaultHomepageRooms,
   defaultHomepageSettings,
@@ -45,8 +46,13 @@ export async function fetchHomepageContent(supabase: Client) {
   const stored = roomsResult.data as HomepageRoom[] | null;
 
   return {
-    settings:
-      (settingsResult.data as HomepageSettings | null) || defaultHomepageSettings,
+    settings: settingsResult.data
+      ? ({
+          ...defaultHomepageSettings,
+          ...settingsResult.data,
+          gallery_items: normalizeGalleryItems(settingsResult.data.gallery_items),
+        } as HomepageSettings)
+      : defaultHomepageSettings,
     rooms: defaultHomepageRooms.map(
       (fallback) =>
         stored?.find((room) => room.room_code === fallback.room_code) || fallback

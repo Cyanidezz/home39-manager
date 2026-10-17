@@ -351,6 +351,9 @@ export type Database = {
           contact_description: string
           contact_title: string
           facebook_url: string
+          gallery_description: string
+          gallery_items: Json
+          gallery_title: string
           id: string
           line_id: string
           line_url: string
@@ -376,6 +379,9 @@ export type Database = {
           contact_description?: string
           contact_title?: string
           facebook_url?: string
+          gallery_description?: string
+          gallery_items?: Json
+          gallery_title?: string
           id?: string
           line_id?: string
           line_url?: string
@@ -401,6 +407,9 @@ export type Database = {
           contact_description?: string
           contact_title?: string
           facebook_url?: string
+          gallery_description?: string
+          gallery_items?: Json
+          gallery_title?: string
           id?: string
           line_id?: string
           line_url?: string

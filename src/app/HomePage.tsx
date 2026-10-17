@@ -7,6 +7,7 @@ import type { HomepageRoom, HomepageSettings } from "@/lib/homepage";
 import type { MapDestination } from "@/lib/mapLinks";
 import Hero from "./_components/home/Hero";
 import RoomCards from "./_components/home/RoomCards";
+import GallerySection from "./_components/home/GallerySection";
 import LocationSection from "./_components/home/LocationSection";
 import ContactSection from "./_components/home/ContactSection";
 import LoginDialog from "./_components/home/LoginDialog";
@@ -112,6 +113,7 @@ export default function HomePage({ rooms, isLoggedIn, settings, homepageRooms, n
 
       <Hero settings={settings} />
       <RoomCards rooms={displayRooms} onSelect={setSelectedRoom} />
+      <GallerySection settings={settings} />
       <LocationSection settings={settings} destinations={nearbyDestinations} />
       <ContactSection settings={settings} />
 

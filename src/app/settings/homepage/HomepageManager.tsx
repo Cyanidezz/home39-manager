@@ -6,9 +6,11 @@ import { createClient } from "@/lib/supabase/client";
 import { safeHttpUrl, type HomepageRoom, type HomepageSettings } from "@/lib/homepage";
 import { uploadHomepageImage } from "@/lib/homepageUpload";
 import { clampPercent, clampZoom } from "@/lib/bannerCrop";
+import { MAX_GALLERY_ITEMS, normalizeGalleryItems, type GalleryItem } from "@/lib/gallery";
 import BannerSection from "./_components/BannerSection";
 import LocationSection from "./_components/LocationSection";
 import ContactSection from "./_components/ContactSection";
+import GalleryEditor from "./_components/GalleryEditor";
 import RoomsSection from "./_components/RoomsSection";
 import Icon from "@/components/Icon";
 
@@ -55,6 +57,26 @@ export default function HomepageManager({ initialSettings, initialRooms }: Props
     try {
       const url = await uploadImage(file, "banner");
       updateSetting("banner_image_url", url);
+    } catch (error) {
+      setMessage({ type: "error", text: error instanceof Error ? error.message : "อัปโหลดรูปไม่สำเร็จ" });
+    } finally {
+      setUploading("");
+      event.target.value = "";
+    }
+  }
+
+  async function uploadGalleryImages(event: ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(event.target.files || []);
+    if (!files.length) return;
+    setUploading("gallery");
+    setMessage(null);
+    try {
+      const urls = await Promise.all(files.map((file) => uploadImage(file, "gallery")));
+      const added: GalleryItem[] = urls.map((url) => ({ url, caption: "", kind: "photo" }));
+      setSettings((current) => ({
+        ...current,
+        gallery_items: [...current.gallery_items, ...added].slice(0, MAX_GALLERY_ITEMS),
+      }));
     } catch (error) {
       setMessage({ type: "error", text: error instanceof Error ? error.message : "อัปโหลดรูปไม่สำเร็จ" });
     } finally {
@@ -115,6 +137,7 @@ export default function HomepageManager({ initialSettings, initialRooms }: Props
 
     const { error } = await supabase.from("homepage_settings").upsert({
       ...settings,
+      gallery_items: normalizeGalleryItems(settings.gallery_items),
       id: "default",
       updated_at: new Date().toISOString(),
     });
@@ -125,7 +148,7 @@ export default function HomepageManager({ initialSettings, initialRooms }: Props
       return;
     }
 
-    setMessage({ type: "success", text: "บันทึก Banner แผนที่ และข้อมูลติดต่อแล้ว" });
+    setMessage({ type: "success", text: "บันทึก Banner รูปส่วนกลาง แผนที่ และข้อมูลติดต่อแล้ว" });
     router.refresh();
   }
 
@@ -197,11 +220,17 @@ export default function HomepageManager({ initialSettings, initialRooms }: Props
             updateSetting={updateSetting}
             onUploadBanner={uploadBanner}
           />
+          <GalleryEditor
+            settings={settings}
+            uploading={uploading}
+            updateSetting={updateSetting}
+            onUploadImages={uploadGalleryImages}
+          />
           <LocationSection settings={settings} updateSetting={updateSetting} />
           <ContactSection settings={settings} updateSetting={updateSetting} />
           <div className="flex justify-end">
             <button type="submit" disabled={saving || Boolean(uploading)} className="rounded-xl bg-brand-300 px-7 py-3 font-semibold text-brand-950 shadow-sm hover:bg-brand-400 disabled:opacity-50">
-              {saving ? "กำลังบันทึก..." : "บันทึก Banner แผนที่ และข้อมูลติดต่อ"}
+              {saving ? "กำลังบันทึก..." : "บันทึก Banner รูปส่วนกลาง แผนที่ และข้อมูลติดต่อ"}
             </button>
           </div>
         </form>
