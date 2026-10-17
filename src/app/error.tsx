@@ -24,7 +24,7 @@ export default function ErrorPage({ error, reset }: Props) {
           ระบบทำงานไม่สำเร็จ กรุณาลองอีกครั้ง หากยังไม่หายให้แจ้งผู้ดูแลระบบ
         </p>
         {error.digest && (
-          <p className="mt-2 text-xs text-sand-400">รหัสอ้างอิง: {error.digest}</p>
+          <p className="mt-2 text-xs text-sand-500">รหัสอ้างอิง: {error.digest}</p>
         )}
         <div className="mt-6 flex justify-center gap-3">
           <button

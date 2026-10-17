@@ -5,6 +5,8 @@ import type { HomepageRoom } from "@/lib/homepage";
 import { inputClass } from "./styles";
 
 type Props = {
+  /** Room codes with edits that are not saved yet. */
+  dirtyRoomCodes: string[];
   rooms: HomepageRoom[];
   saving: boolean;
   uploading: string;
@@ -13,7 +15,7 @@ type Props = {
   onUploadImages: (roomCode: string, event: ChangeEvent<HTMLInputElement>, cover: boolean) => void;
 };
 
-export default function RoomsSection({ rooms, saving, uploading, updateRoom, onSaveRoom, onUploadImages }: Props) {
+export default function RoomsSection({ dirtyRoomCodes, rooms, saving, uploading, updateRoom, onSaveRoom, onUploadImages }: Props) {
   return (
         <section className="mt-8 rounded-2xl border border-sand-200 bg-white p-5 shadow-sm sm:p-7">
           <div className="mb-6">
@@ -24,7 +26,12 @@ export default function RoomsSection({ rooms, saving, uploading, updateRoom, onS
             {rooms.map((room) => (
               <article key={room.room_code} className="rounded-2xl border border-sand-200 p-5">
                 <div className="flex items-center justify-between gap-4">
-                  <h3 className="text-lg font-bold">ห้อง {room.room_code}</h3>
+                  <h3 className="flex items-center gap-2 text-lg font-bold">
+                    ห้อง {room.room_code}
+                    {dirtyRoomCodes.includes(room.room_code) && (
+                      <span className="rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-semibold text-amber-800">ยังไม่ได้บันทึก</span>
+                    )}
+                  </h3>
                   <button type="button" disabled={saving || Boolean(uploading)} onClick={() => onSaveRoom(room)} className="rounded-lg bg-brand-300 px-4 py-2 text-sm font-semibold text-brand-950 hover:bg-brand-400 disabled:opacity-50">
                     บันทึกห้อง {room.room_code}
                   </button>
@@ -85,7 +92,7 @@ export default function RoomsSection({ rooms, saving, uploading, updateRoom, onS
                       onChange={(image_urls) => updateRoom(room.room_code, { image_urls })}
                     />
                   ) : (
-                    <p className="mt-4 rounded-xl bg-sand-50 px-4 py-6 text-center text-sm text-sand-400">ยังไม่มีรูปหรือวิดีโอเพิ่มเติม</p>
+                    <p className="mt-4 rounded-xl bg-sand-50 px-4 py-6 text-center text-sm text-sand-500">ยังไม่มีรูปหรือวิดีโอเพิ่มเติม</p>
                   )}
                 </div>
               </article>

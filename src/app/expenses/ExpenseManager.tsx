@@ -44,6 +44,8 @@ export default function ExpenseManager({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [expenseDate, setExpenseDate] = useState(bangkokDate);
   const [period, setPeriod] = useState(selectedPeriod);
+  // Until the owner picks a month by hand, the accounting month follows the payment date.
+  const [periodTouched, setPeriodTouched] = useState(false);
   const [category, setCategory] = useState("water");
   const [amount, setAmount] = useState("");
   const [note, setNote] = useState("");
@@ -55,6 +57,7 @@ export default function ExpenseManager({
     setEditingId(null);
     setExpenseDate(bangkokDate());
     setPeriod(selectedPeriod);
+    setPeriodTouched(false);
     setCategory("water");
     setAmount("");
     setNote("");
@@ -67,6 +70,7 @@ export default function ExpenseManager({
     setPeriod(
       `${expense.billing_year}-${String(expense.billing_month).padStart(2, "0")}`
     );
+    setPeriodTouched(true);
     setCategory(expense.category);
     setAmount(String(expense.amount));
     setNote(expense.note || "");
@@ -165,7 +169,11 @@ export default function ExpenseManager({
             <input
               type="date"
               value={expenseDate}
-              onChange={(event) => setExpenseDate(event.target.value)}
+              onChange={(event) => {
+                const value = event.target.value;
+                setExpenseDate(value);
+                if (!periodTouched && /^\d{4}-\d{2}-\d{2}$/.test(value)) setPeriod(value.slice(0, 7));
+              }}
               className="w-full rounded-xl border border-sand-200 px-4 py-3 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
               required
             />
@@ -178,10 +186,22 @@ export default function ExpenseManager({
             <input
               type="month"
               value={period}
-              onChange={(event) => setPeriod(event.target.value)}
+              onChange={(event) => {
+                setPeriod(event.target.value);
+                setPeriodTouched(true);
+              }}
+              aria-describedby="period-hint"
               className="w-full rounded-xl border border-sand-200 px-4 py-3 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
               required
             />
+            <p id="period-hint" className="mt-2 text-xs text-sand-500">
+              กำหนดว่ารายจ่ายนี้นับเข้ากำไร/ขาดทุนของเดือนไหน (ปกติตรงกับเดือนของวันที่จ่าย)
+              {expenseDate && period && expenseDate.slice(0, 7) !== period && (
+                <span className="mt-1 block font-semibold text-amber-700">
+                  เดือนนี้ต่างจากเดือนของวันที่จ่าย
+                </span>
+              )}
+            </p>
           </div>
 
           <div>

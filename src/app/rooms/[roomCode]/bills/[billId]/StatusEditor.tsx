@@ -41,8 +41,9 @@ export default function StatusEditor({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="text-xs font-medium text-sand-500 underline decoration-gray-300 underline-offset-4 transition hover:text-sand-900"
+        className="inline-flex items-center gap-1.5 rounded-lg border border-sand-300 bg-white px-3 py-1.5 text-xs font-semibold text-brand-800 transition hover:bg-brand-50"
       >
+        <Icon name="pencil" className="h-3.5 w-3.5" />
         แก้ไขสถานะบิล
       </button>
 
@@ -64,7 +65,7 @@ export default function StatusEditor({
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="flex h-9 w-9 items-center justify-center rounded-full text-sand-400 transition hover:bg-sand-100 hover:text-brand-700"
+                className="flex h-9 w-9 items-center justify-center rounded-full text-sand-500 transition hover:bg-sand-100 hover:text-brand-700"
               >
                 <Icon name="close" className="h-5 w-5" />
               </button>
@@ -115,9 +116,9 @@ export default function StatusEditor({
                     required
                     rows={4}
                     placeholder="เช่น กดบันทึกชำระผิด, ตรวจสอบยอดใหม่, ลูกค้าแจ้งแก้ไข"
-                    className="w-full resize-none rounded-xl border border-sand-300 px-4 py-3 outline-none transition placeholder:text-sand-400 focus:border-black"
+                    className="w-full resize-none rounded-xl border border-sand-300 px-4 py-3 outline-none transition placeholder:text-sand-500 focus:border-black"
                   />
-                  <p className="mt-2 text-xs text-sand-400">
+                  <p className="mt-2 text-xs text-sand-500">
                     เหตุผลนี้จะถูกบันทึกไว้ในประวัติการเปลี่ยนสถานะ
                   </p>
                 </div>

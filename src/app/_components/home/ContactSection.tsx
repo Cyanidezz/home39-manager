@@ -26,7 +26,7 @@ export default function ContactSection({ settings }: Props) {
               href={safeHttpUrl(settings.line_url)}
               target="_blank"
               rel="noopener noreferrer"
-              className="rounded-xl bg-emerald-500 px-5 py-3 font-semibold text-white hover:bg-emerald-600"
+              className="rounded-xl bg-emerald-700 px-5 py-3 font-semibold text-white hover:bg-emerald-800"
             >
               LINE {settings.line_id}
             </a>

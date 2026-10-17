@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { requireUser } from "@/lib/data/session";
 import { fetchPaymentSettings } from "@/lib/data/settings";
 import PaymentSettingsForm from "./PaymentSettingsForm";
+import PageHeader from "@/components/PageHeader";
 
 export default async function PaymentSettingsPage() {
   const { supabase } = await requireUser();
@@ -9,21 +9,15 @@ export default async function PaymentSettingsPage() {
   const { settings: initialSettings, error } = await fetchPaymentSettings(supabase);
 
   return (
-    <main className="min-h-screen bg-sand-50 px-4 py-10">
-      <div className="mx-auto max-w-xl">
-        <Link
-          href="/dashboard"
-          className="text-sm font-medium text-sand-600 hover:text-brand-700"
-        >
-          ← กลับ Dashboard
-        </Link>
-
-        <div className="mt-5 rounded-2xl border border-sand-200 bg-white p-6 shadow-sm">
-          <h1 className="text-2xl font-bold">ตั้งค่าบัญชีรับโอน</h1>
-          <p className="mt-2 text-sm text-sand-500">
-            ข้อมูลนี้จะแสดงในหน้าบิลลูกค้าที่ยังไม่ได้ชำระ
-          </p>
-
+    <main className="min-h-screen bg-sand-50 text-sand-900">
+      <PageHeader
+        width="3xl"
+        back={{ href: "/dashboard", label: "กลับ Dashboard" }}
+        title="ตั้งค่าบัญชีรับโอน"
+        subtitle="ข้อมูลนี้จะแสดงในหน้าบิลลูกค้าที่ยังไม่ได้ชำระ"
+      />
+      <div className="mx-auto max-w-3xl px-4 py-6 sm:px-8">
+        <div className="max-w-xl rounded-2xl border border-sand-200 bg-white p-6 shadow-sm">
           {error && (
             <div className="mt-5 rounded-lg bg-red-50 p-3 text-sm text-red-700">
               ไม่สามารถโหลดข้อมูลเดิมได้: {error.message}

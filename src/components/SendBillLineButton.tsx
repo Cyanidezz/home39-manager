@@ -52,7 +52,7 @@ export default function SendBillLineButton({ billId }: { billId: string }) {
         type="button"
         onClick={send}
         disabled={state === "loading"}
-        className="rounded-xl bg-green-600 px-5 py-3 font-semibold text-white hover:bg-green-700 disabled:opacity-50"
+        className="rounded-xl bg-green-700 px-5 py-3 font-semibold text-white hover:bg-green-800 disabled:opacity-50"
       >
         {state === "loading" ? "กำลังส่ง..." : "ส่งบิลทาง LINE"}
       </button>

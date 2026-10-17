@@ -201,7 +201,7 @@ export default async function PublicBillPage({ params }: Props) {
           )}
         </div>
 
-        <p className="mt-5 text-center text-xs text-sand-400">กรุณาตรวจสอบรายละเอียดก่อนชำระเงิน</p>
+        <p className="mt-5 text-center text-xs text-sand-500">กรุณาตรวจสอบรายละเอียดก่อนชำระเงิน</p>
       </div>
     </main>
   );

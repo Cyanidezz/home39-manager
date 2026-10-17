@@ -3,6 +3,7 @@ import { requireUser } from "@/lib/data/session";
 import { fetchRoomList } from "@/lib/data/lists";
 import { formatThaiDate } from "@/lib/format";
 import Icon from "@/components/Icon";
+import PageHeader from "@/components/PageHeader";
 
 export default async function RoomsPage() {
   const { supabase } = await requireUser("/");
@@ -13,25 +14,23 @@ export default async function RoomsPage() {
   const vacant = (rooms || []).length - occupied;
 
   return (
-    <main className="min-h-screen bg-sand-50 px-4 py-8 sm:p-8">
-      <div className="mx-auto max-w-6xl">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p className="text-sm font-semibold text-brand-600">ROOM MANAGEMENT</p>
-            <h1 className="mt-2 text-3xl font-bold">ห้องพักทั้งหมด</h1>
-            <p className="mt-2 text-sand-500">
-              ดูสถานะ ผู้เช่า และข้อมูลค่าเช่าของแต่ละห้อง
-            </p>
-          </div>
-          <div className="flex gap-3">
-            <div className="rounded-xl border border-brand-100 bg-brand-50 px-4 py-3 text-sm">
+    <main className="min-h-screen bg-sand-50 text-sand-900">
+      <PageHeader
+        eyebrow="Room management"
+        title="ห้องพักทั้งหมด"
+        subtitle="ดูสถานะ ผู้เช่า และข้อมูลค่าเช่าของแต่ละห้อง"
+        actions={
+          <>
+            <div className="rounded-xl border border-brand-100 bg-brand-50 px-4 py-2 text-sm">
               มีผู้เช่า <strong className="ml-2 text-brand-700">{occupied}</strong>
             </div>
-            <div className="rounded-xl border border-sand-200 bg-white px-4 py-3 text-sm">
+            <div className="rounded-xl border border-sand-200 bg-white px-4 py-2 text-sm">
               ห้องว่าง <strong className="ml-2">{vacant}</strong>
             </div>
-          </div>
-        </div>
+          </>
+        }
+      />
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-8">
 
         {error && (
           <div className="mt-6 rounded-xl bg-red-50 p-4 text-red-700">

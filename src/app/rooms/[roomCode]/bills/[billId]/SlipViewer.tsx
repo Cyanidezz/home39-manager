@@ -151,7 +151,7 @@ export default function SlipViewer({
                     <input type="hidden" name="roomCode" value={roomCode} />
                     <ConfirmSubmitButton
                       confirmMessage="ยืนยันว่าได้รับเงินแล้วและบันทึกเป็นชำระแล้ว? ระบบจะแจ้งผู้เช่าทาง LINE"
-                      className="rounded-xl bg-green-600 px-5 py-3 font-semibold text-white hover:bg-green-700"
+                      className="rounded-xl bg-green-700 px-5 py-3 font-semibold text-white hover:bg-green-800"
                     >
                       ยืนยันสลิปและบันทึกชำระเงิน
                     </ConfirmSubmitButton>
