@@ -1,3 +1,4 @@
+import type { GalleryItem } from "./gallery";
 import type { MapDestination } from "./mapLinks";
 
 export type HomepageSettings = {
@@ -21,6 +22,9 @@ export type HomepageSettings = {
   line_url: string;
   phone_primary: string;
   phone_secondary: string;
+  gallery_title: string;
+  gallery_description: string;
+  gallery_items: GalleryItem[];
 };
 
 export type HomepageRoom = {
@@ -183,6 +187,9 @@ export const defaultHomepageSettings: HomepageSettings = {
   line_url: "https://line.me/R/ti/p/%40069jzotj",
   phone_primary: "087-0954441",
   phone_secondary: "089-4644898",
+  gallery_title: "ภาพรวมและส่วนกลาง",
+  gallery_description: "ดูบรรยากาศโดยรวมของหอพัก พื้นที่ส่วนกลาง และแปลนห้องพัก",
+  gallery_items: [],
 };
 
 const roomDescriptions: Record<string, string> = {
