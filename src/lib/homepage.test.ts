@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { googleMapsEmbedUrl, safeHttpUrl } from "./homepage";
+import {
+  googleMapsDirectionsEmbedUrl,
+  googleMapsDirectionsLink,
+  googleMapsEmbedUrl,
+  parseNearbyPlace,
+  safeHttpUrl,
+} from "./homepage";
 import { homepageImageExtension } from "./homepageUpload";
 
 describe("safeHttpUrl", () => {
@@ -62,5 +68,55 @@ describe("googleMapsEmbedUrl", () => {
   it("falls back for invalid URLs", () => {
     expect(embed("not a url").searchParams.get("q")).toBe("Home 39 Hatyai");
     expect(embed("").searchParams.get("q")).toBe("Home 39 Hatyai");
+  });
+});
+
+describe("parseNearbyPlace", () => {
+  it("strips the abbreviation and reads metres", () => {
+    expect(parseNearbyPlace("โรงเรียนหาดใหญ่วิทยาลัย (ญ.ว.) 200 ม.")).toEqual({
+      name: "โรงเรียนหาดใหญ่วิทยาลัย",
+      meters: 200,
+    });
+  });
+
+  it("reads kilometres as metres", () => {
+    expect(parseNearbyPlace("มหาวิทยาลัยสงขลานครินทร์ 4.5 กม.")).toEqual({
+      name: "มหาวิทยาลัยสงขลานครินทร์",
+      meters: 4500,
+    });
+    expect(parseNearbyPlace("Airport 12 km")).toEqual({ name: "Airport", meters: 12000 });
+  });
+
+  it("keeps text without a distance", () => {
+    expect(parseNearbyPlace("แบงค์ชาติ")).toEqual({ name: "แบงค์ชาติ", meters: null });
+    expect(parseNearbyPlace("  ")).toEqual({ name: "", meters: null });
+  });
+});
+
+describe("directions URLs", () => {
+  const embed = (name: string, meters: number | null) =>
+    new URL(googleMapsDirectionsEmbedUrl(name, meters));
+
+  it("routes from Home 39 by name and walks short distances", () => {
+    const url = embed("โรงเรียนหาดใหญ่วิทยาลัย", 200);
+    expect(url.searchParams.get("saddr")).toBe("Home 39 Hatyai");
+    expect(url.searchParams.get("daddr")).toBe("โรงเรียนหาดใหญ่วิทยาลัย");
+    expect(url.searchParams.get("dirflg")).toBe("w");
+    expect(url.searchParams.get("output")).toBe("embed");
+  });
+
+  it("drives long or unknown distances and adds the city for disambiguation", () => {
+    const far = embed("มหาวิทยาลัยสงขลานครินทร์", 4500);
+    expect(far.searchParams.get("dirflg")).toBeNull();
+    expect(far.searchParams.get("daddr")).toBe("มหาวิทยาลัยสงขลานครินทร์ หาดใหญ่");
+    expect(embed("แบงค์ชาติ", null).searchParams.get("dirflg")).toBeNull();
+  });
+
+  it("builds a matching Google Maps link", () => {
+    const link = new URL(googleMapsDirectionsLink("แบงค์ชาติ", 150));
+    expect(link.origin + link.pathname).toBe("https://www.google.com/maps/dir/");
+    expect(link.searchParams.get("origin")).toBe("Home 39 Hatyai");
+    expect(link.searchParams.get("destination")).toBe("แบงค์ชาติ หาดใหญ่");
+    expect(link.searchParams.get("travelmode")).toBe("walking");
   });
 });
