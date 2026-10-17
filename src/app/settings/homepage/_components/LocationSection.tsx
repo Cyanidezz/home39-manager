@@ -31,6 +31,9 @@ export default function LocationSection({ settings, updateSetting }: Props) {
                     + เพิ่มสถานที่
                   </button>
                 </div>
+                <p className="mt-1 text-xs text-sand-500">
+                  แตะสถานที่บนหน้าแรกเพื่อดูเส้นทางจาก Home 39 ถ้าอยากกำหนดจุดปลายทางเอง (เช่น ประตูอีกด้าน) ให้เติม | แล้ววางลิงก์ Google Maps หรือพิกัด เช่น โรงเรียนหาดใหญ่วิทยาลัย (ญ.ว.) 400 ม. | https://maps.app.goo.gl/...
+                </p>
                 <div className="mt-2 space-y-3">
                   {settings.nearby_places.map((place, index) => (
                     <div key={index} className="flex items-center gap-3">

@@ -1,8 +1,25 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { fetchHomepageContent } from "@/lib/data/settings";
-import { defaultHomepageRooms, defaultHomepageSettings } from "@/lib/homepage";
+import { defaultHomepageRooms, defaultHomepageSettings, parseNearbyPlace } from "@/lib/homepage";
+import { destinationFromTarget, isShortMapLink, type MapDestination } from "@/lib/mapLinks";
+import { resolveShortMapLink } from "@/lib/mapLinks.server";
 import HomePage from "./HomePage";
+
+/** Route destinations pinned by admins after "|" in a nearby place, keyed by the raw target text. */
+async function resolveNearbyDestinations(places: string[]) {
+  const destinations: Record<string, MapDestination> = {};
+  await Promise.all(
+    places.map(async (text) => {
+      const target = parseNearbyPlace(text).target;
+      if (!target) return;
+      const resolved = isShortMapLink(target) ? await resolveShortMapLink(target) : target;
+      const destination = resolved ? destinationFromTarget(resolved) : null;
+      if (destination) destinations[target] = destination;
+    })
+  );
+  return destinations;
+}
 
 export const dynamic = "force-dynamic";
 
@@ -45,6 +62,7 @@ export default async function Home() {
       isLoggedIn={Boolean(user)}
       settings={homepageSettings}
       homepageRooms={homepageRooms}
+      nearbyDestinations={await resolveNearbyDestinations(homepageSettings.nearby_places)}
     />
   );
 }
