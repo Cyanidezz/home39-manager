@@ -1,5 +1,7 @@
 import Link from "next/link";
 import Icon from "@/components/Icon";
+import { formatMoney, formatNumber, formatThaiMonth } from "@/lib/format";
+import { EmptyNote, InfoCard, InfoRows, secondaryButton } from "./InfoCard";
 
 export type RoomBill = {
   billing_year: number;
@@ -15,12 +17,12 @@ type Props = {
 };
 
 const statusStyles: Record<string, { text: string; className: string }> = {
-  paid: { text: "ชำระแล้ว", className: "text-green-600" },
-  unpaid: { text: "ยังไม่ชำระ", className: "text-red-600" },
-  overdue: { text: "เกินกำหนด", className: "text-orange-600" },
-  slip_submitted: { text: "ส่งสลิปแล้ว", className: "text-brand-600" },
-  verifying: { text: "กำลังตรวจสอบ", className: "text-yellow-600" },
-  rejected: { text: "สลิปไม่ผ่าน", className: "text-red-600" },
+  paid: { text: "ชำระแล้ว", className: "text-green-700" },
+  unpaid: { text: "ยังไม่ชำระ", className: "text-red-700" },
+  overdue: { text: "เกินกำหนด", className: "text-orange-700" },
+  slip_submitted: { text: "ส่งสลิปแล้ว", className: "text-brand-700" },
+  verifying: { text: "กำลังตรวจสอบ", className: "text-amber-700" },
+  rejected: { text: "สลิปไม่ผ่าน", className: "text-red-700" },
   draft: { text: "ฉบับร่าง", className: "text-sand-600" },
 };
 
@@ -29,59 +31,44 @@ function getBillStatusLabel(status: string) {
 }
 
 export default function LatestBillCard({ roomCode, bill }: Props) {
-  const status = bill ? getBillStatusLabel(bill.status) : null;
+  const icon = <Icon name="bolt" className="h-5 w-5" />;
+
+  if (!bill) {
+    return (
+      <InfoCard
+        icon={icon}
+        title="ข้อมูลล่าสุด"
+        footer={
+          <Link href={`/rooms/${roomCode}/bills/new`} className={secondaryButton}>
+            <Icon name="receipt" className="h-4 w-4" /> ออกบิลแรก
+          </Link>
+        }
+      >
+        <EmptyNote>ยังไม่มีประวัติบิล</EmptyNote>
+      </InfoCard>
+    );
+  }
+
+  const status = getBillStatusLabel(bill.status);
 
   return (
-    <section className="rounded-2xl border border-sand-200 bg-white p-6 shadow-sm">
-      <h2 className="text-xl font-semibold"><Icon name="bolt" /> ข้อมูลล่าสุด</h2>
-
-      {bill && status ? (
-        <div className="mt-5 space-y-2">
-          <p>
-            มิเตอร์ไฟล่าสุด <strong>{bill.current_meter ?? "-"}</strong>
-          </p>
-
-          <p>
-            บิลล่าสุด{" "}
-            <strong>
-              {bill.billing_month}/{bill.billing_year}
-            </strong>
-          </p>
-
-          <p>
-            ยอด{" "}
-            <strong>
-              {Number(bill.total_amount).toLocaleString(undefined, {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}{" "}
-              บาท
-            </strong>
-          </p>
-
-          <p>
-            สถานะ <strong className={status.className}>{status.text}</strong>
-          </p>
-
-          <Link
-            href={`/rooms/${roomCode}/bills`}
-            className="mt-5 inline-block rounded-lg border px-4 py-2 text-sm hover:bg-sand-50"
-          >
-            <Icon name="receipt" /> ดูประวัติบิลทั้งหมด
-          </Link>
-        </div>
-      ) : (
-        <div className="mt-4">
-          <p className="text-sand-500">ยังไม่มีประวัติบิล</p>
-
-          <Link
-            href={`/rooms/${roomCode}/bills/new`}
-            className="mt-4 inline-block rounded-lg border px-4 py-2 text-sm hover:bg-sand-50"
-          >
-            <Icon name="receipt" /> ออกบิลแรก
-          </Link>
-        </div>
-      )}
-    </section>
+    <InfoCard
+      icon={icon}
+      title="ข้อมูลล่าสุด"
+      footer={
+        <Link href={`/rooms/${roomCode}/bills`} className={secondaryButton}>
+          <Icon name="receipt" className="h-4 w-4" /> ดูประวัติบิลทั้งหมด
+        </Link>
+      }
+    >
+      <InfoRows
+        rows={[
+          { label: "มิเตอร์ไฟล่าสุด", value: bill.current_meter != null ? formatNumber(bill.current_meter) : "-" },
+          { label: "บิลล่าสุด", value: formatThaiMonth(`${bill.billing_year}-${String(bill.billing_month).padStart(2, "0")}`) },
+          { label: "ยอด", value: `${formatMoney(bill.total_amount)} บาท` },
+          { label: "สถานะ", value: <span className={status.className}>{status.text}</span> },
+        ]}
+      />
+    </InfoCard>
   );
 }

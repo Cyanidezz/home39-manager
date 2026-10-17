@@ -97,7 +97,12 @@ const homepageRooms = rooms.map((room) => ({
 }));
 
 export const tables = {
-  rooms, tenants, bills, bill_items: billItems, expenses, contracts: [],
+  rooms, tenants, bills, bill_items: billItems, expenses,
+  contracts: [{
+    id: uuid(601), room_id: rooms[1].id, tenant_id: tenants[1].id, contract_start: day(year - 1, 8, 15), contract_end: null,
+    deposit_amount: 10000, file_path: "mock/contract.pdf", original_file_name: "สัญญาเช่า ตัวอย่าง.pdf", note: null,
+    created_at: `${day(year - 1, 8, 15)}T03:00:00Z`,
+  }],
   payment_settings: [{ id: "default", bank_name: "ธนาคารตัวอย่าง", bank_code: "SCB", account_name: "ชื่อบัญชี ตัวอย่าง", account_number: "000-0-00000-0" }],
   homepage_settings: homepageSettings, homepage_rooms: homepageRooms,
   line_link_codes: [], line_notification_logs: [], bill_status_logs: [],

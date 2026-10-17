@@ -1,4 +1,6 @@
 import Icon from "@/components/Icon";
+import { formatMoney } from "@/lib/format";
+import { InfoCard, InfoRows } from "./InfoCard";
 
 type Props = {
   room: {
@@ -7,33 +9,22 @@ type Props = {
   };
 };
 
+const WATER_RATE = 150;
+
 export default function RoomInfoCard({ room }: Props) {
   return (
-    <section className="rounded-2xl border border-sand-200 bg-white p-6 shadow-sm">
-      <h2 className="text-xl font-semibold"><Icon name="home" /> ข้อมูลห้อง</h2>
-
-      <div className="mt-5 space-y-3">
-        <p>
-          ค่าเช่า{" "}
-          <strong>{Number(room.monthly_rent).toLocaleString()} บาท/เดือน</strong>
-        </p>
-
-        <p>
-          จำนวนผู้พัก <strong>{room.occupant_count} คน</strong>
-        </p>
-
-        <p>
-          ค่าน้ำ{" "}
-          <strong>
-            {room.occupant_count} × 150 ={" "}
-            {(room.occupant_count * 150).toLocaleString()} บาท
-          </strong>
-        </p>
-
-        <p>
-          ค่าไฟ <strong>7 บาท/หน่วย</strong>
-        </p>
-      </div>
-    </section>
+    <InfoCard icon={<Icon name="home" className="h-5 w-5" />} title="ข้อมูลห้อง">
+      <InfoRows
+        rows={[
+          { label: "ค่าเช่า", value: `${formatMoney(room.monthly_rent)} บาท/เดือน` },
+          { label: "จำนวนผู้พัก", value: `${room.occupant_count} คน` },
+          {
+            label: "ค่าน้ำ",
+            value: `${room.occupant_count} × ${WATER_RATE} = ${(room.occupant_count * WATER_RATE).toLocaleString("th-TH")} บาท`,
+          },
+          { label: "ค่าไฟ", value: "7 บาท/หน่วย" },
+        ]}
+      />
+    </InfoCard>
   );
 }

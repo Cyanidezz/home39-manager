@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { formatThaiDate, formatThaiMonth } from "@/lib/format";
 import Icon from "@/components/Icon";
+import { formatMoney, formatNumber, formatThaiDate, formatThaiMonth } from "@/lib/format";
+import { EmptyNote, InfoCard, InfoRows, secondaryButton } from "./InfoCard";
 
 export type RoomTenant = {
   id: string;
@@ -20,65 +21,63 @@ type Props = {
 };
 
 function baht(value: number | string | null) {
-  return value != null ? `${Number(value).toLocaleString()} บาท` : "-";
+  return value != null ? `${formatMoney(value)} บาท` : "-";
 }
 
 export default function TenantCard({ roomCode, tenants }: Props) {
+  const icon = <Icon name="user" className="h-5 w-5" />;
+
+  if (tenants.length === 0) {
+    return (
+      <InfoCard icon={icon} title="ผู้เช่า">
+        <EmptyNote>ยังไม่มีข้อมูลผู้เช่า</EmptyNote>
+      </InfoCard>
+    );
+  }
+
   return (
-    <section className="rounded-2xl border border-sand-200 bg-white p-6 shadow-sm">
-      <h2 className="text-xl font-semibold"><Icon name="user" /> ผู้เช่า</h2>
+    <>
+      {tenants.map((tenant) => (
+        <InfoCard
+          key={tenant.id}
+          icon={icon}
+          title="ผู้เช่า"
+          footer={
+            <Link href={`/rooms/${roomCode}/tenant/${tenant.id}/edit`} className={secondaryButton}>
+              <Icon name="pencil" className="h-4 w-4" /> แก้ไขข้อมูลผู้เช่า
+            </Link>
+          }
+        >
+          <p className="mb-3 text-base font-semibold">{tenant.full_name}</p>
+          <InfoRows
+            rows={[
+              { label: "โทร", value: tenant.phone || "-" },
+              { label: "เริ่มเช่า", value: formatThaiDate(tenant.move_in_date) },
+              { label: "ค่าเช่าล่วงหน้า", value: baht(tenant.advance_rent_amount) },
+              { label: "ค่ามัดจำ", value: baht(tenant.deposit_amount) },
+              {
+                label: "มิเตอร์ไฟตอนเข้าอยู่",
+                value:
+                  tenant.initial_electricity_meter != null
+                    ? formatNumber(tenant.initial_electricity_meter)
+                    : "ยังไม่ได้ระบุ",
+              },
+            ]}
+          />
 
-      <div className="mt-5">
-        {tenants.length > 0 ? (
-          tenants.map((tenant) => (
-            <div key={tenant.id}>
-              <p className="text-lg font-medium">{tenant.full_name}</p>
-
-              <p className="mt-2 text-sand-600">โทร: {tenant.phone || "-"}</p>
-
-              <p className="text-sand-600">
-                เริ่มเช่า: {formatThaiDate(tenant.move_in_date)}
+          {tenant.planned_move_out_date && (
+            <div className="mt-5 rounded-xl border border-orange-200 bg-orange-50 p-4 text-sm text-orange-900">
+              <p className="font-semibold">
+                ผู้เช่าแจ้งย้ายออก {formatThaiDate(tenant.planned_move_out_date)}
               </p>
-
-              <div className="mt-4 grid gap-2 rounded-xl bg-sand-50 p-4 text-sm text-sand-700 sm:grid-cols-2">
-                <p>
-                  ค่าเช่าล่วงหน้า <strong>{baht(tenant.advance_rent_amount)}</strong>
-                </p>
-                <p>
-                  ค่ามัดจำ <strong>{baht(tenant.deposit_amount)}</strong>
-                </p>
-                <p className="sm:col-span-2">
-                  มิเตอร์ไฟตอนเข้าอยู่{" "}
-                  <strong>{tenant.initial_electricity_meter ?? "ยังไม่ได้ระบุ"}</strong>
-                </p>
-              </div>
-
-              <Link
-                href={`/rooms/${roomCode}/tenant/${tenant.id}/edit`}
-                className="mt-4 inline-block rounded-lg border px-4 py-2 text-sm hover:bg-sand-50"
-              >
-                <Icon name="pencil" /> แก้ไขข้อมูลผู้เช่า
-              </Link>
-
-              {tenant.planned_move_out_date && (
-                <div className="mt-4 rounded-xl border border-orange-200 bg-orange-50 p-4 text-sm text-orange-900">
-                  <p className="font-semibold">
-                    ผู้เช่าแจ้งย้ายออก {formatThaiDate(tenant.planned_move_out_date)}
-                  </p>
-                  <p className="mt-1">
-                    แจ้งเมื่อ {formatThaiDate(tenant.termination_notice_date)}
-                  </p>
-                  <p className="mt-1">
-                    ค่าเช่าเดือน {formatThaiMonth(tenant.termination_notice_date)} ใช้ค่าเช่าล่วงหน้า
-                  </p>
-                </div>
-              )}
+              <p className="mt-1">แจ้งเมื่อ {formatThaiDate(tenant.termination_notice_date)}</p>
+              <p className="mt-1">
+                ค่าเช่าเดือน {formatThaiMonth(tenant.termination_notice_date)} ใช้ค่าเช่าล่วงหน้า
+              </p>
             </div>
-          ))
-        ) : (
-          <p className="text-sand-500">ยังไม่มีข้อมูลผู้เช่า</p>
-        )}
-      </div>
-    </section>
+          )}
+        </InfoCard>
+      ))}
+    </>
   );
 }
