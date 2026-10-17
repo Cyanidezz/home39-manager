@@ -1,5 +1,6 @@
 import type { ChangeEvent } from "react";
 import HomepageImage from "@/components/HomepageImage";
+import PhotoGallery from "./PhotoGallery";
 import type { HomepageRoom } from "@/lib/homepage";
 import { inputClass } from "./styles";
 
@@ -86,14 +87,11 @@ export default function RoomsSection({ rooms, saving, uploading, updateRoom, onS
                     </label>
                   </div>
                   {room.image_urls.length ? (
-                    <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-                      {room.image_urls.map((url, index) => (
-                        <div key={url} className="relative">
-                          <HomepageImage src={url} alt={`ห้อง ${room.room_code} รูปที่ ${index + 1}`} className="aspect-[4/3] w-full rounded-lg object-cover" />
-                          <button type="button" aria-label={`เอารูปที่ ${index + 1} ออก`} onClick={() => updateRoom(room.room_code, { image_urls: room.image_urls.filter((item) => item !== url) })} className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-sand-950/75 text-white hover:bg-red-600">×</button>
-                        </div>
-                      ))}
-                    </div>
+                    <PhotoGallery
+                      roomCode={room.room_code}
+                      urls={room.image_urls}
+                      onChange={(image_urls) => updateRoom(room.room_code, { image_urls })}
+                    />
                   ) : (
                     <p className="mt-4 rounded-xl bg-sand-50 px-4 py-6 text-center text-sm text-sand-400">ยังไม่มีรูปเพิ่มเติม</p>
                   )}
