@@ -15,7 +15,7 @@ export default function IncomeAndTasks({ summary }: { summary: MonthSummary }) {
     { icon: "search", label: "สลิปรอตรวจ", value: summary.pendingSlips.length, color: "bg-amber-50 text-amber-600" },
     { icon: "home", label: "ห้องว่าง", value: summary.vacantRooms.length, color: "bg-brand-50 text-brand-600" },
     { icon: "logout", label: "แจ้งย้ายออก", value: summary.movingOutTenants.length, color: "bg-sand-100 text-sand-600" },
-    { text: "LINE", label: "ยังไม่ผูก LINE", value: summary.unlinkedTenants.length, color: "bg-emerald-50 text-emerald-600" },
+    { text: "LINE", label: "ยังไม่ผูก LINE", value: summary.unlinkedTenants.length, color: "bg-emerald-50 text-emerald-700" },
     { icon: "user", label: "ห้องมีผู้เช่า", value: summary.occupiedRooms.length, color: "bg-brand-50 text-brand-700" },
   ];
 
@@ -38,7 +38,7 @@ export default function IncomeAndTasks({ summary }: { summary: MonthSummary }) {
                 <span className="text-sm text-sand-600">{label}</span>
               </div>
               <strong className="text-sm">
-                {formatMoney(value)} <span className="font-normal text-sand-400">บาท</span>
+                {formatMoney(value)} <span className="font-normal text-sand-500">บาท</span>
               </strong>
             </div>
           ))}

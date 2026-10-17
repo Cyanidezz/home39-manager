@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { safeHttpUrl, type HomepageRoom, type HomepageSettings } from "@/lib/homepage";
@@ -13,6 +13,7 @@ import ContactSection from "./_components/ContactSection";
 import GalleryEditor from "./_components/GalleryEditor";
 import RoomsSection from "./_components/RoomsSection";
 import Icon from "@/components/Icon";
+import PageHeader from "@/components/PageHeader";
 
 
 type Props = {
@@ -27,9 +28,28 @@ export default function HomepageManager({ initialSettings, initialRooms }: Props
   const supabase = createClient();
   const [settings, setSettings] = useState(initialSettings);
   const [rooms, setRooms] = useState(initialRooms);
+  const [savedSettings, setSavedSettings] = useState(initialSettings);
+  const [savedRooms, setSavedRooms] = useState(initialRooms);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState("");
   const [message, setMessage] = useState<Message>(null);
+
+  const settingsDirty = JSON.stringify(settings) !== JSON.stringify(savedSettings);
+  const dirtyRooms = rooms.filter(
+    (room) => JSON.stringify(room) !== JSON.stringify(savedRooms.find((item) => item.room_code === room.room_code))
+  );
+  const dirty = settingsDirty || dirtyRooms.length > 0;
+
+  // Closing or reloading the tab with unsaved edits would silently drop them.
+  useEffect(() => {
+    if (!dirty) return;
+    const warn = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = "";
+    };
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [dirty]);
 
   function updateSetting<K extends keyof HomepageSettings>(
     key: K,
@@ -123,10 +143,8 @@ export default function HomepageManager({ initialSettings, initialRooms }: Props
     }
   }
 
-  async function saveSettings(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setMessage(null);
-
+  /** Saves the page-level settings (banner, gallery, map, contact). Returns true on success. */
+  async function persistSettings() {
     const badUrl = [
       ["ลิงก์ Google Maps", settings.map_url],
       ["Facebook URL", settings.facebook_url],
@@ -134,40 +152,35 @@ export default function HomepageManager({ initialSettings, initialRooms }: Props
     ].find(([, value]) => safeHttpUrl(value, "") === "");
     if (badUrl) {
       setMessage({ type: "error", text: `${badUrl[0]} ต้องขึ้นต้นด้วย http:// หรือ https://` });
-      return;
+      return false;
     }
 
-    setSaving(true);
-
+    const toSave = { ...settings, gallery_items: normalizeGalleryItems(settings.gallery_items) };
     const { error } = await supabase.from("homepage_settings").upsert({
-      ...settings,
-      gallery_items: normalizeGalleryItems(settings.gallery_items),
+      ...toSave,
       id: "default",
       updated_at: new Date().toISOString(),
     });
 
-    setSaving(false);
     if (error) {
       setMessage({ type: "error", text: `บันทึกไม่สำเร็จ: ${error.message}` });
-      return;
+      return false;
     }
-
-    setMessage({ type: "success", text: "บันทึก Banner รูปส่วนกลาง แผนที่ และข้อมูลติดต่อแล้ว" });
-    router.refresh();
+    setSavedSettings(toSave);
+    return true;
   }
 
-  async function saveRoom(room: HomepageRoom) {
+  /** Saves one room's content. Returns true on success. */
+  async function persistRoom(room: HomepageRoom) {
     const monthlyPrice = Number(room.monthly_price);
     if (!Number.isFinite(monthlyPrice) || monthlyPrice < 0) {
       setMessage({
         type: "error",
         text: `กรุณากรอกราคาห้อง ${room.room_code} ให้ถูกต้อง`,
       });
-      return;
+      return false;
     }
 
-    setSaving(true);
-    setMessage(null);
     const { error } = await supabase.from("homepage_rooms").upsert({
       ...room,
       monthly_price: monthlyPrice,
@@ -176,46 +189,77 @@ export default function HomepageManager({ initialSettings, initialRooms }: Props
       cover_image_zoom: clampZoom(room.cover_image_zoom ?? 100),
       updated_at: new Date().toISOString(),
     });
-    setSaving(false);
 
     if (error) {
       setMessage({ type: "error", text: `บันทึกห้อง ${room.room_code} ไม่สำเร็จ: ${error.message}` });
-      return;
+      return false;
     }
+    setSavedRooms((current) => current.map((item) => (item.room_code === room.room_code ? room : item)));
+    return true;
+  }
+
+  async function saveSettings(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setMessage(null);
+    setSaving(true);
+    const ok = await persistSettings();
+    setSaving(false);
+    if (!ok) return;
+    setMessage({ type: "success", text: "บันทึก Banner รูปส่วนกลาง แผนที่ และข้อมูลติดต่อแล้ว" });
+    router.refresh();
+  }
+
+  async function saveRoom(room: HomepageRoom) {
+    setMessage(null);
+    setSaving(true);
+    const ok = await persistRoom(room);
+    setSaving(false);
+    if (!ok) return;
     setMessage({ type: "success", text: `บันทึกข้อมูลห้อง ${room.room_code} แล้ว` });
     router.refresh();
   }
 
+  async function saveAll() {
+    setMessage(null);
+    setSaving(true);
+    let saved = 0;
+    if (settingsDirty) {
+      if (!(await persistSettings())) {
+        setSaving(false);
+        return;
+      }
+      saved += 1;
+    }
+    for (const room of dirtyRooms) {
+      if (!(await persistRoom(room))) {
+        setSaving(false);
+        return;
+      }
+      saved += 1;
+    }
+    setSaving(false);
+    setMessage({ type: "success", text: `บันทึกครบแล้ว (${saved} ส่วน)` });
+    router.refresh();
+  }
+
   return (
-    <main className="min-h-screen bg-sand-50 px-4 py-8 sm:px-6 lg:px-10">
-      <div className="mx-auto max-w-6xl">
-        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-sand-900">จัดการ Homepage</h1>
-            <p className="mt-2 text-sand-500">แก้ไขข้อความ ราคา รูปภาพ แผนที่ และช่องทางติดต่อหน้าแรก</p>
-          </div>
+    <main className="min-h-screen bg-sand-50 text-sand-900">
+      <PageHeader
+        width="6xl"
+        title="จัดการ Homepage"
+        subtitle="แก้ไขข้อความ ราคา รูปภาพ แผนที่ และช่องทางติดต่อหน้าแรก"
+        actions={
           <a
             href="/"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex justify-center rounded-xl border border-brand-200 bg-white px-5 py-3 font-semibold text-brand-700 hover:bg-brand-50"
+            className="inline-flex justify-center rounded-xl border border-brand-200 bg-white px-5 py-2.5 font-semibold text-brand-700 hover:bg-brand-50"
           >
             ดูหน้าเว็บไซต์ <Icon name="external" />
           </a>
-        </div>
-
-        {message && (
-          <div
-            role="status"
-            className={`mb-6 rounded-xl border px-4 py-3 ${
-              message.type === "success"
-                ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-                : "border-red-200 bg-red-50 text-red-700"
-            }`}
-          >
-            {message.text}
-          </div>
-        )}
+        }
+      />
+      <div className="mx-auto max-w-6xl px-4 py-6 sm:px-8">
 
         <form onSubmit={saveSettings} className="space-y-8">
           <BannerSection
@@ -240,6 +284,7 @@ export default function HomepageManager({ initialSettings, initialRooms }: Props
         </form>
 
         <RoomsSection
+          dirtyRoomCodes={dirtyRooms.map((room) => room.room_code)}
           rooms={rooms}
           saving={saving}
           uploading={uploading}
@@ -248,6 +293,37 @@ export default function HomepageManager({ initialSettings, initialRooms }: Props
           onUploadImages={uploadRoomImages}
         />
       </div>
+
+      {(dirty || message) && (
+        <div className="sticky bottom-0 z-30 mt-8 border-t border-sand-200 bg-white/95 px-4 py-3 shadow-[0_-4px_12px_rgba(60,40,20,0.08)] backdrop-blur sm:px-6 lg:px-10">
+          <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3">
+            {message ? (
+              <p
+                role="status"
+                className={`text-sm font-semibold ${message.type === "success" ? "text-emerald-700" : "text-red-700"}`}
+              >
+                {message.text}
+              </p>
+            ) : (
+              <p className="text-sm font-semibold text-amber-800">
+                มีการแก้ไขที่ยังไม่ได้บันทึก
+                {settingsDirty && " · ข้อมูลหน้าแรก"}
+                {dirtyRooms.length > 0 && ` · ห้อง ${dirtyRooms.map((room) => room.room_code).join(", ")}`}
+              </p>
+            )}
+            {dirty && (
+              <button
+                type="button"
+                onClick={saveAll}
+                disabled={saving || Boolean(uploading)}
+                className="rounded-xl bg-brand-300 px-6 py-2.5 font-semibold text-brand-950 shadow-sm hover:bg-brand-400 disabled:opacity-50"
+              >
+                {saving ? "กำลังบันทึก..." : "บันทึกทั้งหมด"}
+              </button>
+            )}
+          </div>
+        </div>
+      )}
     </main>
   );
 }

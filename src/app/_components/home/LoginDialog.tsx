@@ -45,7 +45,7 @@ export default function LoginDialog({ email, password, loading, error, onEmailCh
           <button
             type="button"
             onClick={onClose}
-            className="flex h-10 w-10 items-center justify-center rounded-full text-2xl text-sand-400 hover:bg-sand-100 hover:text-sand-700"
+            className="flex h-10 w-10 items-center justify-center rounded-full text-2xl text-sand-500 hover:bg-sand-100 hover:text-sand-700"
             aria-label="ปิด"
           >
             ×

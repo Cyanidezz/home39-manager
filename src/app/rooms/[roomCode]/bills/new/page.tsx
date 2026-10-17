@@ -18,7 +18,7 @@ export default async function NewBillPage({ params }: Props) {
   const context = await fetchBillingContext(supabase, roomCode);
   if (!context) notFound();
 
-  const { room, tenant, previousMeter } = context;
+  const { room, tenant, previousMeter, existingPeriods } = context;
 
   return (
     <main className="min-h-screen bg-sand-50 p-8">
@@ -53,6 +53,7 @@ export default async function NewBillPage({ params }: Props) {
               tenantId={tenant.id}
               tenantName={tenant.full_name}
               tenantHasLine={Boolean(tenant.line_user_id)}
+              existingPeriods={existingPeriods}
               rentWaivedYear={tenant.rent_waived_year}
               rentWaivedMonth={tenant.rent_waived_month}
             />

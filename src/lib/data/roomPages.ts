@@ -13,7 +13,7 @@ export async function fetchBillingContext(supabase: Client, roomCode: string) {
 
   if (!room) return null;
 
-  const [tenantResult, latestBillResult] = await Promise.all([
+  const [tenantResult, latestBillResult, periodsResult] = await Promise.all([
     supabase
       .from("tenants")
       .select(
@@ -32,8 +32,13 @@ export async function fetchBillingContext(supabase: Client, roomCode: string) {
       .order("billing_month", { ascending: false })
       .limit(1)
       .maybeSingle(),
+    // Periods that already have a bill ("YYYY-MM"), so the form can warn before submitting.
+    supabase.from("bills").select("billing_year, billing_month").eq("room_id", room.id),
   ]);
 
+  const existingPeriods = (periodsResult.data ?? []).map(
+    (bill) => `${bill.billing_year}-${String(bill.billing_month).padStart(2, "0")}`
+  );
   const tenant = tenantResult.data;
   const latestMeter = latestBillResult.data?.current_meter;
   const initialMeter = tenant?.initial_electricity_meter;
@@ -44,7 +49,7 @@ export async function fetchBillingContext(supabase: Client, roomCode: string) {
         ? Number(initialMeter)
         : null;
 
-  return { room, tenant, previousMeter };
+  return { room, tenant, previousMeter, existingPeriods };
 }
 
 /** All bills for a room (newest first), or null when the room code is unknown. */

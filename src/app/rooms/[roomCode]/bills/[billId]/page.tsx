@@ -8,6 +8,7 @@ import { updateBillStatus } from "./actions";
 import SendBillLineButton from "@/components/SendBillLineButton";
 import { getBillStatus } from "@/lib/billStatus";
 import Icon from "@/components/Icon";
+import PageHeader from "@/components/PageHeader";
 
 type Props = {
   params: Promise<{
@@ -70,39 +71,24 @@ export default async function BillDetailPage({ params, searchParams }: Props) {
   );
 
   return (
-    <main className="min-h-screen bg-sand-50 px-4 py-10">
-      <div className="mx-auto max-w-3xl">
-        <Link
-          href={`/rooms/${bill.rooms.room_code}/bills`}
-          className="text-sm text-sand-500 hover:text-brand-700"
-        >
-          ← กลับประวัติบิล
-        </Link>
-
-        {lineSend === "sent" && (
-          <p role="status" className="mt-5 rounded-xl bg-green-50 p-4 text-sm text-green-800">
-            ออกบิลและส่งทาง LINE ให้ผู้เช่าแล้ว
-          </p>
-        )}
-        {lineSend === "failed" && (
-          <p role="alert" className="mt-5 rounded-xl bg-amber-50 p-4 text-sm text-amber-900">
-            ออกบิลแล้ว แต่ส่งทาง LINE ไม่สำเร็จ ผู้เช่ายังไม่ได้รับบิล กรุณากด &quot;ส่งบิลทาง LINE&quot; ด้านล่างเพื่อลองใหม่
-          </p>
-        )}
-
-        <div className="mt-5 flex items-start justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold"><Icon name="receipt" /> รายละเอียดบิล</h1>
-            <p className="mt-2 text-sand-500">ห้อง {bill.rooms.room_code}</p>
-            <p className="text-sand-500">
+    <main className="min-h-screen bg-sand-50 text-sand-900">
+      <PageHeader
+        width="3xl"
+        back={{ href: `/rooms/${bill.rooms.room_code}/bills`, label: "กลับประวัติบิล" }}
+        title={<><Icon name="receipt" /> รายละเอียดบิล</>}
+        subtitle={
+          <>
+            <p>ห้อง {bill.rooms.room_code}</p>
+            <p>
               ผู้เช่า:{" "}
               <span className="font-medium text-sand-900">
                 {bill.tenants?.full_name || "-"}
               </span>
             </p>
-          </div>
-
-          <div className="flex shrink-0 flex-col items-center gap-1.5">
+          </>
+        }
+        actions={
+          <>
             <span
               className={`rounded-full px-4 py-2 text-sm font-semibold ${status.className}`}
             >
@@ -114,8 +100,20 @@ export default async function BillDetailPage({ params, searchParams }: Props) {
               currentStatus={bill.status}
               updateBillStatus={updateBillStatus}
             />
-          </div>
-        </div>
+          </>
+        }
+      />
+      <div className="mx-auto max-w-3xl px-4 py-6 sm:px-8">
+        {lineSend === "sent" && (
+          <p role="status" className="mb-5 rounded-xl bg-green-50 p-4 text-sm text-green-800">
+            ออกบิลและส่งทาง LINE ให้ผู้เช่าแล้ว
+          </p>
+        )}
+        {lineSend === "failed" && (
+          <p role="alert" className="mb-5 rounded-xl bg-amber-50 p-4 text-sm text-amber-900">
+            ออกบิลแล้ว แต่ส่งทาง LINE ไม่สำเร็จ ผู้เช่ายังไม่ได้รับบิล กรุณากด &quot;ส่งบิลทาง LINE&quot; ด้านล่างเพื่อลองใหม่
+          </p>
+        )}
 
         <BillBreakdown bill={bill} items={billItems} />
 

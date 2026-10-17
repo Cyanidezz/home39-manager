@@ -48,7 +48,7 @@ export default function RoomDialog({ room, settings, onClose }: Props) {
             <button
               type="button"
               onClick={onClose}
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-2xl text-sand-400 hover:bg-sand-100 hover:text-sand-700"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-2xl text-sand-500 hover:bg-sand-100 hover:text-sand-700"
               aria-label="ปิด"
             >
               ×
@@ -86,7 +86,7 @@ export default function RoomDialog({ room, settings, onClose }: Props) {
                         <p className="mt-3 text-sm font-semibold text-brand-700">
                           รูปห้อง {room.room_code}
                         </p>
-                        <p className="mt-1 text-xs text-sand-400">ภาพที่ {index + 1}</p>
+                        <p className="mt-1 text-xs text-sand-500">ภาพที่ {index + 1}</p>
                       </div>
                     )}
                   </div>

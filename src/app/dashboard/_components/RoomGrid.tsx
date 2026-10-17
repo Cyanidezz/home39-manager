@@ -75,10 +75,10 @@ export default function RoomGrid({ rooms, billsByRoom, period }: Props) {
                   <strong
                     className={
                       currentBill?.status === "paid"
-                        ? "text-emerald-600"
+                        ? "text-emerald-700"
                         : currentBill
-                          ? "text-amber-600"
-                          : "text-sand-400"
+                          ? "text-amber-700"
+                          : "text-sand-500"
                     }
                   >
                     {currentBill?.status === "paid"

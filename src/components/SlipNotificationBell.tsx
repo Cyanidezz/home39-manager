@@ -174,7 +174,7 @@ export default function SlipNotificationBell() {
               </p>
             ) : notifications.length === 0 ? (
               <div className="px-4 py-8 text-center">
-                <span className="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
+                <span className="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-emerald-50 text-emerald-700">
                   <Icon name="check" className="h-5 w-5" />
                 </span>
                 <p className="mt-3 text-sm font-medium text-sand-700">
@@ -207,7 +207,7 @@ export default function SlipNotificationBell() {
                       <span className="mt-1 block truncate text-xs text-sand-500">
                         {tenant?.full_name || "ไม่ระบุชื่อผู้เช่า"}
                       </span>
-                      <span className="mt-1 block text-xs text-sand-400">
+                      <span className="mt-1 block text-xs text-sand-500">
                         {formatSubmittedAt(notification.slip_submitted_at)}
                       </span>
                     </span>

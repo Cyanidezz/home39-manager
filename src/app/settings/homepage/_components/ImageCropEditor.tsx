@@ -224,7 +224,7 @@ export default function ImageCropEditor({
             )}
           </>
         ) : (
-          <div className="flex h-full items-center justify-center text-sm text-sand-400">
+          <div className="flex h-full items-center justify-center text-sm text-sand-500">
             ยังไม่มีรูปภาพ
           </div>
         )}

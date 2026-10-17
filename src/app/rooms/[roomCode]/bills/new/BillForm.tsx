@@ -25,9 +25,25 @@ type Props = {
   tenantId: string;
   tenantName: string;
   tenantHasLine: boolean;
+  /** Periods that already have a bill, as "YYYY-MM". */
+  existingPeriods: string[];
   rentWaivedYear: number | null;
   rentWaivedMonth: number | null;
 };
+
+function firstFreePeriod(from: Date, existing: string[]): [number, number] {
+  let year = from.getFullYear();
+  let month = from.getMonth() + 1;
+  for (let i = 0; i < 24; i++) {
+    if (!existing.includes(`${year}-${String(month).padStart(2, "0")}`)) break;
+    month += 1;
+    if (month > 12) {
+      month = 1;
+      year += 1;
+    }
+  }
+  return [year, month];
+}
 
 export default function BillForm({
   roomId,
@@ -38,6 +54,7 @@ export default function BillForm({
   tenantId,
   tenantName,
   tenantHasLine,
+  existingPeriods,
   rentWaivedYear,
   rentWaivedMonth,
 }: Props) {
@@ -45,8 +62,10 @@ export default function BillForm({
   const supabase = createClient();
   const now = new Date();
 
-  const [billingYear, setBillingYear] = useState(now.getFullYear());
-  const [billingMonth, setBillingMonth] = useState(now.getMonth() + 1);
+  // Start at the first month from now that has no bill yet.
+  const [initialYear, initialMonth] = firstFreePeriod(now, existingPeriods);
+  const [billingYear, setBillingYear] = useState(initialYear);
+  const [billingMonth, setBillingMonth] = useState(initialMonth);
   const [currentMeter, setCurrentMeter] = useState("");
   const [otherItems, setOtherItems] = useState<OtherItem[]>([
     { name: "", amount: "" },
@@ -72,6 +91,9 @@ export default function BillForm({
     0
   );
 
+  const duplicatePeriod = existingPeriods.includes(
+    `${billingYear}-${String(billingMonth).padStart(2, "0")}`
+  );
   const isRentWaived =
     billingYear === rentWaivedYear && billingMonth === rentWaivedMonth;
   const chargedRent = isRentWaived ? 0 : monthlyRent;
@@ -234,7 +256,7 @@ export default function BillForm({
           <strong>
             {isRentWaived ? (
               <>
-                <span className="mr-2 font-normal text-sand-400 line-through">
+                <span className="mr-2 font-normal text-sand-500 line-through">
                   {monthlyRent.toLocaleString()}
                 </span>
                 0 บาท
@@ -311,7 +333,7 @@ export default function BillForm({
         />
       </div>
 
-      <div className="rounded-xl bg-green-50 p-6">
+      <div className="rounded-xl bg-brand-100 p-6">
         <div className="flex items-end justify-between">
           <span className="font-medium">ยอดรวม</span>
           <strong className="text-3xl">
@@ -322,6 +344,12 @@ export default function BillForm({
           </strong>
         </div>
       </div>
+
+      {duplicatePeriod && (
+        <div role="alert" className="rounded-lg bg-amber-50 p-4 text-sm text-amber-900">
+          ห้องนี้มีบิลของเดือน {billingMonth}/{billingYear} อยู่แล้ว กรุณาเลือกเดือนอื่น หรือแก้ไขบิลเดิมจากประวัติบิล
+        </div>
+      )}
 
       {tenantHasLine ? (
         <label className="flex items-start gap-3 rounded-xl border border-sand-200 p-4">
@@ -351,7 +379,7 @@ export default function BillForm({
       <div className="flex gap-3">
         <button
           type="submit"
-          disabled={loading}
+          disabled={loading || duplicatePeriod}
           className="rounded-lg bg-brand-300 px-6 py-3 text-brand-950 disabled:opacity-50"
         >
           {loading ? "กำลังบันทึก..." : <><Icon name="receipt" /> บันทึกและออกบิล</>}

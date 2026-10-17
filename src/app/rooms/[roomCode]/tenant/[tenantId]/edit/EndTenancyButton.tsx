@@ -203,7 +203,7 @@ export default function EndTenancyButton({
                 type="button"
                 onClick={() => setCompleteOpen(false)}
                 disabled={completing}
-                className="text-2xl text-sand-400 hover:text-brand-700 disabled:opacity-50"
+                className="text-2xl text-sand-500 hover:text-brand-700 disabled:opacity-50"
                 aria-label="ปิด"
               >
                 ×
@@ -260,7 +260,7 @@ export default function EndTenancyButton({
                 <h3 className="text-xl font-bold">บันทึกการสิ้นสุดสัญญาเช่า</h3>
                 <p className="mt-1 text-sm text-sand-500">{tenantName}</p>
               </div>
-              <button type="button" onClick={() => setOpen(false)} className="text-2xl text-sand-400 hover:text-brand-700" aria-label="ปิด">×</button>
+              <button type="button" onClick={() => setOpen(false)} className="text-2xl text-sand-500 hover:text-brand-700" aria-label="ปิด">×</button>
             </div>
 
             <div className="mt-6 space-y-5">

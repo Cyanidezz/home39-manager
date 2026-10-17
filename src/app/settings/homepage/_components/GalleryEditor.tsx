@@ -54,7 +54,7 @@ export default function GalleryEditor({ settings, uploading, updateSetting, onUp
       </p>
 
       {items.length === 0 ? (
-        <p className="mt-4 rounded-xl bg-sand-50 px-4 py-6 text-center text-sm text-sand-400">ยังไม่มีรูปในส่วนนี้</p>
+        <p className="mt-4 rounded-xl bg-sand-50 px-4 py-6 text-center text-sm text-sand-500">ยังไม่มีรูปในส่วนนี้</p>
       ) : (
         <ul className="mt-4 space-y-3">
           {items.map((item, index) => (

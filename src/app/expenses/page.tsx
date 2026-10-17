@@ -1,8 +1,8 @@
-import Link from "next/link";
 import { requireUser } from "@/lib/data/session";
 import { fetchMonthExpenses } from "@/lib/data/lists";
 import { parsePeriod } from "@/lib/format";
 import ExpenseManager from "./ExpenseManager";
+import PageHeader from "@/components/PageHeader";
 
 type Props = {
   searchParams: Promise<{ month?: string }>;
@@ -17,44 +17,35 @@ export default async function ExpensesPage({ searchParams }: Props) {
   const { data: expenses, error } = await fetchMonthExpenses(supabase, year, month);
 
   return (
-    <main className="min-h-screen bg-sand-50 px-4 py-8 sm:p-8">
-      <div className="mx-auto max-w-6xl">
-        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <Link
-              href={`/dashboard?month=${selectedPeriod}`}
-              className="text-sm font-medium text-brand-600 hover:text-brand-700"
-            >
-              ← กลับ Dashboard
-            </Link>
-            <h1 className="mt-3 text-3xl font-bold">รายจ่ายจริง</h1>
-            <p className="mt-1 text-sand-500">
-              บันทึกค่าใช้จ่ายเพื่อนำไปคำนวณกำไร/ขาดทุน
-            </p>
-          </div>
-
+    <main className="min-h-screen bg-sand-50 text-sand-900">
+      <PageHeader
+        back={{ href: `/dashboard?month=${selectedPeriod}`, label: "กลับ Dashboard" }}
+        title="รายจ่ายจริง"
+        subtitle="บันทึกค่าใช้จ่ายเพื่อนำไปคำนวณกำไร/ขาดทุน"
+        actions={
           <form className="flex items-end gap-3">
             <div>
-              <label htmlFor="month" className="mb-1 block text-sm text-sand-500">
-                เดือนบัญชี
+              <label htmlFor="month" className="mb-1 block text-xs text-sand-500">
+                เดือนที่แสดงรายการ
               </label>
               <input
                 id="month"
                 name="month"
                 type="month"
                 defaultValue={selectedPeriod}
-                className="rounded-xl border border-sand-200 bg-white px-4 py-3 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+                className="rounded-xl border border-sand-200 bg-white px-4 py-2.5 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
               />
             </div>
             <button
               type="submit"
-              className="rounded-xl border border-brand-200 bg-white px-4 py-3 font-semibold text-brand-700 hover:bg-brand-50"
+              className="rounded-xl border border-brand-200 bg-white px-4 py-2.5 font-semibold text-brand-700 hover:bg-brand-50"
             >
               ดูเดือนนี้
             </button>
           </form>
-        </div>
-
+        }
+      />
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-8">
         {error && (
           <div className="mb-6 rounded-xl bg-red-50 p-4 text-red-700">
             โหลดรายจ่ายไม่สำเร็จ: {error.message}

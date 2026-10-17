@@ -29,7 +29,7 @@ type Props = {
 
 export default function BillBreakdown({ bill, items }: Props) {
   return (
-    <div className="mt-8 overflow-hidden rounded-2xl border border-sand-200 bg-white shadow-sm">
+    <div className="overflow-hidden rounded-2xl border border-sand-200 bg-white shadow-sm">
       <div className="border-b px-6 py-5">
         <p className="text-xl font-bold">
           {thaiMonths[bill.billing_month - 1]} {bill.billing_year + 543}
