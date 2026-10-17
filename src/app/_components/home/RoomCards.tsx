@@ -43,9 +43,9 @@ export default function RoomCards({ rooms, onSelect }: Props) {
               key={room.room_code}
               type="button"
               onClick={() => onSelect(room)}
-              className="group overflow-hidden rounded-2xl border border-sand-200 bg-white text-left shadow-sm hover:-translate-y-1 hover:border-brand-300 hover:shadow-xl"
+              className="group flex h-full flex-col overflow-hidden rounded-2xl border border-sand-200 bg-white text-left shadow-sm hover:-translate-y-1 hover:border-brand-300 hover:shadow-xl"
             >
-              <div className="relative flex h-52 items-center justify-center overflow-hidden bg-gradient-to-br from-brand-100 via-sand-100 to-brand-50">
+              <div className="relative flex h-52 shrink-0 items-center justify-center overflow-hidden bg-gradient-to-br from-brand-100 via-sand-100 to-brand-50">
                 {room.cover_image_url ? (
                   <div className="absolute inset-0 transition duration-300 group-hover:scale-105">
                     <HomepageImage
@@ -61,7 +61,7 @@ export default function RoomCards({ rooms, onSelect }: Props) {
                   </span>
                 )}
               </div>
-              <div className="p-5">
+              <div className="flex flex-1 flex-col p-5">
                 <div className="flex items-center justify-between gap-3">
                   <h3 className="text-xl font-bold">{room.title}</h3>
                   <span
@@ -82,9 +82,12 @@ export default function RoomCards({ rooms, onSelect }: Props) {
                     {money(room.monthly_price)} บาท/เดือน
                   </p>
                 )}
-                <p className="mt-4 border-t border-sand-100 pt-4 text-sm font-semibold text-brand-600">
-                  ดูรายละเอียดและรูปภาพ →
-                </p>
+                {/* Buttons centre their content when stretched by a taller sibling; flex-col + mt-auto pins this to the bottom instead. */}
+                <div className="mt-auto pt-4">
+                  <p className="border-t border-sand-100 pt-4 text-sm font-semibold text-brand-600">
+                    ดูรายละเอียดและรูปภาพ →
+                  </p>
+                </div>
               </div>
             </button>
           );
