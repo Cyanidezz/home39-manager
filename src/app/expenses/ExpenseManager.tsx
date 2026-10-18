@@ -4,6 +4,9 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { bangkokDate, formatMoney, formatThaiDateShort } from "@/lib/format";
+import { removeExpenseReceipt, uploadExpenseReceipt } from "@/lib/expenseReceipt";
+import Icon from "@/components/Icon";
+import ReceiptDialog from "./ReceiptDialog";
 
 type Expense = {
   id: string;
@@ -13,6 +16,7 @@ type Expense = {
   billing_year: number | null;
   billing_month: number | null;
   note: string | null;
+  receipt_path: string | null;
 };
 
 type Props = {
@@ -52,8 +56,18 @@ export default function ExpenseManager({
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [error, setError] = useState("");
+  // Optional proof photo: a newly chosen file, and whether the saved one should be dropped.
+  const [receiptFile, setReceiptFile] = useState<File | null>(null);
+  const [existingReceipt, setExistingReceipt] = useState<string | null>(null);
+  const [removeReceipt, setRemoveReceipt] = useState(false);
+  const [fileInputKey, setFileInputKey] = useState(0);
+  const [viewing, setViewing] = useState<Expense | null>(null);
 
   function resetForm() {
+    setReceiptFile(null);
+    setExistingReceipt(null);
+    setRemoveReceipt(false);
+    setFileInputKey((key) => key + 1);
     setEditingId(null);
     setExpenseDate(bangkokDate());
     setPeriod(selectedPeriod);
@@ -74,6 +88,10 @@ export default function ExpenseManager({
     setCategory(expense.category);
     setAmount(String(expense.amount));
     setNote(expense.note || "");
+    setExistingReceipt(expense.receipt_path);
+    setRemoveReceipt(false);
+    setReceiptFile(null);
+    setFileInputKey((key) => key + 1);
     setError("");
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -99,6 +117,18 @@ export default function ExpenseManager({
 
     setSaving(true);
 
+    // The photo goes up first, so an expense never points at a file that is not there.
+    let newReceiptPath: string | null = null;
+    if (receiptFile) {
+      try {
+        newReceiptPath = await uploadExpenseReceipt(supabase, receiptFile);
+      } catch (uploadError) {
+        setError(uploadError instanceof Error ? uploadError.message : "อัปโหลดรูปหลักฐานไม่สำเร็จ");
+        setSaving(false);
+        return;
+      }
+    }
+
     const values = {
       expense_date: expenseDate,
       category,
@@ -106,6 +136,7 @@ export default function ExpenseManager({
       billing_year: billingYear,
       billing_month: billingMonth,
       note: note.trim() || null,
+      ...(newReceiptPath ? { receipt_path: newReceiptPath } : removeReceipt ? { receipt_path: null } : {}),
     };
 
     const result = editingId
@@ -115,9 +146,13 @@ export default function ExpenseManager({
     setSaving(false);
 
     if (result.error) {
+      if (newReceiptPath) await removeExpenseReceipt(supabase, newReceiptPath);
       setError(result.error.message || "บันทึกรายจ่ายไม่สำเร็จ");
       return;
     }
+
+    // The replaced or removed photo is no longer referenced.
+    if (existingReceipt && (newReceiptPath || removeReceipt)) await removeExpenseReceipt(supabase, existingReceipt);
 
     resetForm();
     router.refresh();
@@ -143,6 +178,8 @@ export default function ExpenseManager({
       setError(deleteError.message || "ลบรายจ่ายไม่สำเร็จ");
       return;
     }
+
+    if (expense.receipt_path) await removeExpenseReceipt(supabase, expense.receipt_path);
 
     if (editingId === expense.id) resetForm();
     router.refresh();
@@ -243,6 +280,33 @@ export default function ExpenseManager({
             />
           </div>
 
+          <div>
+            <label htmlFor="receipt" className="mb-2 block text-sm font-medium">
+              รูปหลักฐาน <span className="font-normal text-sand-500">(ไม่บังคับ)</span>
+            </label>
+            {existingReceipt && !removeReceipt && !receiptFile && (
+              <p className="mb-2 flex flex-wrap items-center gap-3 text-sm">
+                <span className="text-sand-600"><Icon name="paperclip" /> มีรูปหลักฐานแนบอยู่</span>
+                <button type="button" onClick={() => setRemoveReceipt(true)} className="font-semibold text-red-600 hover:underline">เอารูปออก</button>
+              </p>
+            )}
+            {removeReceipt && (
+              <p className="mb-2 text-sm text-orange-700">
+                จะเอารูปเดิมออกเมื่อบันทึก{" "}
+                <button type="button" onClick={() => setRemoveReceipt(false)} className="font-semibold underline">ยกเลิก</button>
+              </p>
+            )}
+            <input
+              key={fileInputKey}
+              id="receipt"
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={(event) => setReceiptFile(event.target.files?.[0] ?? null)}
+              className="block w-full text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-brand-300 file:px-4 file:py-2 file:font-semibold file:text-brand-950 hover:file:bg-brand-400"
+            />
+            <p className="mt-2 text-xs text-sand-500">รูปจะถูกย่อให้เล็กลงอัตโนมัติก่อนอัปโหลด</p>
+          </div>
+
           {error && (
             <p className="rounded-xl bg-red-50 p-3 text-sm text-red-700">
               {error}
@@ -304,7 +368,16 @@ export default function ExpenseManager({
                   </p>
                 </div>
                 <div className="mt-3 flex items-center justify-between gap-3 sm:mt-0">
-                  <strong>{formatMoney(expense.amount)} บาท</strong>
+                  <strong className="whitespace-nowrap">{formatMoney(expense.amount)} บาท</strong>
+                  {expense.receipt_path && (
+                    <button
+                      type="button"
+                      onClick={() => setViewing(expense)}
+                      className="whitespace-nowrap rounded-lg border px-3 py-2 text-sm text-brand-800 hover:bg-brand-50"
+                    >
+                      <Icon name="paperclip" /> หลักฐาน
+                    </button>
+                  )}
                   <button
                     type="button"
                     onClick={() => editExpense(expense)}
@@ -326,6 +399,14 @@ export default function ExpenseManager({
           </div>
         )}
       </section>
+
+      {viewing?.receipt_path && (
+        <ReceiptDialog
+          path={viewing.receipt_path}
+          title={`${categoryLabel(viewing.category)} ${formatMoney(viewing.amount)} บาท`}
+          onClose={() => setViewing(null)}
+        />
+      )}
     </div>
   );
 }

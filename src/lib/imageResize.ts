@@ -25,13 +25,17 @@ export function isResizableImage(file: Pick<File, "type">) {
  * Downscales a large photo in the browser before upload. Falls back to the original file
  * whenever resizing is not possible or would not help.
  */
-export async function downscaleImage(file: File): Promise<File> {
+export async function downscaleImage(
+  file: File,
+  options: { maxDimension?: number; skipBelowBytes?: number } = {}
+): Promise<File> {
+  const { maxDimension = MAX_IMAGE_DIMENSION, skipBelowBytes = SKIP_BELOW_BYTES } = options;
   if (!isResizableImage(file) || typeof createImageBitmap !== "function") return file;
 
   try {
     const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
-    const target = fitWithin(bitmap.width, bitmap.height);
-    if (!target.scaled && file.size <= SKIP_BELOW_BYTES) {
+    const target = fitWithin(bitmap.width, bitmap.height, maxDimension);
+    if (!target.scaled && file.size <= skipBelowBytes) {
       bitmap.close();
       return file;
     }

@@ -91,7 +91,7 @@ const billItems = [
 ];
 
 const expenses = [
-  { id: uuid(501), expense_date: day(year, month, 2), category: "water", amount: 620, billing_year: year, billing_month: month, note: "ค่าน้ำประปา", created_at: `${day(year, month, 2)}T04:00:00Z` },
+  { id: uuid(501), expense_date: day(year, month, 2), category: "water", amount: 620, billing_year: year, billing_month: month, note: "ค่าน้ำประปา", receipt_path: "mock/receipt.jpg", created_at: `${day(year, month, 2)}T04:00:00Z` },
   { id: uuid(502), expense_date: day(year, month, 3), category: "electricity", amount: 1840, billing_year: year, billing_month: month, note: null, created_at: `${day(year, month, 3)}T04:00:00Z` },
   { id: uuid(503), expense_date: day(year, month, 8), category: "cleaning", amount: 800, billing_year: year, billing_month: month, note: "แม่บ้าน", created_at: `${day(year, month, 8)}T04:00:00Z` },
 ];
