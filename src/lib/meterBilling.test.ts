@@ -10,6 +10,7 @@ const base: MeterBillInput = {
   today: "2026-11-01",
   tenant: { id: "t", moveInDate: "2026-09-01", rentWaivedYear: null, rentWaivedMonth: null },
   room: { monthlyRent: 5000, occupantCount: 2 },
+  rates: { water: 150, electricity: 7 },
   previousMeter: 100,
   billExists: false,
   usageByDate: fullMonth("2026-10", 5),
@@ -22,7 +23,7 @@ describe("computeMeterBill", () => {
       ok: true,
       bill: {
         year: 2026, month: 10, days: 31, units: 155, previousMeter: 100, currentMeter: 255,
-        rent: 5000, rentWaived: false, water: 300, electricity: 1085, total: 6385, dueDate: "2026-11-08",
+        rent: 5000, rentWaived: false, water: 300, waterRate: 150, electricityRate: 7, electricity: 1085, total: 6385, dueDate: "2026-11-08",
       },
     });
   });
@@ -41,6 +42,11 @@ describe("computeMeterBill", () => {
   it("counts only the days from move-in in the move-in month", () => {
     const result = computeMeterBill({ ...base, tenant: { ...base.tenant!, moveInDate: "2026-10-20" }, usageByDate: { ...fullMonth("2026-10", 5), "2026-10-05": null } });
     expect(result.ok && [result.bill.days, result.bill.units]).toEqual([12, 60]);
+  });
+
+  it("uses the rates it is given", () => {
+    const result = computeMeterBill({ ...base, rates: { water: 200, electricity: 8.5 } });
+    expect(result.ok && [result.bill.water, result.bill.electricity, result.bill.total, result.bill.waterRate, result.bill.electricityRate]).toEqual([400, 1317.5, 6717.5, 200, 8.5]);
   });
 
   it("is blocked until the month is over", () => {

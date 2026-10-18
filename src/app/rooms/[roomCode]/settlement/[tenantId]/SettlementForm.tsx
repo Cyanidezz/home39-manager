@@ -12,6 +12,7 @@ import {
   suggestedWater,
   type DeductionItem,
 } from "@/lib/settlement";
+import type { BillingRates } from "@/lib/billingRates";
 import { primaryButton, secondaryButton } from "../../_components/InfoCard";
 
 type OutstandingBill = { id: string; year: number; month: number; amount: number; status: string };
@@ -34,6 +35,7 @@ type Props = {
   tenantId: string;
   deposit: number;
   previousMeter: number | null;
+  rates: BillingRates;
   lastOccupants: number | null;
   outstandingBills: OutstandingBill[];
   pendingCheckCount: number;
@@ -52,7 +54,7 @@ function toRows(items: { name: string; amount: number }[]): DeductionItem[] {
 const baht = (value: number) => `${formatMoney(value)} บาท`;
 
 export default function SettlementForm({
-  tenantId, deposit, previousMeter, lastOccupants, outstandingBills, pendingCheckCount, settlement, slipUrl,
+  tenantId, deposit, previousMeter, rates, lastOccupants, outstandingBills, pendingCheckCount, settlement, slipUrl,
 }: Props) {
   const router = useRouter();
   const closed = settlement?.status === "closed";
@@ -60,7 +62,7 @@ export default function SettlementForm({
   const [finalMeter, setFinalMeter] = useState(settlement?.finalMeter != null ? String(settlement.finalMeter) : "");
   const [electricity, setElectricity] = useState(settlement ? String(settlement.electricity) : "");
   const [electricityEdited, setElectricityEdited] = useState(Boolean(settlement));
-  const [water, setWater] = useState(settlement ? String(settlement.water) : String(suggestedWater(lastOccupants)));
+  const [water, setWater] = useState(settlement ? String(settlement.water) : String(suggestedWater(lastOccupants, rates.water)));
   const [items, setItems] = useState<DeductionItem[]>(toRows(settlement?.items ?? []));
   const [note, setNote] = useState(settlement?.note ?? "");
   const [refundedOn, setRefundedOn] = useState(bangkokDate());
@@ -86,7 +88,7 @@ export default function SettlementForm({
 
   function changeMeter(value: string) {
     setFinalMeter(value);
-    if (!electricityEdited) setElectricity(String(electricityDeduction(previousMeter, value)));
+    if (!electricityEdited) setElectricity(String(electricityDeduction(previousMeter, value, rates.electricity)));
   }
 
   function updateItem(index: number, patch: Partial<DeductionItem>) {

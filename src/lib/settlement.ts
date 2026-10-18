@@ -14,16 +14,16 @@ export type SettlementParts = {
 const roundBaht = (value: number) => Math.round(value * 100) / 100;
 
 /** Electricity from the last billed reading to the reading taken at move-out. */
-export function electricityDeduction(previousMeter: number | null, finalMeter: string) {
+export function electricityDeduction(previousMeter: number | null, finalMeter: string, rate = ELECTRICITY_RATE) {
   if (previousMeter === null || finalMeter.trim() === "") return 0;
   const final = Number(finalMeter);
   if (!Number.isFinite(final)) return 0;
-  return roundBaht(Math.max(0, final - previousMeter) * ELECTRICITY_RATE);
+  return roundBaht(Math.max(0, final - previousMeter) * rate);
 }
 
 /** Starting point for the last water charge: the people billed last time, at the usual rate. */
-export function suggestedWater(occupants: number | null | undefined) {
-  return roundBaht(Math.max(0, occupants ?? 0) * WATER_RATE);
+export function suggestedWater(occupants: number | null | undefined, rate = WATER_RATE) {
+  return roundBaht(Math.max(0, occupants ?? 0) * rate);
 }
 
 /** Total of the deduction rows; rows with no name or no positive amount are left out. */

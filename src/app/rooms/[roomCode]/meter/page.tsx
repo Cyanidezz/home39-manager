@@ -4,6 +4,7 @@ import { requireUser } from "@/lib/data/session";
 import { bangkokDate, currentPeriod, parsePeriod, thaiMonthNames } from "@/lib/format";
 import { METER_START_PERIOD, monthDates, shiftPeriod, type MeterDay } from "@/lib/meter";
 import { fetchBillingContext } from "@/lib/data/roomPages";
+import { fetchBillingRates } from "@/lib/data/settings";
 import { computeMeterBill } from "@/lib/meterBilling";
 import MeterBillCard from "./MeterBillCard";
 import { MeterDatePicker } from "./MeterDatePicker";
@@ -60,7 +61,7 @@ export default async function MeterPage({ params, searchParams }: Props) {
     };
   });
 
-  const billing = await fetchBillingContext(supabase, room.room_code);
+  const [billing, rates] = await Promise.all([fetchBillingContext(supabase, room.room_code), fetchBillingRates(supabase)]);
   const billResult = billing
     ? computeMeterBill({
         year,
@@ -76,6 +77,7 @@ export default async function MeterPage({ params, searchParams }: Props) {
           : null,
         room: { monthlyRent: Number(billing.room.monthly_rent), occupantCount: billing.room.occupant_count },
         previousMeter: billing.previousMeter,
+        rates,
         billExists: billing.existingPeriods.includes(period),
         usageByDate: Object.fromEntries(views.map((view) => [view.date, view.kwh])),
       })

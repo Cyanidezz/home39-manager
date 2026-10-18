@@ -10,6 +10,8 @@ import {
 
 type Client = SupabaseClient<Database>;
 
+import { DEFAULT_BILLING_RATES, type BillingRates } from "@/lib/billingRates";
+
 export const defaultPaymentSettings = {
   bank_name: "ธนาคารไทยพาณิชย์",
   bank_code: "SCB",
@@ -34,6 +36,18 @@ export async function fetchPaymentSettings(supabase: Client) {
     : defaultPaymentSettings;
 
   return { settings, error };
+}
+
+/** The dorm-wide water and electricity rates, or the starting rates when nothing is saved yet. */
+export async function fetchBillingRates(supabase: Client): Promise<BillingRates> {
+  const { data } = await supabase
+    .from("billing_settings")
+    .select("water_rate_per_person, electricity_rate")
+    .eq("id", "default")
+    .maybeSingle();
+  return data
+    ? { water: Number(data.water_rate_per_person), electricity: Number(data.electricity_rate) }
+    : DEFAULT_BILLING_RATES;
 }
 
 /** Homepage copy and per-room content, falling back to defaults for missing rows. */

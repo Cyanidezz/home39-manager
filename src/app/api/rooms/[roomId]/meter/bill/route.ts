@@ -3,7 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 import { bangkokDate } from "@/lib/format";
 import { monthDates } from "@/lib/meter";
 import { computeMeterBill, meterBillBlockText } from "@/lib/meterBilling";
-import { billCreationError, ELECTRICITY_RATE, pickPreviousMeter, WATER_RATE } from "@/lib/billing";
+import { billCreationError, pickPreviousMeter } from "@/lib/billing";
+import { fetchBillingRates } from "@/lib/data/settings";
 
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -46,7 +47,8 @@ export async function POST(request: Request, { params }: Params) {
     if (tenantId) query = query.eq("tenant_id", tenantId);
     return query.order("billing_year", { ascending: false }).order("billing_month", { ascending: false }).limit(1).maybeSingle();
   };
-  const [tenantLatest, roomLatest, existing, usage] = await Promise.all([
+  const [rates, tenantLatest, roomLatest, existing, usage] = await Promise.all([
+    fetchBillingRates(supabase),
     tenant ? latest(tenant.id) : Promise.resolve({ data: null }),
     latest(),
     supabase.from("bills").select("id").eq("room_id", roomId).eq("billing_year", year).eq("billing_month", month).limit(1),
@@ -61,6 +63,7 @@ export async function POST(request: Request, { params }: Params) {
       ? { id: tenant.id, moveInDate: tenant.move_in_date, rentWaivedYear: tenant.rent_waived_year, rentWaivedMonth: tenant.rent_waived_month }
       : null,
     room: { monthlyRent: Number(room.monthly_rent), occupantCount: room.occupant_count },
+    rates,
     previousMeter: pickPreviousMeter({
       tenantLatest: tenantLatest.data?.current_meter,
       tenantInitial: tenant?.initial_electricity_meter,
@@ -80,12 +83,12 @@ export async function POST(request: Request, { params }: Params) {
     p_billing_month: month,
     p_rent_amount: bill.rent,
     p_occupant_count: room.occupant_count,
-    p_water_rate_per_person: WATER_RATE,
+    p_water_rate_per_person: bill.waterRate,
     p_water_amount: bill.water,
     p_previous_meter: bill.previousMeter,
     p_current_meter: bill.currentMeter,
     p_electricity_units: bill.units,
-    p_electricity_rate: ELECTRICITY_RATE,
+    p_electricity_rate: bill.electricityRate,
     p_electricity_amount: bill.electricity,
     p_other_amount: 0,
     p_total_amount: bill.total,

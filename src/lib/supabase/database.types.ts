@@ -98,6 +98,27 @@ export type Database = {
           },
         ]
       }
+      billing_settings: {
+        Row: {
+          electricity_rate: number
+          id: string
+          updated_at: string
+          water_rate_per_person: number
+        }
+        Insert: {
+          electricity_rate?: number
+          id?: string
+          updated_at?: string
+          water_rate_per_person?: number
+        }
+        Update: {
+          electricity_rate?: number
+          id?: string
+          updated_at?: string
+          water_rate_per_person?: number
+        }
+        Relationships: []
+      }
       bills: {
         Row: {
           billing_month: number

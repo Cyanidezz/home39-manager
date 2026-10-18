@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/data/session";
+import { fetchBillingRates } from "@/lib/data/settings";
 import { fetchRoomOverview } from "@/lib/data/room";
 import { bangkokDate, formatThaiDate } from "@/lib/format";
 import RoomInfoCard from "./_components/RoomInfoCard";
@@ -25,7 +26,7 @@ export default async function RoomPage({ params }: Props) {
 
   const { supabase } = await requireUser();
 
-  const overview = await fetchRoomOverview(supabase, roomCode);
+  const [overview, rates] = await Promise.all([fetchRoomOverview(supabase, roomCode), fetchBillingRates(supabase)]);
   if (!overview) notFound();
 
   const { room, tenants, bills, latestContract, contractUrl, lastMovedOut } = overview;
@@ -83,7 +84,7 @@ export default async function RoomPage({ params }: Props) {
         {/* Two independent stacks (no stretched rows), in reading order on mobile: room, tenant, contract, latest bill. */}
         <div className="grid gap-6 md:grid-cols-2 md:items-start">
           <div className="flex flex-col gap-6">
-            <RoomInfoCard room={room} />
+            <RoomInfoCard room={room} rates={rates} />
             <TenantCard roomCode={room.room_code} tenants={tenants} />
             {lastMovedOut && (
               <SettlementCard

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/data/session";
 import { fetchBillingContext } from "@/lib/data/roomPages";
+import { fetchBillingRates } from "@/lib/data/settings";
 import BillForm from "./BillForm";
 import Icon from "@/components/Icon";
 
@@ -22,6 +23,7 @@ export default async function NewBillPage({ params, searchParams }: Props) {
   if (!context) notFound();
 
   const { room, tenant, previousMeter, existingPeriods } = context;
+  const rates = await fetchBillingRates(supabase);
 
   return (
     <main className="min-h-screen bg-sand-50 p-8">
@@ -59,6 +61,8 @@ export default async function NewBillPage({ params, searchParams }: Props) {
               existingPeriods={existingPeriods}
               rentWaivedYear={tenant.rent_waived_year}
               rentWaivedMonth={tenant.rent_waived_month}
+              waterRate={rates.water}
+              electricityRate={rates.electricity}
               initialYear={Number.isInteger(Number(query.year)) && query.year ? Number(query.year) : undefined}
               initialMonth={Number.isInteger(Number(query.month)) && query.month ? Number(query.month) : undefined}
               initialMeter={query.meter && Number.isFinite(Number(query.meter)) ? query.meter : undefined}

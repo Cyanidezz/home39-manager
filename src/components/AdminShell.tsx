@@ -37,6 +37,12 @@ const navigation = [
     icon: <Icon name="sliders" className="h-4 w-4" />,
     active: (path: string) => path.startsWith("/settings/payment"),
   },
+  {
+    label: "อัตราค่าน้ำ/ค่าไฟ",
+    href: "/settings/rates",
+    icon: <Icon name="bolt" className="h-4 w-4" />,
+    active: (path: string) => path.startsWith("/settings/rates"),
+  },
 ];
 
 export default function AdminShell({ children }: Props) {
