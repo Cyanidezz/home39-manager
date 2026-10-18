@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { downscaleImage } from "@/lib/imageResize";
 
 const maxImageSize = 10 * 1024 * 1024;
 export const MAX_VIDEO_SIZE = 50 * 1024 * 1024;
@@ -56,11 +57,13 @@ export function uploadHomepageMedia(supabase: SupabaseClient, file: File, folder
 
 export async function uploadHomepageImage(
   supabase: SupabaseClient,
-  file: File,
+  original: File,
   folder: string
 ) {
-  const image = homepageImageExtension(file);
-  if (!image) throw new Error("รองรับไฟล์ JPG, PNG, WebP, GIF และ HEIC เท่านั้น");
+  if (!homepageImageExtension(original)) throw new Error("รองรับไฟล์ JPG, PNG, WebP, GIF และ HEIC เท่านั้น");
+  // Large photos are shrunk in the browser first, so a 10+ MB camera shot still uploads.
+  const file = await downscaleImage(original);
+  const image = homepageImageExtension(file)!;
   if (file.size > maxImageSize) throw new Error("รูปภาพต้องมีขนาดไม่เกิน 10 MB");
 
   const path = `${folder}/${crypto.randomUUID()}.${image.extension}`;
