@@ -30,3 +30,7 @@ The script signs in through the real `/login` form first, so the login flow is e
 - The mock understands only the PostgREST features the app uses (select with embedded relations, eq/neq/in/is/not, order, limit, single). If a page starts using something new, extend `query()` in `mock-supabase.mjs`.
 - Screenshots come from Chrome with an English locale, so native widgets (e.g. the month picker) show English text.
 - The Next.js dev badge may appear in the corner; ignore it.
+
+## Phone overflow check
+On the mobile viewport the script also prints `! overflow <page>` when a page is wider than the screen, with the first elements sticking out.
+It runs in Chrome's phone emulation, not iOS Safari: iOS also gives date/month inputs their own width, which `globals.css` neutralises, so check those pages on a real iPhone too.

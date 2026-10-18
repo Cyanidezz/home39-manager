@@ -25,11 +25,11 @@ export default function OtherItemsEditor({ items, total, onAdd, onChange, onRemo
 
         <div className="space-y-3">
           {items.map((item, index) => (
-            <div key={index} className="grid grid-cols-[1fr_160px_auto] gap-3">
+            <div key={index} className="grid grid-cols-[minmax(0,1fr)_auto] gap-3 sm:grid-cols-[minmax(0,1fr)_160px_auto]">
               <input
                 value={item.name}
                 onChange={(e) => onChange(index, "name", e.target.value)}
-                className="rounded-lg border px-4 py-3"
+                className="col-span-2 min-w-0 rounded-lg border px-4 py-3 sm:col-span-1"
                 placeholder="ชื่อรายการ เช่น ค่ากุญแจ"
               />
               <input
@@ -38,7 +38,7 @@ export default function OtherItemsEditor({ items, total, onAdd, onChange, onRemo
                 step="0.01"
                 value={item.amount}
                 onChange={(e) => onChange(index, "amount", e.target.value)}
-                className="rounded-lg border px-4 py-3 text-right"
+                className="min-w-0 rounded-lg border px-4 py-3 text-right"
                 placeholder="จำนวนเงิน"
               />
               <button

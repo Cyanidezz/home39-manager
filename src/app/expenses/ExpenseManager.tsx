@@ -192,7 +192,7 @@ export default function ExpenseManager({
 
   return (
     <div className="grid gap-6 lg:grid-cols-[380px_1fr]">
-      <section className="h-fit rounded-2xl border border-sand-200 bg-white p-6 shadow-sm">
+      <section className="h-fit min-w-0 rounded-2xl border border-sand-200 bg-white p-6 shadow-sm">
         <h2 className="text-xl font-semibold">
           {editingId ? "แก้ไขรายจ่าย" : "เพิ่มรายจ่ายจริง"}
         </h2>
@@ -335,7 +335,7 @@ export default function ExpenseManager({
         </form>
       </section>
 
-      <section className="rounded-2xl border border-sand-200 bg-white p-6 shadow-sm">
+      <section className="min-w-0 rounded-2xl border border-sand-200 bg-white p-6 shadow-sm">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <h2 className="text-xl font-semibold">รายการรายจ่ายเดือนนี้</h2>
