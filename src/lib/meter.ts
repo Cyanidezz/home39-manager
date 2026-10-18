@@ -39,3 +39,21 @@ export function usageSummary(series: { kwh: number | null }[], windowDays = 7) {
     average: recent.length ? Math.round((total / recent.length) * 100) / 100 : null,
   };
 }
+
+/** The first month shown on the meter page (the month the meter data starts). */
+export const METER_START_PERIOD = "2026-10";
+
+/** "YYYY-MM" moved by `delta` months. */
+export function shiftPeriod(period: string, delta: number) {
+  const [year, month] = period.split("-").map(Number);
+  const moved = new Date(Date.UTC(year, month - 1 + delta, 1));
+  return moved.toISOString().slice(0, 7);
+}
+
+/** Every date of the month "YYYY-MM", oldest first. */
+export function monthDates(period: string) {
+  const first = `${period}-01`;
+  const next = `${shiftPeriod(period, 1)}-01`;
+  const count = Math.round((Date.parse(`${next}T00:00:00Z`) - Date.parse(`${first}T00:00:00Z`)) / DAY_MS);
+  return Array.from({ length: count }, (_, index) => addDays(first, index));
+}

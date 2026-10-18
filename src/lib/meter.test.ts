@@ -31,3 +31,20 @@ describe("dailySeries / usageSummary", () => {
     expect(usageSummary([], 7)).toEqual({ total: 0, daysWithData: 0, average: null });
   });
 });
+
+import { monthDates, shiftPeriod } from "./meter";
+
+describe("month helpers", () => {
+  it("shifts across years", () => {
+    expect(shiftPeriod("2026-10", 1)).toBe("2026-11");
+    expect(shiftPeriod("2026-12", 1)).toBe("2027-01");
+    expect(shiftPeriod("2026-01", -1)).toBe("2025-12");
+  });
+  it("lists every date of a month", () => {
+    expect(monthDates("2026-10")).toHaveLength(31);
+    expect(monthDates("2026-11")).toHaveLength(30);
+    expect(monthDates("2028-02")).toHaveLength(29);
+    expect(monthDates("2026-10")[0]).toBe("2026-10-01");
+    expect(monthDates("2026-10")[30]).toBe("2026-10-31");
+  });
+});
