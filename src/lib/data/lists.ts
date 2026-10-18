@@ -19,7 +19,7 @@ export async function fetchMonthExpenses(
 ) {
   return supabase
     .from("expenses")
-    .select("id, expense_date, category, amount, billing_year, billing_month, note")
+    .select("id, expense_date, category, amount, billing_year, billing_month, note, receipt_path")
     .eq("billing_year", year)
     .eq("billing_month", month)
     .order("expense_date", { ascending: false })
