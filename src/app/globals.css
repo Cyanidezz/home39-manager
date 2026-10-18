@@ -54,6 +54,19 @@
   ::file-selector-button {
     border-color: var(--color-sand-300);
   }
+
+  /*
+   * iOS Safari gives date/month inputs their own intrinsic width and ignores w-full, so a form overflows the screen.
+   * Dropping the native look and the minimum width lets them shrink to the column like any other input.
+   */
+  input[type="date"],
+  input[type="month"],
+  input[type="time"] {
+    min-width: 0;
+    max-width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
+  }
 }
 
 body {

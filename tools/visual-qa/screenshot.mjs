@@ -57,6 +57,18 @@ try {
     for (const route of pages) {
       await page.goto(`${base}${route}`, { waitUntil: "networkidle2", timeout: 60000 });
       await new Promise((resolve) => setTimeout(resolve, 400));
+      if (name === "mobile") {
+        // A page wider than the screen scrolls sideways on a phone (decorative shapes clipped by their card do not count).
+        const wide = await page.evaluate(() => {
+          const width = document.documentElement.clientWidth;
+          const offenders = [...document.querySelectorAll("body *")]
+            .filter((el) => el.getBoundingClientRect().right > width + 1 && getComputedStyle(el).position !== "fixed" && !el.closest("[aria-hidden='true']"))
+            .slice(0, 6)
+            .map((el) => `${el.tagName.toLowerCase()}${el.id ? `#${el.id}` : ""}${el.type ? `[${el.type}]` : ""} right=${Math.round(el.getBoundingClientRect().right)}`);
+          return { scroll: document.documentElement.scrollWidth, width, offenders };
+        });
+        if (wide.scroll > wide.width) console.log(`  ! overflow ${route}: page ${wide.scroll}px > screen ${wide.width}px; ${wide.offenders.join(", ")}`);
+      }
       const file = path.join(outDir, `${slug(route)}.${name}.png`);
       await page.screenshot({ path: file, fullPage: true });
       console.log(`${name.padEnd(7)} ${route} -> ${file}`);
