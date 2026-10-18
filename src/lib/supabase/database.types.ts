@@ -499,32 +499,46 @@ export type Database = {
           },
         ]
       }
-      payment_settings: {
+      meter_daily_usage: {
         Row: {
-          account_name: string
-          account_number: string
-          bank_code: string | null
-          bank_name: string
-          id: string
+          created_at: string
+          end_total_kwh: number | null
+          kwh: number | null
+          note: string | null
+          room_id: string
+          source: string
           updated_at: string
+          usage_date: string
         }
         Insert: {
-          account_name: string
-          account_number: string
-          bank_code?: string | null
-          bank_name: string
-          id?: string
+          created_at?: string
+          end_total_kwh?: number | null
+          kwh?: number | null
+          note?: string | null
+          room_id: string
+          source: string
           updated_at?: string
+          usage_date: string
         }
         Update: {
-          account_name?: string
-          account_number?: string
-          bank_code?: string | null
-          bank_name?: string
-          id?: string
+          created_at?: string
+          end_total_kwh?: number | null
+          kwh?: number | null
+          note?: string | null
+          room_id?: string
+          source?: string
           updated_at?: string
+          usage_date?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "meter_daily_usage_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       move_out_settlements: {
         Row: {
@@ -609,6 +623,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      payment_settings: {
+        Row: {
+          account_name: string
+          account_number: string
+          bank_code: string | null
+          bank_name: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          account_name: string
+          account_number: string
+          bank_code?: string | null
+          bank_name: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          account_name?: string
+          account_number?: string
+          bank_code?: string | null
+          bank_name?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       payments: {
         Row: {
@@ -914,8 +955,8 @@ export type Database = {
       close_move_out_settlement: {
         Args: {
           p_expected_refund: number
-          p_refunded_on: string
           p_reference: string
+          p_refunded_on: string
           p_slip_path: string
           p_tenant_id: string
         }
@@ -965,9 +1006,26 @@ export type Database = {
         }
         Returns: string
       }
+      delete_meter_usage: {
+        Args: { p_room_id: string; p_usage_date: string }
+        Returns: Json
+      }
       get_public_bill: { Args: { p_token: string }; Returns: Json }
+      record_meter_total: {
+        Args: { p_room_id: string; p_total_kwh: number; p_usage_date: string }
+        Returns: Json
+      }
       reopen_move_out_settlement: {
         Args: { p_tenant_id: string }
+        Returns: Json
+      }
+      save_manual_meter_usage: {
+        Args: {
+          p_kwh: number
+          p_note: string
+          p_room_id: string
+          p_usage_date: string
+        }
         Returns: Json
       }
       save_move_out_settlement: {

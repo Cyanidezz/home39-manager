@@ -26,6 +26,7 @@ const supabaseStubs = `
 const pendingMigrations = [
   { file: "20261017200000_billing_integrity.sql", marker: "public.tenants_one_active_per_room" },
   { file: "20261018090000_move_out_settlement.sql", marker: "public.move_out_settlements" },
+  { file: "20261019090000_meter_daily_usage.sql", marker: "public.meter_daily_usage" },
 ].map(({ file, marker }) => ({
   marker,
   sql: readFileSync(new URL(`../../supabase/migrations/${file}`, import.meta.url), "utf8"),
