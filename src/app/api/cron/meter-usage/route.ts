@@ -1,8 +1,8 @@
 import { timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { previousBangkokDate } from "@/lib/meter";
-import { readMeter, tuyaConfig, tuyaDeviceId } from "@/lib/tuya";
+import { bangkokDate } from "@/lib/format";
+import { readDailyEndTotals, tuyaConfig, tuyaDeviceId } from "@/lib/tuya";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -13,7 +13,7 @@ function bearerMatches(header: string | null, secret: string) {
   return received.length === expected.length && timingSafeEqual(received, expected);
 }
 
-/** Runs at Bangkok midnight: stores each connected meter's running total as the end of the previous day. */
+/** Runs at Bangkok midnight: stores each connected meter's end-of-day totals for the days Tuya still has. */
 export async function GET(request: Request) {
   const secret = process.env.CRON_SECRET;
   if (!secret || !bearerMatches(request.headers.get("authorization"), secret)) {
@@ -30,30 +30,32 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Query failed" }, { status: 500 });
   }
 
-  const usageDate = previousBangkokDate();
+  // The last 7 days of the report log, every night: a missed run or a late start is filled in by the next one.
+  const today = bangkokDate();
+  const since = new Date(Date.now() - 8 * 86_400_000);
   const results: Record<string, string> = {};
   for (const room of rooms ?? []) {
     const deviceId = tuyaDeviceId(room.room_code);
     if (!deviceId) continue;
     try {
-      const meter = await readMeter(config, deviceId);
-      if (!meter.online || meter.totalKwh === null) {
-        results[room.room_code] = "offline";
-        continue;
+      const totals = await readDailyEndTotals(config, deviceId, since);
+      const days = Object.keys(totals).filter((day) => day < today).sort();
+      let saved = 0;
+      for (const day of days) {
+        const { error: saveError } = await supabase.rpc("record_meter_total", {
+          p_room_id: room.id,
+          p_usage_date: day,
+          p_total_kwh: totals[day],
+        });
+        if (saveError) throw saveError;
+        saved += 1;
       }
-      const { data, error: saveError } = await supabase.rpc("record_meter_total", {
-        p_room_id: room.id,
-        p_usage_date: usageDate,
-        p_total_kwh: meter.totalKwh,
-      });
-      if (saveError) throw saveError;
-      const outcome = data as { skipped?: string; kwh?: number | null };
-      results[room.room_code] = outcome.skipped ? `skipped (${outcome.skipped})` : `ok ${outcome.kwh ?? "no previous total"}`;
+      results[room.room_code] = days.length ? `ok ${saved} days (${days[0]}..${days[days.length - 1]})` : "no data";
     } catch (failure) {
       console.error(`Meter job failed for room ${room.room_code}:`, failure);
       results[room.room_code] = "error";
     }
   }
 
-  return NextResponse.json({ usageDate, results });
+  return NextResponse.json({ today, results });
 }

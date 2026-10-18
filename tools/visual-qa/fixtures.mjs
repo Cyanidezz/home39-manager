@@ -123,7 +123,14 @@ const settlements = [{
   closed_at: null, created_at: `${day(year, month, 2)}T08:00:00Z`, updated_at: `${day(year, month, 2)}T08:00:00Z`,
 }];
 
+const meterMonth = new Date().toISOString().slice(0, 7);
+const meterUsage = [1, 2, 3, 5, 6, 8, 9, 12].map((d, i) => ({
+  room_id: rooms[0].id, usage_date: `${meterMonth}-${String(d).padStart(2, "0")}`,
+  kwh: [8.4, 9.1, 7.7, 12.3, 10, 9.6, 14.25, 11][i], end_total_kwh: null, source: i < 6 ? "manual" : "tuya", note: i === 0 ? "ตั้งแต่ต้นเดือน" : null,
+}));
+
 export const tables = {
+  meter_daily_usage: meterUsage,
   move_out_settlements: settlements,
   rooms, tenants, bills, bill_items: billItems, expenses,
   contracts: [{

@@ -91,3 +91,43 @@ export async function readMeter(config: TuyaConfig, deviceId: string): Promise<M
   );
   return { online: true, ...energyFromShadow(shadow.properties ?? []) };
 }
+
+type ReportLog = { eventTime: number; value: string | number };
+
+/** Last reading of each Bangkok day, in kWh. Days without any reading are absent. */
+export function endTotalsByDay(logs: ReportLog[]): Record<string, number> {
+  const latest = new Map<string, { time: number; raw: number }>();
+  for (const log of logs) {
+    const time = Number(log.eventTime);
+    const raw = Number(log.value);
+    if (!Number.isFinite(time) || !Number.isFinite(raw) || raw < 0) continue;
+    const day = new Date(time + 7 * 3_600_000).toISOString().slice(0, 10);
+    const current = latest.get(day);
+    if (!current || time > current.time) latest.set(day, { time, raw });
+  }
+  return Object.fromEntries(
+    [...latest].map(([day, { raw }]) => [day, Math.round(raw * TUYA_ENERGY_SCALE * 1000) / 1000])
+  );
+}
+
+const MAX_LOG_PAGES = 40;
+
+/**
+ * Per-day end totals from the device's report log. Tuya keeps only about 7 days, so running this every
+ * night fills any day a previous run missed.
+ */
+export async function readDailyEndTotals(config: TuyaConfig, deviceId: string, since: Date): Promise<Record<string, number>> {
+  const { access_token: token } = await tuyaGet<{ access_token: string }>(config, "/v1.0/token?grant_type=1");
+  const logs: ReportLog[] = [];
+  let lastRowKey = "";
+  for (let page = 0; page < MAX_LOG_PAGES; page++) {
+    const path =
+      `/v2.1/cloud/thing/${encodeURIComponent(deviceId)}/report-logs?codes=add_ele&end_time=${Date.now()}&size=100&start_time=${since.getTime()}` +
+      (lastRowKey ? `&last_row_key=${encodeURIComponent(lastRowKey)}` : "");
+    const result = await tuyaGet<{ logs?: ReportLog[]; hasMore?: boolean; lastRowKey?: string }>(config, path, token);
+    logs.push(...(result.logs ?? []));
+    if (!result.hasMore || !result.lastRowKey || result.lastRowKey === lastRowKey) break;
+    lastRowKey = result.lastRowKey;
+  }
+  return endTotalsByDay(logs);
+}

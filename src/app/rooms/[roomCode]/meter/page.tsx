@@ -1,31 +1,69 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/data/session";
-import { bangkokDate, formatThaiDate } from "@/lib/format";
-import { dailySeries, METER_HISTORY_DAYS, addDays, type MeterDay } from "@/lib/meter";
+import { bangkokDate, currentPeriod, parsePeriod, thaiMonthNames } from "@/lib/format";
+import { METER_START_PERIOD, monthDates, shiftPeriod, type MeterDay } from "@/lib/meter";
 import { tuyaDeviceId } from "@/lib/tuya";
 import PageHeader from "@/components/PageHeader";
-import { DeleteDayButton, MeterForm } from "./MeterForm";
+import { MeterDayRow, type MeterDayView } from "./MeterForm";
 
-type Props = { params: Promise<{ roomCode: string }> };
+type Props = {
+  params: Promise<{ roomCode: string }>;
+  searchParams: Promise<{ month?: string }>;
+};
 
-export default async function MeterPage({ params }: Props) {
+const weekdayFormat = new Intl.DateTimeFormat("th-TH", { weekday: "short", timeZone: "UTC" });
+const kwhText = (value: number) => value.toLocaleString("th-TH", { maximumFractionDigits: 2 });
+
+export default async function MeterPage({ params, searchParams }: Props) {
   const { roomCode } = await params;
+  const { month } = await searchParams;
   const { supabase } = await requireUser();
 
   const { data: room } = await supabase.from("rooms").select("id, room_code").eq("room_code", roomCode.toUpperCase()).single();
   if (!room) notFound();
 
-  const today = bangkokDate();
-  const from = addDays(today, -(METER_HISTORY_DAYS - 1));
+  const thisPeriod = currentPeriod();
+  const requested = parsePeriod(month).period;
+  // The meter data starts in October 2026; nothing before it and nothing after the current month.
+  const period = requested < METER_START_PERIOD ? METER_START_PERIOD : requested > thisPeriod ? thisPeriod : requested;
+  const [year, monthNumber] = period.split("-").map(Number);
+  const prev = shiftPeriod(period, -1);
+  const next = shiftPeriod(period, 1);
+
+  const dates = monthDates(period);
   const { data } = await supabase
     .from("meter_daily_usage")
     .select("usage_date, kwh, source, note")
     .eq("room_id", room.id)
-    .gte("usage_date", from)
-    .order("usage_date", { ascending: false });
-  const rows: MeterDay[] = data ?? [];
-  const series = dailySeries(rows, today, METER_HISTORY_DAYS);
+    .gte("usage_date", dates[0])
+    .lte("usage_date", dates[dates.length - 1]);
+  const byDate = new Map((data ?? ([] as MeterDay[])).map((row) => [row.usage_date, row]));
+
+  const today = bangkokDate();
+  const views: MeterDayView[] = dates.map((date) => {
+    const row = byDate.get(date);
+    return {
+      date,
+      day: String(Number(date.slice(8))),
+      weekday: weekdayFormat.format(new Date(`${date}T00:00:00Z`)),
+      future: date > today,
+      kwh: row && row.kwh !== null ? Number(row.kwh) : null,
+      hasRow: Boolean(row),
+      source: row?.source ?? null,
+      note: row?.note ?? null,
+    };
+  });
+
+  const pastDays = views.filter((view) => !view.future);
+  const filled = pastDays.filter((view) => view.kwh !== null);
+  const total = filled.reduce((sum, view) => sum + view.kwh!, 0);
+  const missing = pastDays.length - filled.length;
+  const peak = Math.max(...views.map((view) => view.kwh ?? 0), 0);
   const connected = tuyaDeviceId(room.room_code) !== null;
+
+  const navLink = "flex h-10 w-10 items-center justify-center rounded-full border border-sand-300 bg-white text-lg text-brand-800 hover:bg-brand-50";
+  const navDisabled = "flex h-10 w-10 items-center justify-center rounded-full border border-sand-200 text-lg text-sand-300";
 
   return (
     <main className="min-h-screen bg-sand-50 text-sand-900">
@@ -35,43 +73,61 @@ export default async function MeterPage({ params }: Props) {
         title="มิเตอร์ไฟฟ้า"
         subtitle={`ห้อง ${room.room_code} • ${connected ? "เชื่อมมิเตอร์ Tuya (บันทึกอัตโนมัติทุกเที่ยงคืน)" : "ยังไม่ได้เชื่อมมิเตอร์ Tuya"}`}
       />
-      <div className="mx-auto max-w-5xl space-y-6 px-4 py-8 sm:px-8">
-        <section className="rounded-2xl border border-sand-200 bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-semibold">กรอกหน่วยไฟเอง</h2>
-          <p className="mb-4 mt-1 text-sm text-sand-500">
-            ใช้กับวันที่มิเตอร์ดึงย้อนหลังไม่ได้ ค่าที่กรอกเองจะไม่ถูกระบบอัตโนมัติเขียนทับ
-          </p>
-          <MeterForm roomId={room.id} />
-        </section>
+      <div className="mx-auto max-w-5xl space-y-6 px-4 py-6 sm:px-8">
+        <div className="flex items-center justify-between gap-3">
+          {period > METER_START_PERIOD ? (
+            <Link href={`?month=${prev}`} aria-label="เดือนก่อนหน้า" className={navLink}>‹</Link>
+          ) : (
+            <span aria-hidden className={navDisabled}>‹</span>
+          )}
+          <h2 className="text-xl font-bold">{thaiMonthNames[monthNumber - 1]} {year + 543}</h2>
+          {period < thisPeriod ? (
+            <Link href={`?month=${next}`} aria-label="เดือนถัดไป" className={navLink}>›</Link>
+          ) : (
+            <span aria-hidden className={navDisabled}>›</span>
+          )}
+        </div>
 
-        <section className="rounded-2xl border border-sand-200 bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-semibold">หน่วยไฟต่อวัน ({METER_HISTORY_DAYS} วันล่าสุด)</h2>
-          <div className="mt-4 overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-sand-200 text-left text-sand-500">
-                  <th className="py-2 pr-4 font-medium">วันที่</th>
-                  <th className="py-2 pr-4 text-right font-medium">หน่วย (kWh)</th>
-                  <th className="py-2 pr-4 font-medium">ที่มา</th>
-                  <th className="py-2 pr-4 font-medium">หมายเหตุ</th>
-                  <th className="py-2" />
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-sand-100">
-                {series.map(({ date, row, kwh }) => (
-                  <tr key={date}>
-                    <td className="py-2 pr-4">{formatThaiDate(date)}</td>
-                    <td className="py-2 pr-4 text-right font-semibold">
-                      {kwh === null ? <span className="font-normal text-sand-400">{row ? "ไม่มีผลต่าง" : "-"}</span> : kwh.toLocaleString("th-TH", { maximumFractionDigits: 3 })}
-                    </td>
-                    <td className="py-2 pr-4 text-sand-600">{row ? (row.source === "manual" ? "กรอกเอง" : "มิเตอร์ Tuya") : ""}</td>
-                    <td className="py-2 pr-4 text-sand-600">{row?.note}</td>
-                    <td className="py-2 text-right">{row && <DeleteDayButton roomId={room.id} date={date} />}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {[
+            { label: "รวมเดือนนี้", value: `${kwhText(total)} kWh` },
+            { label: "เฉลี่ยต่อวัน", value: filled.length ? `${kwhText(total / filled.length)} kWh` : "-" },
+            { label: "วันที่มีข้อมูล", value: `${filled.length}/${pastDays.length} วัน` },
+            { label: "ยังไม่มีข้อมูล", value: missing === 0 ? "ครบแล้ว" : `${missing} วัน`, warn: missing > 0 },
+          ].map((item) => (
+            <div key={item.label} className="rounded-2xl border border-sand-200 bg-white p-4 shadow-sm">
+              <dt className="text-sm text-sand-500">{item.label}</dt>
+              <dd className={`mt-1 text-xl font-bold ${item.warn ? "text-orange-700" : ""}`}>{item.value}</dd>
+            </div>
+          ))}
+        </dl>
+
+        <div className="rounded-2xl border border-sand-200 bg-white p-4 shadow-sm sm:p-6">
+          <div className="flex h-24 items-end gap-0.5 sm:gap-1" role="img" aria-label={`กราฟหน่วยไฟต่อวัน ${thaiMonthNames[monthNumber - 1]}`}>
+            {views.map((view) => (
+              <span
+                key={view.date}
+                title={`${view.day} ${thaiMonthNames[monthNumber - 1]}: ${view.kwh === null ? "ไม่มีข้อมูล" : `${kwhText(view.kwh)} kWh`}`}
+                className={`flex-1 rounded-t ${view.kwh === null ? "bg-sand-100" : "bg-brand-300"}`}
+                style={{ height: view.kwh === null || peak === 0 ? "4px" : `${Math.max(8, (view.kwh / peak) * 100)}%` }}
+              />
+            ))}
           </div>
+          <div className="mt-1 flex justify-between text-xs text-sand-400"><span>1</span><span>{views.length}</span></div>
+        </div>
+
+        <section className="overflow-hidden rounded-2xl border border-sand-200 bg-white shadow-sm">
+          <div className="border-b border-sand-100 px-4 py-3">
+            <h2 className="font-semibold">หน่วยไฟรายวัน</h2>
+            <p className="text-sm text-sand-500">
+              วันไหนยังไม่มีข้อมูล พิมพ์จำนวนหน่วย (kWh) แล้วกดบันทึกได้เลย ค่าที่กรอกเองจะไม่ถูกระบบอัตโนมัติเขียนทับ
+            </p>
+          </div>
+          <ul className="divide-y divide-sand-100">
+            {views.map((view) => (
+              <MeterDayRow key={view.date} roomId={room.id} view={view} />
+            ))}
+          </ul>
         </section>
       </div>
     </main>

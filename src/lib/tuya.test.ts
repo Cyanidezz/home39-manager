@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { energyFromShadow, readMeter, tuyaConfig, tuyaDeviceId, tuyaSignature } from "./tuya";
+import { endTotalsByDay, energyFromShadow, readMeter, tuyaConfig, tuyaDeviceId, tuyaSignature } from "./tuya";
 
 const config = { accessId: "id123", accessKey: "secret", endpoint: "https://openapi.example.com" };
 
@@ -74,5 +74,21 @@ describe("readMeter", () => {
     const error = await readMeter(config, "dev1").catch((e: Error) => e.message);
     expect(error).toMatch(/clientId is invalid/);
     expect(error).not.toMatch(/secret/);
+  });
+});
+
+describe("endTotalsByDay", () => {
+  const at = (iso: string, value: string) => ({ eventTime: Date.parse(iso), value });
+  it("keeps the last reading of each Bangkok day, in kWh", () => {
+    expect(
+      endTotalsByDay([
+        at("2026-10-12T16:59:00Z", "363568"), // 23:59 Bangkok on the 12th
+        at("2026-10-12T10:00:00Z", "360000"),
+        at("2026-10-12T17:01:00Z", "363657"), // 00:01 on the 13th
+      ])
+    ).toEqual({ "2026-10-12": 363.568, "2026-10-13": 363.657 });
+  });
+  it("ignores unusable rows", () => {
+    expect(endTotalsByDay([{ eventTime: NaN, value: "1" }, at("2026-10-12T10:00:00Z", "x"), at("2026-10-12T10:00:00Z", "-5")])).toEqual({});
   });
 });
