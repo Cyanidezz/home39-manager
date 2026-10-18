@@ -7,6 +7,8 @@ import { fetchBillingContext } from "@/lib/data/roomPages";
 import { fetchBillingRates } from "@/lib/data/settings";
 import { computeMeterBill } from "@/lib/meterBilling";
 import MeterBillCard from "./MeterBillCard";
+import MeterChecksCard from "./MeterChecksCard";
+import { compareChecks, type MeterCheck } from "@/lib/meterChecks";
 import { MeterDatePicker } from "./MeterDatePicker";
 import { tuyaDeviceId } from "@/lib/tuya";
 import PageHeader from "@/components/PageHeader";
@@ -73,6 +75,16 @@ export default async function MeterPage({ params, searchParams }: Props) {
     : [];
   const rangeFigures = rangeRows.filter((row) => row.kwh !== null).map((row) => Number(row.kwh));
   const rangeTotal = rangeFigures.reduce((sum, value) => sum + value, 0);
+
+  const [{ data: checkRows }, { data: totalRows }] = await Promise.all([
+    supabase.from("meter_checks").select("id, check_date, disc_reading, note").eq("room_id", room.id).order("check_date"),
+    supabase.from("meter_daily_usage").select("usage_date, end_total_kwh").eq("room_id", room.id).not("end_total_kwh", "is", null),
+  ]);
+  const checks: MeterCheck[] = checkRows ?? [];
+  const comparisons = compareChecks(
+    checks,
+    Object.fromEntries((totalRows ?? []).map((row) => [row.usage_date, Number(row.end_total_kwh)]))
+  );
 
   const [billing, rates] = await Promise.all([fetchBillingContext(supabase, room.room_code), fetchBillingRates(supabase)]);
   const billResult = billing
@@ -202,6 +214,8 @@ export default async function MeterPage({ params, searchParams }: Props) {
             ))}
           </ul>
         </section>
+
+        <MeterChecksCard roomId={room.id} checks={checks} comparisons={comparisons} />
       </div>
     </main>
   );

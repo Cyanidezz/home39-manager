@@ -520,6 +520,41 @@ export type Database = {
           },
         ]
       }
+      meter_checks: {
+        Row: {
+          check_date: string
+          created_at: string
+          disc_reading: number
+          id: string
+          note: string | null
+          room_id: string
+        }
+        Insert: {
+          check_date: string
+          created_at?: string
+          disc_reading: number
+          id?: string
+          note?: string | null
+          room_id: string
+        }
+        Update: {
+          check_date?: string
+          created_at?: string
+          disc_reading?: number
+          id?: string
+          note?: string | null
+          room_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meter_checks_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       meter_daily_usage: {
         Row: {
           created_at: string
