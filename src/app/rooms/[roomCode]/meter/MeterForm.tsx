@@ -21,7 +21,7 @@ const input = "w-full rounded-lg border border-sand-300 bg-white px-3 py-2 text-
 const kwhText = (value: number) => value.toLocaleString("th-TH", { maximumFractionDigits: 3 });
 
 /** One calendar day: shows the stored usage, or an input to type it in. */
-export function MeterDayRow({ roomId, view }: { roomId: string; view: MeterDayView }) {
+export function MeterDayRow({ roomId, view, selected = false }: { roomId: string; view: MeterDayView; selected?: boolean }) {
   const router = useRouter();
   const [editing, setEditing] = useState(false);
   const [kwh, setKwh] = useState(view.kwh === null ? "" : String(view.kwh));
@@ -59,7 +59,7 @@ export function MeterDayRow({ roomId, view }: { roomId: string; view: MeterDayVi
   }
 
   return (
-    <li className={`grid gap-2 px-4 py-3 sm:grid-cols-[5.5rem_1fr] sm:items-center ${view.future ? "bg-sand-50/60 text-sand-400" : ""}`}>
+    <li id={`day-${view.date}`} className={`grid scroll-mt-24 gap-2 px-4 py-3 sm:grid-cols-[5.5rem_1fr] sm:items-center ${view.future ? "bg-sand-50/60 text-sand-400" : ""} ${selected ? "bg-brand-50 ring-2 ring-inset ring-brand-300" : ""}`}>
       <div className="flex items-baseline gap-2">
         <span className="text-lg font-bold tabular-nums">{view.day}</span>
         <span className="text-sm text-sand-500">{view.weekday}</span>
