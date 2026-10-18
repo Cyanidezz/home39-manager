@@ -30,6 +30,9 @@ type Props = {
   existingPeriods: string[];
   rentWaivedYear: number | null;
   rentWaivedMonth: number | null;
+  initialYear?: number;
+  initialMonth?: number;
+  initialMeter?: string;
 };
 
 function firstFreePeriod(from: Date, existing: string[]): [number, number] {
@@ -58,6 +61,9 @@ export default function BillForm({
   existingPeriods,
   rentWaivedYear,
   rentWaivedMonth,
+  initialYear: prefillYear,
+  initialMonth: prefillMonth,
+  initialMeter,
 }: Props) {
   const router = useRouter();
   const supabase = createClient();
@@ -65,9 +71,9 @@ export default function BillForm({
 
   // Start at the first month from now that has no bill yet.
   const [initialYear, initialMonth] = firstFreePeriod(now, existingPeriods);
-  const [billingYear, setBillingYear] = useState(initialYear);
-  const [billingMonth, setBillingMonth] = useState(initialMonth);
-  const [currentMeter, setCurrentMeter] = useState("");
+  const [billingYear, setBillingYear] = useState(prefillYear ?? initialYear);
+  const [billingMonth, setBillingMonth] = useState(prefillMonth && prefillMonth >= 1 && prefillMonth <= 12 ? prefillMonth : initialMonth);
+  const [currentMeter, setCurrentMeter] = useState(initialMeter ?? "");
   const [otherItems, setOtherItems] = useState<OtherItem[]>([
     { name: "", amount: "" },
   ]);

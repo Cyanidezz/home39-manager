@@ -17,7 +17,7 @@ export async function fetchBillingContext(supabase: Client, roomCode: string) {
   const { data: tenant } = await supabase
     .from("tenants")
     .select(
-      "id, full_name, rent_waived_year, rent_waived_month, initial_electricity_meter, line_user_id"
+      "id, full_name, move_in_date, rent_waived_year, rent_waived_month, initial_electricity_meter, line_user_id"
     )
     .eq("room_id", room.id)
     .eq("is_active", true)

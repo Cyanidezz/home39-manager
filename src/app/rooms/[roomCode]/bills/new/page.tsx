@@ -8,10 +8,13 @@ type Props = {
   params: Promise<{
     roomCode: string;
   }>;
+  /** Prefill from the meter page: the month and the meter reading worked out from its daily usage. */
+  searchParams: Promise<{ year?: string; month?: string; meter?: string }>;
 };
 
-export default async function NewBillPage({ params }: Props) {
+export default async function NewBillPage({ params, searchParams }: Props) {
   const { roomCode } = await params;
+  const query = await searchParams;
 
   const { supabase } = await requireUser();
 
@@ -56,6 +59,9 @@ export default async function NewBillPage({ params }: Props) {
               existingPeriods={existingPeriods}
               rentWaivedYear={tenant.rent_waived_year}
               rentWaivedMonth={tenant.rent_waived_month}
+              initialYear={Number.isInteger(Number(query.year)) && query.year ? Number(query.year) : undefined}
+              initialMonth={Number.isInteger(Number(query.month)) && query.month ? Number(query.month) : undefined}
+              initialMeter={query.meter && Number.isFinite(Number(query.meter)) ? query.meter : undefined}
             />
           )}
         </div>

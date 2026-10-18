@@ -26,7 +26,7 @@ export default function MeterCard({ roomCode, days, connected }: Props) {
       title="มิเตอร์ไฟฟ้า"
       footer={
         <Link href={`/rooms/${roomCode}/meter`} className={secondaryButton}>
-          ดูข้อมูลทั้งหมด / กรอกย้อนหลัง
+          ดูข้อมูลทั้งหมด
         </Link>
       }
     >
@@ -58,7 +58,7 @@ export default function MeterCard({ roomCode, days, connected }: Props) {
           </div>
         </>
       ) : (
-        <EmptyNote>ยังไม่มีข้อมูลหน่วยไฟ ระบบจะบันทึกให้ทุกเที่ยงคืน หรือกรอกย้อนหลังเองได้</EmptyNote>
+        <EmptyNote>ยังไม่มีข้อมูลหน่วยไฟ ระบบจะบันทึกให้ทุกเที่ยงคืน</EmptyNote>
       )}
     </InfoCard>
   );
