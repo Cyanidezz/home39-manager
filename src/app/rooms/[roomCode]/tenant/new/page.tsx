@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/data/session";
+import { fetchBillingRates } from "@/lib/data/settings";
 import TenantForm from "./TenantForm";
 
 type Props = {
@@ -39,6 +40,7 @@ export default async function NewTenantPage({ params }: Props) {
             roomId={room.id}
             roomCode={room.room_code}
             initialMonthlyRent={Number(room.monthly_rent)}
+            waterRate={(await fetchBillingRates(supabase)).water}
           />
         </div>
       </div>

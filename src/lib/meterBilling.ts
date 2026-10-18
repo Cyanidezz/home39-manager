@@ -1,4 +1,4 @@
-import { ELECTRICITY_RATE, WATER_RATE } from "@/lib/billing";
+import type { BillingRates } from "@/lib/billingRates";
 import { addDays, monthDates } from "@/lib/meter";
 
 export const METER_BILL_DUE_DAYS = 7;
@@ -15,6 +15,7 @@ export type MeterBillInput = {
     rentWaivedMonth: number | null;
   } | null;
   room: { monthlyRent: number; occupantCount: number };
+  rates: BillingRates;
   previousMeter: number | null;
   /** True when the room already has a bill for this month. */
   billExists: boolean;
@@ -40,6 +41,8 @@ export type MeterBill = {
   rent: number;
   rentWaived: boolean;
   water: number;
+  waterRate: number;
+  electricityRate: number;
   electricity: number;
   total: number;
   dueDate: string;
@@ -85,8 +88,8 @@ export function computeMeterBill(input: MeterBillInput): { ok: true; bill: Meter
   const units = round2(billable.reduce((sum, date) => sum + (input.usageByDate[date] as number), 0));
   const rentWaived = tenant.rentWaivedYear === year && tenant.rentWaivedMonth === month;
   const rent = rentWaived ? 0 : input.room.monthlyRent;
-  const water = input.room.occupantCount * WATER_RATE;
-  const electricity = round2(units * ELECTRICITY_RATE);
+  const water = input.room.occupantCount * input.rates.water;
+  const electricity = round2(units * input.rates.electricity);
 
   return {
     ok: true,
@@ -100,6 +103,8 @@ export function computeMeterBill(input: MeterBillInput): { ok: true; bill: Meter
       rent,
       rentWaived,
       water,
+      waterRate: input.rates.water,
+      electricityRate: input.rates.electricity,
       electricity,
       total: round2(rent + water + electricity),
       dueDate: addDays(input.today, METER_BILL_DUE_DAYS),

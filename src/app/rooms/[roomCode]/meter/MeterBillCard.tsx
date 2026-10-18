@@ -4,7 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { formatMoney, formatThaiDate } from "@/lib/format";
-import { ELECTRICITY_RATE, WATER_RATE } from "@/lib/billing";
 import { meterBillBlockText, type MeterBill, type MeterBillBlock } from "@/lib/meterBilling";
 import { primaryButton, secondaryButton } from "../_components/InfoCard";
 
@@ -77,8 +76,8 @@ export default function MeterBillCard({ roomId, roomCode, year, month, monthLabe
           </p>
           <dl className="mt-3 divide-y divide-sand-100">
             <div className={row}><dt className="text-sand-500">ค่าเช่าห้อง{result.bill.rentWaived ? " (หักค่าเช่าล่วงหน้าแล้ว)" : ""}</dt><dd className="font-semibold">{formatMoney(result.bill.rent)} บาท</dd></div>
-            <div className={row}><dt className="text-sand-500">ค่าน้ำ ({WATER_RATE} บาท/คน)</dt><dd className="font-semibold">{formatMoney(result.bill.water)} บาท</dd></div>
-            <div className={row}><dt className="text-sand-500">ค่าไฟ {result.bill.units.toLocaleString("th-TH")} หน่วย × {ELECTRICITY_RATE}</dt><dd className="font-semibold">{formatMoney(result.bill.electricity)} บาท</dd></div>
+            <div className={row}><dt className="text-sand-500">ค่าน้ำ ({result.bill.waterRate} บาท/คน)</dt><dd className="font-semibold">{formatMoney(result.bill.water)} บาท</dd></div>
+            <div className={row}><dt className="text-sand-500">ค่าไฟ {result.bill.units.toLocaleString("th-TH")} หน่วย × {result.bill.electricityRate}</dt><dd className="font-semibold">{formatMoney(result.bill.electricity)} บาท</dd></div>
             <div className={row}><dt className="text-sand-500">มิเตอร์</dt><dd className="font-semibold">{result.bill.previousMeter} → {result.bill.currentMeter}</dd></div>
             <div className={row}><dt className="text-sand-500">กำหนดชำระ</dt><dd className="font-semibold">{formatThaiDate(result.bill.dueDate)}</dd></div>
             <div className="flex justify-between gap-4 pt-3"><dt className="font-semibold">ยอดรวม</dt><dd className="text-xl font-bold">{formatMoney(result.bill.total)} บาท</dd></div>

@@ -4,8 +4,6 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import {
-  ELECTRICITY_RATE,
-  WATER_RATE,
   billCreationError,
   electricityUnitsUsed,
   hasInvalidOtherItem,
@@ -33,6 +31,8 @@ type Props = {
   initialYear?: number;
   initialMonth?: number;
   initialMeter?: string;
+  waterRate: number;
+  electricityRate: number;
 };
 
 function firstFreePeriod(from: Date, existing: string[]): [number, number] {
@@ -64,6 +64,8 @@ export default function BillForm({
   initialYear: prefillYear,
   initialMonth: prefillMonth,
   initialMeter,
+  waterRate: WATER_RATE,
+  electricityRate: ELECTRICITY_RATE,
 }: Props) {
   const router = useRouter();
   const supabase = createClient();

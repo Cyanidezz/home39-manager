@@ -10,9 +10,9 @@ type Props = {
   roomId: string;
   roomCode: string;
   initialMonthlyRent: number;
+  waterRate: number;
 };
 
-const WATER_RATE = 150;
 const MAX_CONTRACT_SIZE = 10 * 1024 * 1024;
 
 function money(value: string) {
@@ -26,6 +26,7 @@ export default function TenantForm({
   roomId,
   roomCode,
   initialMonthlyRent,
+  waterRate: WATER_RATE,
 }: Props) {
   const router = useRouter();
   const supabase = createClient();

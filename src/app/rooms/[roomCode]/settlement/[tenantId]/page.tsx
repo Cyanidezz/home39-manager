@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/data/session";
 import { fetchSettlementContext } from "@/lib/data/settlement";
+import { fetchBillingRates } from "@/lib/data/settings";
 import { formatMoney, formatThaiDate } from "@/lib/format";
 import PageHeader from "@/components/PageHeader";
 import SettlementForm from "./SettlementForm";
@@ -13,7 +14,7 @@ export default async function SettlementPage({ params }: Props) {
   const { roomCode, tenantId } = await params;
   const { supabase } = await requireUser();
 
-  const context = await fetchSettlementContext(supabase, roomCode, tenantId);
+  const [context, rates] = await Promise.all([fetchSettlementContext(supabase, roomCode, tenantId), fetchBillingRates(supabase)]);
   if (!context) notFound();
 
   const { room, tenant, settlement } = context;
@@ -46,6 +47,7 @@ export default async function SettlementPage({ params }: Props) {
           tenantId={tenant.id}
           deposit={Number(tenant.deposit_amount ?? 0)}
           previousMeter={context.previousMeter}
+          rates={rates}
           lastOccupants={context.lastOccupants}
           outstandingBills={context.outstandingBills.map((bill) => ({
             id: bill.id,
