@@ -2,12 +2,15 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/data/session";
 import { fetchRoomOverview } from "@/lib/data/room";
-import { formatThaiDate } from "@/lib/format";
+import { bangkokDate, formatThaiDate } from "@/lib/format";
 import RoomInfoCard from "./_components/RoomInfoCard";
 import TenantCard from "./_components/TenantCard";
 import ContractCard from "./_components/ContractCard";
 import LatestBillCard from "./_components/LatestBillCard";
 import SettlementCard from "./_components/SettlementCard";
+import MeterCard from "./_components/MeterCard";
+import { addDays, type MeterDay } from "@/lib/meter";
+import { tuyaDeviceId } from "@/lib/tuya";
 import Icon from "@/components/Icon";
 import PageHeader from "@/components/PageHeader";
 
@@ -28,6 +31,14 @@ export default async function RoomPage({ params }: Props) {
   const { room, tenants, bills, latestContract, contractUrl, lastMovedOut } = overview;
   const activeTenant = tenants[0];
   const latestBill = bills[0];
+
+  const { data: meterRows } = await supabase
+    .from("meter_daily_usage")
+    .select("usage_date, kwh, source, note")
+    .eq("room_id", room.id)
+    .gte("usage_date", addDays(bangkokDate(), -13))
+    .order("usage_date", { ascending: false });
+  const meterDays: MeterDay[] = meterRows ?? [];
 
   return (
     <main className="min-h-screen bg-sand-50 text-sand-900">
@@ -89,6 +100,7 @@ export default async function RoomPage({ params }: Props) {
               contractUrl={contractUrl}
             />
             <LatestBillCard roomCode={room.room_code} bill={latestBill} />
+            <MeterCard roomCode={room.room_code} days={meterDays} connected={tuyaDeviceId(room.room_code) !== null} />
           </div>
         </div>
       </div>
