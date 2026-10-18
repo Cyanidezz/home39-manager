@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/data/session";
-import { bangkokDate, currentPeriod, parsePeriod, thaiMonthNames } from "@/lib/format";
-import { METER_START_PERIOD, monthDates, shiftPeriod, type MeterDay } from "@/lib/meter";
+import { bangkokDate, currentPeriod, formatThaiDate, parsePeriod, thaiMonthNames } from "@/lib/format";
+import { METER_START_PERIOD, monthDates, parseDateRange, rangeDays, shiftPeriod, type MeterDay } from "@/lib/meter";
 import { fetchBillingContext } from "@/lib/data/roomPages";
 import { fetchBillingRates } from "@/lib/data/settings";
 import { computeMeterBill } from "@/lib/meterBilling";
@@ -14,7 +14,7 @@ import { MeterDayRow, type MeterDayView } from "./MeterForm";
 
 type Props = {
   params: Promise<{ roomCode: string }>;
-  searchParams: Promise<{ month?: string; date?: string }>;
+  searchParams: Promise<{ month?: string; from?: string; to?: string }>;
 };
 
 const weekdayFormat = new Intl.DateTimeFormat("th-TH", { weekday: "short", timeZone: "UTC" });
@@ -22,7 +22,7 @@ const kwhText = (value: number) => value.toLocaleString("th-TH", { maximumFracti
 
 export default async function MeterPage({ params, searchParams }: Props) {
   const { roomCode } = await params;
-  const { month, date: dateParam } = await searchParams;
+  const { month, from: fromParam, to: toParam } = await searchParams;
   const { supabase } = await requireUser();
 
   const { data: room } = await supabase.from("rooms").select("id, room_code").eq("room_code", roomCode.toUpperCase()).single();
@@ -31,7 +31,7 @@ export default async function MeterPage({ params, searchParams }: Props) {
   const thisPeriod = currentPeriod();
   const requested = parsePeriod(month).period;
   // The meter data starts in October 2026; nothing before it and nothing after the current month.
-  const selectedDate = /^\d{4}-\d{2}-\d{2}$/.test(dateParam ?? "") ? dateParam! : null;
+  const range = parseDateRange(fromParam, toParam, bangkokDate());
   const period = requested < METER_START_PERIOD ? METER_START_PERIOD : requested > thisPeriod ? thisPeriod : requested;
   const [year, monthNumber] = period.split("-").map(Number);
   const prev = shiftPeriod(period, -1);
@@ -60,6 +60,19 @@ export default async function MeterPage({ params, searchParams }: Props) {
       note: row?.note ?? null,
     };
   });
+
+  const rangeRows = range
+    ? (
+        await supabase
+          .from("meter_daily_usage")
+          .select("kwh")
+          .eq("room_id", room.id)
+          .gte("usage_date", range.from)
+          .lte("usage_date", range.to)
+      ).data ?? []
+    : [];
+  const rangeFigures = rangeRows.filter((row) => row.kwh !== null).map((row) => Number(row.kwh));
+  const rangeTotal = rangeFigures.reduce((sum, value) => sum + value, 0);
 
   const [billing, rates] = await Promise.all([fetchBillingContext(supabase, room.room_code), fetchBillingRates(supabase)]);
   const billResult = billing
@@ -115,7 +128,29 @@ export default async function MeterPage({ params, searchParams }: Props) {
           )}
         </div>
 
-        <MeterDatePicker min={`${METER_START_PERIOD}-01`} max={today} value={selectedDate ?? ""} />
+        <MeterDatePicker min={`${METER_START_PERIOD}-01`} max={today} from={range?.from ?? ""} to={range?.to ?? ""} />
+
+        {range && (
+          <section aria-label="หน่วยไฟช่วงที่เลือก" className="rounded-2xl border border-brand-300 bg-brand-50 p-4 sm:p-5">
+            <p className="text-sm text-sand-600">
+              {range.from === range.to ? formatThaiDate(range.from) : `${formatThaiDate(range.from)} – ${formatThaiDate(range.to)}`}
+              {" "}({rangeDays(range.from, range.to)} วัน)
+            </p>
+            <div className="mt-2 grid grid-cols-2 gap-3">
+              <div>
+                <p className="text-sm text-sand-500">รวม</p>
+                <p className="text-2xl font-bold">{kwhText(rangeTotal)} kWh</p>
+              </div>
+              <div>
+                <p className="text-sm text-sand-500">เฉลี่ยต่อวัน</p>
+                <p className="text-2xl font-bold">{rangeFigures.length ? `${kwhText(rangeTotal / rangeFigures.length)} kWh` : "-"}</p>
+              </div>
+            </div>
+            {rangeFigures.length < rangeDays(range.from, range.to) && (
+              <p className="mt-2 text-xs text-sand-500">คิดเฉพาะวันที่มีข้อมูล ({rangeFigures.length} จาก {rangeDays(range.from, range.to)} วัน)</p>
+            )}
+          </section>
+        )}
 
         <dl className="grid grid-cols-2 gap-3">
           {[
@@ -163,7 +198,7 @@ export default async function MeterPage({ params, searchParams }: Props) {
           </div>
           <ul className="divide-y divide-sand-100">
             {views.map((view) => (
-              <MeterDayRow key={view.date} roomId={room.id} view={view} selected={view.date === selectedDate} />
+              <MeterDayRow key={view.date} roomId={room.id} view={view} selected={range !== null && view.date >= range.from && view.date <= range.to} />
             ))}
           </ul>
         </section>

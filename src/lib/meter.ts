@@ -57,3 +57,25 @@ export function monthDates(period: string) {
   const count = Math.round((Date.parse(`${next}T00:00:00Z`) - Date.parse(`${first}T00:00:00Z`)) / DAY_MS);
   return Array.from({ length: count }, (_, index) => addDays(first, index));
 }
+
+const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+
+/**
+ * The range picked on the meter page: valid dates only, `from` first, kept between the first day of the meter data and today.
+ * A single date counts as a one-day range; nothing usable gives null.
+ */
+export function parseDateRange(from: string | undefined, to: string | undefined, today: string) {
+  const start = `${METER_START_PERIOD}-01`;
+  const valid = (value: string | undefined) => (value && DATE_PATTERN.test(value) && !Number.isNaN(Date.parse(value)) ? value : null);
+  const a = valid(from) ?? valid(to);
+  const b = valid(to) ?? a;
+  if (!a || !b) return null;
+  const [first, last] = a <= b ? [a, b] : [b, a];
+  const clamped = { from: first < start ? start : first, to: last > today ? today : last };
+  return clamped.from > clamped.to ? null : clamped;
+}
+
+/** Number of days in an inclusive range of dates. */
+export function rangeDays(from: string, to: string) {
+  return Math.round((Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) / DAY_MS) + 1;
+}

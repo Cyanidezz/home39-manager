@@ -48,3 +48,28 @@ describe("month helpers", () => {
     expect(monthDates("2026-10")[30]).toBe("2026-10-31");
   });
 });
+
+import { parseDateRange, rangeDays } from "./meter";
+
+describe("parseDateRange", () => {
+  const today = "2026-10-19";
+  it("orders the dates and keeps a single date as one day", () => {
+    expect(parseDateRange("2026-10-12", "2026-10-05", today)).toEqual({ from: "2026-10-05", to: "2026-10-12" });
+    expect(parseDateRange("2026-10-12", undefined, today)).toEqual({ from: "2026-10-12", to: "2026-10-12" });
+    expect(parseDateRange(undefined, "2026-10-12", today)).toEqual({ from: "2026-10-12", to: "2026-10-12" });
+  });
+  it("clamps to the start of the data and to today", () => {
+    expect(parseDateRange("2026-09-20", "2026-10-03", today)).toEqual({ from: "2026-10-01", to: "2026-10-03" });
+    expect(parseDateRange("2026-10-15", "2026-12-31", today)).toEqual({ from: "2026-10-15", to: today });
+  });
+  it("ignores unusable input", () => {
+    expect(parseDateRange("x", "2026-13-45", today)).toBeNull();
+    expect(parseDateRange(undefined, undefined, today)).toBeNull();
+    expect(parseDateRange("2026-09-01", "2026-09-30", today)).toBeNull();
+    expect(parseDateRange("2026-11-01", "2026-11-05", today)).toBeNull();
+  });
+  it("counts days inclusively", () => {
+    expect(rangeDays("2026-10-13", "2026-10-18")).toBe(6);
+    expect(rangeDays("2026-10-31", "2026-11-02")).toBe(3);
+  });
+});
