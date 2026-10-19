@@ -343,7 +343,7 @@ export default function ExpenseManager({
               ทั้งหมด {initialExpenses.length} รายการ
             </p>
           </div>
-          <p className="text-right">
+          <p className="sm:text-right">
             <span className="block text-sm text-sand-500">รวมรายจ่าย</span>
             <strong className="text-2xl text-red-700">{formatMoney(total)} บาท</strong>
           </p>
@@ -367,8 +367,8 @@ export default function ExpenseManager({
                     {expense.note ? ` · ${expense.note}` : ""}
                   </p>
                 </div>
-                <div className="mt-3 flex items-center justify-between gap-3 sm:mt-0">
-                  <strong className="whitespace-nowrap">{formatMoney(expense.amount)} บาท</strong>
+                <div className="mt-3 flex flex-wrap items-center gap-2 sm:mt-0 sm:flex-nowrap sm:justify-between sm:gap-3">
+                  <strong className="w-full whitespace-nowrap sm:w-auto">{formatMoney(expense.amount)} บาท</strong>
                   {expense.receipt_path && (
                     <button
                       type="button"
