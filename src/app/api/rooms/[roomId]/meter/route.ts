@@ -73,3 +73,24 @@ export async function DELETE(request: Request, context: Params) {
   }
   return NextResponse.json({ ok: true });
 }
+
+/** Use the smart meter's figure for a day that was typed in by hand. */
+export async function PATCH(request: Request, context: Params) {
+  const checked = await guard(request, context);
+  if ("response" in checked) return checked.response;
+
+  const body = await readBody(request);
+  const date = typeof body?.date === "string" && datePattern.test(body.date) ? body.date : null;
+  if (!date) return NextResponse.json({ error: "วันที่ไม่ถูกต้อง" }, { status: 400 });
+
+  const { error } = await createAdminClient().rpc("use_tuya_meter_usage", { p_room_id: checked.roomId, p_usage_date: date });
+  if (error) {
+    const known = error.message.includes("totals missing") || error.message.includes("went down");
+    if (!known) console.error("Use Tuya meter usage failed:", error);
+    return NextResponse.json(
+      { error: known ? "วันนี้ไม่มียอดสะสมจากมิเตอร์พอจะคำนวณ" : "เปลี่ยนไม่สำเร็จ" },
+      { status: known ? 409 : 500 }
+    );
+  }
+  return NextResponse.json({ ok: true });
+}

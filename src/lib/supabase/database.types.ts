@@ -1148,6 +1148,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      use_tuya_meter_usage: {
+        Args: { p_room_id: string; p_usage_date: string }
+        Returns: Json
+      }
     }
     Enums: {
       [_ in never]: never
