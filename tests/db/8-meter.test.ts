@@ -100,3 +100,23 @@ describe("8b. กรอกหน่วยไฟย้อนหลังเอง
     expect((await rows(db, "select 1 from meter_daily_usage")).length).toBe(0);
   });
 });
+
+describe("8c. เลือกใช้ค่าจากมิเตอร์แทนที่กรอกเอง", () => {
+  const useTuya = (date: string) => one<{ r: { ok: boolean; kwh: number } }>(db, "select use_tuya_meter_usage($1,$2) r", [roomId, date]).then((row) => row.r);
+
+  it("เปลี่ยนวันที่กรอกเองให้เป็นค่าจากมิเตอร์ (ยอดสะสมวันนี้ ลบ เมื่อวาน)", async () => {
+    await record("2026-10-12", 363.568);
+    await record("2026-10-13", 368.766);
+    await manual("2026-10-13", 5, "จดจากจานหมุน");
+    expect(await useTuya("2026-10-13")).toEqual({ ok: true, kwh: 5.198 });
+    expect(await day("2026-10-13")).toMatchObject({ kwh: "5.198", source: "tuya", note: null, total: "368.766" });
+  });
+
+  it("ไม่ได้ถ้าขาดยอดสะสมของวันนั้นหรือเมื่อวาน หรือยอดลดลง", async () => {
+    await manual("2026-10-13", 5);
+    expect(await errorOf(() => useTuya("2026-10-13"))).toMatch(/totals missing/);
+    await record("2026-10-12", 500);
+    await record("2026-10-13", 10);
+    expect(await errorOf(() => useTuya("2026-10-13"))).toMatch(/went down/);
+  });
+});

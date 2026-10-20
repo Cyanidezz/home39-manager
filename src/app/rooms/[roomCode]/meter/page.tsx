@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/data/session";
 import { bangkokDate, currentPeriod, formatThaiDate, parsePeriod, thaiMonthNames } from "@/lib/format";
-import { METER_START_PERIOD, monthDates, parseDateRange, rangeDays, shiftPeriod, type MeterDay } from "@/lib/meter";
+import { addDays, differencePercent, METER_DIFF_WARN_PERCENT, METER_START_PERIOD, monthDates, parseDateRange, rangeDays, shiftPeriod, tuyaDayUsage, type MeterDay } from "@/lib/meter";
 import { fetchBillingContext } from "@/lib/data/roomPages";
 import { fetchBillingRates } from "@/lib/data/settings";
 import { computeMeterBill } from "@/lib/meterBilling";
@@ -46,17 +46,31 @@ export default async function MeterPage({ params, searchParams }: Props) {
     .eq("room_id", room.id)
     .gte("usage_date", dates[0])
     .lte("usage_date", dates[dates.length - 1]);
+  const { data: monthTotals } = await supabase
+    .from("meter_daily_usage")
+    .select("usage_date, end_total_kwh")
+    .eq("room_id", room.id)
+    .not("end_total_kwh", "is", null)
+    .gte("usage_date", addDays(dates[0], -1))
+    .lte("usage_date", dates[dates.length - 1]);
+  const totalsByDate: Record<string, number> = Object.fromEntries((monthTotals ?? []).map((row) => [row.usage_date, Number(row.end_total_kwh)]));
   const byDate = new Map((data ?? ([] as MeterDay[])).map((row) => [row.usage_date, row]));
 
   const today = bangkokDate();
   const views: MeterDayView[] = dates.map((date) => {
     const row = byDate.get(date);
+    const kwh = row && row.kwh !== null ? Number(row.kwh) : null;
+    // A typed-in day can be compared with what the smart meter counted.
+    const tuyaKwh = row?.source === "manual" ? tuyaDayUsage(totalsByDate, date) : null;
     return {
       date,
       day: String(Number(date.slice(8))),
       weekday: weekdayFormat.format(new Date(`${date}T00:00:00Z`)),
       future: date > today,
-      kwh: row && row.kwh !== null ? Number(row.kwh) : null,
+      kwh,
+      tuyaKwh,
+      diffPercent: kwh !== null && tuyaKwh !== null ? differencePercent(kwh, tuyaKwh) : null,
+      warnPercent: METER_DIFF_WARN_PERCENT,
       hasRow: Boolean(row),
       source: row?.source ?? null,
       note: row?.note ?? null,

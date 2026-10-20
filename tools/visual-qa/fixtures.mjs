@@ -129,6 +129,12 @@ const meterUsage = [1, 2, 3, 5, 6, 8, 9, 12].map((d, i) => ({
   kwh: [8.4, 9.1, 7.7, 12.3, 10, 9.6, 14.25, 11][i], end_total_kwh: null, source: i < 6 ? "manual" : "tuya", note: i === 0 ? "ตั้งแต่ต้นเดือน" : null,
 }));
 
+// tuyaCompare: a typed-in day that has Tuya totals on it and the day before, to show the comparison.
+meterUsage.push(
+  { room_id: rooms[0].id, usage_date: `${meterMonth}-13`, kwh: 5, end_total_kwh: 368.766, source: "manual", note: "จดจากจานหมุน" },
+  { room_id: rooms[0].id, usage_date: `${meterMonth}-12`, kwh: 5.01, end_total_kwh: 363.568, source: "tuya", note: null },
+);
+
 export const tables = {
   meter_daily_usage: meterUsage,
   move_out_settlements: settlements,

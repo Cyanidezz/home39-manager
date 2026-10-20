@@ -15,6 +15,10 @@ export type MeterDayView = {
   hasRow: boolean;
   source: string | null;
   note: string | null;
+  /** What the smart meter counted for a typed-in day, when its totals are there. */
+  tuyaKwh: number | null;
+  diffPercent: number | null;
+  warnPercent: number;
 };
 
 const input = "w-full rounded-lg border border-sand-300 bg-white px-3 py-2 text-sm";
@@ -44,6 +48,20 @@ export function MeterDayRow({ roomId, view, selected = false }: { roomId: string
     setBusy(false);
     if (!response.ok) return setError(body.error ?? "บันทึกไม่สำเร็จ");
     setEditing(false);
+    router.refresh();
+  }
+
+  async function useTuya() {
+    setBusy(true);
+    setError(null);
+    const response = await fetch(`/api/rooms/${roomId}/meter`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ date: view.date }),
+    });
+    const body = await response.json().catch(() => ({}));
+    setBusy(false);
+    if (!response.ok) return setError(body.error ?? "เปลี่ยนไม่สำเร็จ");
     router.refresh();
   }
 
@@ -103,6 +121,24 @@ export function MeterDayRow({ roomId, view, selected = false }: { roomId: string
             <button type="button" onClick={() => setEditing(true)} className="text-sm font-semibold text-brand-700 hover:underline">แก้ไข</button>
             <button type="button" onClick={remove} disabled={busy} className="text-sm font-semibold text-red-600 hover:underline disabled:opacity-60">ลบ</button>
           </span>
+          {view.tuyaKwh !== null && view.source === "manual" && (
+            <p className="flex w-full flex-wrap items-center gap-x-3 gap-y-1 text-sm text-sand-600">
+              <span>
+                Tuya นับได้ <strong>{kwhText(view.tuyaKwh)}</strong> kWh
+                {view.diffPercent !== null && (
+                  <span className={`ml-2 rounded-full px-2 py-0.5 text-xs font-medium ${Math.abs(view.diffPercent) <= view.warnPercent ? "bg-green-100 text-green-700" : "bg-orange-100 text-orange-700"}`}>
+                    ต่าง {view.diffPercent > 0 ? "+" : ""}{view.diffPercent}%
+                  </span>
+                )}
+              </span>
+              {view.diffPercent !== 0 && (
+                <button type="button" onClick={useTuya} disabled={busy} className="font-semibold text-brand-700 hover:underline disabled:opacity-60">
+                  ใช้ค่า Tuya
+                </button>
+              )}
+            </p>
+          )}
+          {error && <p role="alert" className="w-full text-sm text-red-600">{error}</p>}
         </div>
       )}
     </li>

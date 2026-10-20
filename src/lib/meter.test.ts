@@ -73,3 +73,20 @@ describe("parseDateRange", () => {
     expect(rangeDays("2026-10-31", "2026-11-02")).toBe(3);
   });
 });
+
+import { differencePercent, tuyaDayUsage } from "./meter";
+
+describe("tuya comparison", () => {
+  const totals = { "2026-10-12": 363.568, "2026-10-13": 368.766, "2026-10-15": 378.682 };
+  it("works out a day from two consecutive totals", () => {
+    expect(tuyaDayUsage(totals, "2026-10-13")).toBe(5.198);
+    expect(tuyaDayUsage(totals, "2026-10-14")).toBeNull();
+    expect(tuyaDayUsage(totals, "2026-10-15")).toBeNull();
+    expect(tuyaDayUsage({ "2026-10-12": 500, "2026-10-13": 10 }, "2026-10-13")).toBeNull();
+  });
+  it("gives the difference as a percent of the typed-in figure", () => {
+    expect(differencePercent(5, 5.2)).toBe(4);
+    expect(differencePercent(5.2, 5)).toBe(-3.8);
+    expect(differencePercent(0, 5)).toBeNull();
+  });
+});

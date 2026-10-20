@@ -29,6 +29,7 @@ const pendingMigrations = [
   { file: "20261019090000_meter_daily_usage.sql", marker: "public.meter_daily_usage" },
   // Only replaces functions (create or replace), so it has no table to look for and is simply applied every time.
   { file: "20261020090000_meter_keep_known_values.sql", marker: null },
+  { file: "20261020120000_use_tuya_meter_usage.sql", marker: null },
 ].map(({ file, marker }) => ({
   marker,
   sql: readFileSync(new URL(`../../supabase/migrations/${file}`, import.meta.url), "utf8"),

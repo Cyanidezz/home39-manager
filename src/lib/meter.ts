@@ -79,3 +79,19 @@ export function parseDateRange(from: string | undefined, to: string | undefined,
 export function rangeDays(from: string, to: string) {
   return Math.round((Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) / DAY_MS) + 1;
 }
+
+/** Usage the smart meter counted for a day (its total minus the day before's), or null when either total is missing or went down. */
+export function tuyaDayUsage(totals: Record<string, number>, date: string) {
+  const end = totals[date];
+  const start = totals[addDays(date, -1)];
+  if (end === undefined || start === undefined || end < start) return null;
+  return Math.round((end - start) * 1000) / 1000;
+}
+
+/** How far the smart meter is from a typed-in figure, in percent of the typed-in one; null when it can't be told. */
+export function differencePercent(manual: number, tuya: number) {
+  return manual > 0 ? Math.round(((tuya - manual) / manual) * 1000) / 10 : null;
+}
+
+/** Above this the two figures are shown as a warning. */
+export const METER_DIFF_WARN_PERCENT = 3;
