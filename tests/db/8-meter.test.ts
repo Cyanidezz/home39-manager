@@ -50,10 +50,20 @@ describe("8a. มิเตอร์ Tuya: เก็บยอดสะสมส�
     expect((await day("2026-10-20"))!.kwh).toBe("10.500");
   });
 
-  it("ไม่แตะวันที่กรอกเอง", async () => {
+  it("ไม่แตะหน่วยของวันที่กรอกเอง แต่เก็บยอดสะสมไว้ให้วันถัดไปคำนวณ", async () => {
     await manual("2026-10-19", 12);
     expect(await record("2026-10-19", 400)).toEqual({ ok: true, skipped: "manual" });
-    expect(await day("2026-10-19")).toMatchObject({ kwh: "12.000", total: null, source: "manual" });
+    expect(await day("2026-10-19")).toMatchObject({ kwh: "12.000", total: "400.000", source: "manual" });
+    expect((await record("2026-10-20", 410)).kwh).toBe(10);
+  });
+
+  it("ไม่ทับหน่วยที่มีอยู่แล้วด้วยค่าว่าง เมื่อรันซ้ำแล้วไม่มียอดของเมื่อวาน", async () => {
+    await record("2026-10-12", 363.568);
+    await record("2026-10-13", 368.766);
+    expect((await day("2026-10-13"))!.kwh).toBe("5.198");
+    await db.query("delete from meter_daily_usage where room_id=$1 and usage_date=$2", [roomId, "2026-10-12"]);
+    expect((await record("2026-10-13", 368.766)).kwh).toBe(5.198);
+    expect((await day("2026-10-13"))!.kwh).toBe("5.198");
   });
 
   it("ปฏิเสธยอดติดลบ", async () => {
@@ -71,11 +81,11 @@ describe("8b. กรอกหน่วยไฟย้อนหลังเอง
     expect(await day("2026-10-03")).toBeUndefined();
   });
 
-  it("กรอกทับวันที่มิเตอร์เก็บไว้ได้ และวันถัดไปที่ไม่มียอดสะสมก็ไม่คิดหน่วยต่อ", async () => {
+  it("กรอกทับวันที่มิเตอร์เก็บไว้ได้ ยอดสะสมของวันนั้นยังอยู่ วันถัดไปจึงคำนวณได้", async () => {
     await record("2026-10-19", 400);
     await manual("2026-10-19", 9);
-    expect(await day("2026-10-19")).toMatchObject({ kwh: "9.000", total: null, source: "manual" });
-    expect((await record("2026-10-20", 410)).kwh).toBeNull();
+    expect(await day("2026-10-19")).toMatchObject({ kwh: "9.000", total: "400.000", source: "manual" });
+    expect((await record("2026-10-20", 410)).kwh).toBe(10);
   });
 
   it("ไม่รับวันที่ในอนาคต ค่าติดลบ หรือห้องที่ไม่มี", async () => {

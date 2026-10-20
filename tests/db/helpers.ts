@@ -27,6 +27,8 @@ const pendingMigrations = [
   { file: "20261017200000_billing_integrity.sql", marker: "public.tenants_one_active_per_room" },
   { file: "20261018090000_move_out_settlement.sql", marker: "public.move_out_settlements" },
   { file: "20261019090000_meter_daily_usage.sql", marker: "public.meter_daily_usage" },
+  // Only replaces functions (create or replace), so it has no table to look for and is simply applied every time.
+  { file: "20261020090000_meter_keep_known_values.sql", marker: null },
 ].map(({ file, marker }) => ({
   marker,
   sql: readFileSync(new URL(`../../supabase/migrations/${file}`, import.meta.url), "utf8"),
@@ -45,8 +47,8 @@ export async function createDatabase() {
     await shared.exec(supabaseStubs);
     await shared.exec(baseline);
     for (const { marker, sql } of pendingMigrations) {
-      const present = await shared.query<{ found: string | null }>("select to_regclass($1) as found", [marker]);
-      if (!present.rows[0].found) await shared.exec(sql);
+      const present = marker ? await shared.query<{ found: string | null }>("select to_regclass($1) as found", [marker]) : null;
+      if (!present?.rows[0].found) await shared.exec(sql);
     }
   }
   const tables = await shared.query<{ tablename: string }>("select tablename from pg_tables where schemaname = 'public'");
