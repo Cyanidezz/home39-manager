@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Home 39 - Hatyai",
+    default: "Home 39 Hatyai - หอพักหญิง HOME 39 ใกล้ ญว.",
     template: "%s | Home 39",
   },
   description: "ห้องพัก Home 39 หาดใหญ่ พร้อมข้อมูลห้องว่างและช่องทางติดต่อ",
